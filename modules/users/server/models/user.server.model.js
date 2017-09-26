@@ -28,6 +28,13 @@ var validateLocalStrategyEmail = function (email) {
  * User Schema
  */
 var UserSchema = new Schema({
+  username: {
+    type: String,
+    unique: 'Username already exists',
+    required: 'Please fill in a username',
+    lowercase: true,
+    trim: true
+  },
   firstName: {
     type: String,
     trim: true,
@@ -40,9 +47,16 @@ var UserSchema = new Schema({
     default: '',
     validate: [validateLocalStrategyProperty, 'Please fill in your last name']
   },
-  displayName: {
-    type: String,
-    trim: true
+  birthday: {
+	  type: Date,
+	  required: true
+  },
+  gender: {
+	  type: String,
+	  required: true
+  },
+  department: {
+	  type: String
   },
   email: {
     type: String,
@@ -52,13 +66,6 @@ var UserSchema = new Schema({
     default: '',
     validate: [validateLocalStrategyEmail, 'Please fill a valid email address']
   },
-  username: {
-    type: String,
-    unique: 'Username already exists',
-    required: 'Please fill in a username',
-    lowercase: true,
-    trim: true
-  },
   password: {
     type: String,
     default: ''
@@ -66,20 +73,10 @@ var UserSchema = new Schema({
   salt: {
     type: String
   },
-  profileImageURL: {
-    type: String,
-    default: 'modules/users/client/img/profile/default.png'
-  },
-  provider: {
-    type: String,
-    required: 'Provider is required'
-  },
-  providerData: {},
-  additionalProvidersData: {},
   roles: {
     type: [{
       type: String,
-      enum: ['user', 'admin']
+      enum: ['user', 'researcher', 'faculty', 'admin']
     }],
     default: ['user'],
     required: 'Please provide at least one role'
@@ -177,7 +174,7 @@ UserSchema.statics.generateRandomPassphrase = function () {
     var password = '';
     var repeatingCharacters = new RegExp('(.)\\1{2,}', 'g');
 
-    // iterate until the we have a valid passphrase. 
+    // iterate until the we have a valid passphrase.
     // NOTE: Should rarely iterate more than once, but we need this to ensure no repeating characters are present.
     while (password.length < 20 || repeatingCharacters.test(password)) {
       // build the random password
