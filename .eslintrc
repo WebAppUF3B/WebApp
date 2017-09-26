@@ -14,7 +14,7 @@
     "arrow-body-style": 0,
     "global-require": 0,
     "react/sort-comp": 0,
-    "max-len": ['error', 130, 2, {
+    "max-len": [2, 130, 2, {
       ignoreUrls: true,
       ignoreComments: false
     }]
