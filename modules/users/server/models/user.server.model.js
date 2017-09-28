@@ -48,15 +48,15 @@ var UserSchema = new Schema({
     validate: [validateLocalStrategyProperty, 'Please fill in your last name']
   },
   birthday: {
-	  type: Date,
-	  required: true
+    type: Date,
+    required: true
   },
   gender: {
-	  type: String,
-	  required: true
+    type: String,
+    required: true
   },
   department: {
-	  type: String
+    type: String
   },
   email: {
     type: String,

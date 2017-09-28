@@ -3,33 +3,33 @@ var mongoose = require('mongoose'),
 
 var studySchema = new Schema({
   title: {
-	  type: String,
-	  required: true
+    type: String,
+    required: true
   },
   description: {
-	  type: String
+    type: String
   },
   irb: {
-	  type: String,
-	  required: true
+    type: String,
+    required: true
   },
   location: {
-	  room: String,
-	  building: String,
-	  Aadress: String
+    room: String,
+    building: String,
+    Aadress: String
   },
   maxParticipants: {
-	  type: Number
+    type: Number
   },
   maxParticipantsPerSession: {
-	  type: Number
+    type: Number
   },
   compensationType: {
-	  type: String,
-	  required: true
+    type: String,
+    required: true
   },
   availablity: [{
-	  slot: Date,
+    slot: Date,
   }],
   createdOn: Date,
   updated: Date
@@ -37,41 +37,42 @@ var studySchema = new Schema({
 
 var studySchema = new Schema({
   title: {
-	  type: String,
-	  required: true
+    type: String,
+    required: true
   },
   description: {
-	  type: String
+    type: String
   },
   irb: {
-	  type: String,
-	  required: true
+    type: String,
+    required: true
   },
   location: {
-	  room: String,
-	  building: String,
-	  Aadress: String
+    room: String,
+    building: String,
+    Address: String
   },
   maxParticipants: {
-	  type: Number
+    type: Number
   },
   maxParticipantsPerSession: {
-	  type: Number
+    type: Number
   },
   compensationType: {
-	  type: String,
-	  required: true
+    type: String,
+    required: true
   },
   availability: [{
-	  slot: Date,
+    slot: Date,
   }],
   sessions: [{
-	  participants: [{ userID: Number }],
-	  researcher: Number,
-	  time: Date,
-	  compensation: String,
-	  completed: Boolean,
-	  compensationGiven: Boolean
+    participants: [{ userID: Number }],
+    researcher: Number,
+    time: Date,
+    compensation: String,
+    completed: Boolean,
+    participantAttended: Boolean,
+    compensationGiven: Boolean
   }],
   createdOn: Date,
   updated: Date
@@ -84,7 +85,7 @@ studySchema.pre('save', function(next) {
   var current = new Date();
   this.updated = current;
   if(!this.createdOn) {
-	  this.createdOn = current;
+    this.createdOn = current;
   }
   next();
 });
