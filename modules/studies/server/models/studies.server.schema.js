@@ -33,12 +33,11 @@ var studySchema = new Schema({
     slot: Date,
   }],
   sessions: [{
-    participants: [{ userID: Number }],
+    participants: [{ userID: Number, attended: Boolean }],
     researcher: Number,
     time: Date,
     compensation: String,
     completed: Boolean,
-    participantAttended: Boolean,
     compensationGiven: Boolean
   }],
   createdOn: Date,
