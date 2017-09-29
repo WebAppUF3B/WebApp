@@ -3,30 +3,33 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
-  Schema = mongoose.Schema,
-  crypto = require('crypto'),
-  validator = require('validator'),
-  generatePassword = require('generate-password'),
-  owasp = require('owasp-password-strength-test');
+
+const mongoose = require('mongoose');
+const crypto = require('crypto');
+const validator = require('validator');
+const generatePassword = require('generate-password');
+const owasp = require('owasp-password-strength-test');
+
+const Schema = mongoose.Schema;
 
 /**
  * A Validation function for local strategy properties
  */
-var validateLocalStrategyProperty = function (property) {
+const validateLocalStrategyProperty = function (property) {
   return ((this.provider !== 'local' && !this.updated) || property.length);
 };
 
 /**
  * A Validation function for local strategy email
  */
-var validateLocalStrategyEmail = function (email) {
+const validateLocalStrategyEmail = function (email) {
   return ((this.provider !== 'local' && !this.updated) || validator.isEmail(email));
 };
 
 /**
  * User Schema
  */
+
 var userSchema = new Schema({
   username: {
     type: String,
@@ -114,13 +117,12 @@ userSchema.pre('save', function (next) {
  */
 userSchema.pre('validate', function (next) {
   if (this.provider === 'local' && this.password && this.isModified('password')) {
-    var result = owasp.test(this.password);
+    const result = owasp.test(this.password);
     if (result.errors.length) {
-      var error = result.errors.join(' ');
+      const error = result.errors.join(' ');
       this.invalidate('password', error);
     }
   }
-
   next();
 });
 
@@ -130,9 +132,8 @@ userSchema.pre('validate', function (next) {
 userSchema.methods.hashPassword = function (password) {
   if (this.salt && password) {
     return crypto.pbkdf2Sync(password, new Buffer(this.salt, 'base64'), 10000, 64).toString('base64');
-  } else {
-    return password;
   }
+  return password;
 };
 
 /**
@@ -145,13 +146,15 @@ userSchema.methods.authenticate = function (password) {
 /**
  * Find possible not used username
  */
+
 userSchema.statics.findUniqueUsername = function (username, suffix, callback) {
   var _this = this;
   var possibleUsername = username.toLowerCase() + (suffix || '');
 
+
   _this.findOne({
     username: possibleUsername
-  }, function (err, user) {
+  }, (err, user) => {
     if (!err) {
       if (!user) {
         callback(possibleUsername);
@@ -169,6 +172,7 @@ userSchema.statics.findUniqueUsername = function (username, suffix, callback) {
 * Returns a promise that resolves with the generated passphrase, or rejects with an error if something goes wrong.
 * NOTE: Passphrases are only tested against the required owasp strength tests, and not the optional tests.
 */
+
 userSchema.statics.generateRandomPassphrase = function () {
   return new Promise(function (resolve, reject) {
     var password = '';
