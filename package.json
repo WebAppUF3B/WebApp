@@ -15,8 +15,8 @@
     "npm": ">=1.4.28"
   },
   "scripts": {
-    "start": "grunt --force",
-    "test": "grunt test --force",
+    "start": "grunt",
+    "test": "grunt test",
     "postinstall": "bower install --config.interactive=false"
   },
   "dependencies": {
@@ -66,8 +66,6 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.4",
-    "eslint": "^4.7.2",
-    "eslint-config-rallycoding": "^3.2.0",
     "grunt-concurrent": "^2.0.0",
     "grunt-contrib-copy": "~0.8.0",
     "grunt-contrib-csslint": "~0.4.0",
