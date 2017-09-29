@@ -16,7 +16,7 @@ var studySchema = new Schema({
   location: {
     room: String,
     building: String,
-    Aadress: String
+    address: String
   },
   maxParticipants: {
     type: Number
@@ -26,40 +26,7 @@ var studySchema = new Schema({
   },
   compensationType: {
     type: String,
-    required: true
-  },
-  availablity: [{
-    slot: Date,
-  }],
-  createdOn: Date,
-  updated: Date
-});
-
-var studySchema = new Schema({
-  title: {
-    type: String,
-    required: true
-  },
-  description: {
-    type: String
-  },
-  irb: {
-    type: String,
-    required: true
-  },
-  location: {
-    room: String,
-    building: String,
-    Address: String
-  },
-  maxParticipants: {
-    type: Number
-  },
-  maxParticipantsPerSession: {
-    type: Number
-  },
-  compensationType: {
-    type: String,
+    enum: ['extraCredit', 'monetary'],
     required: true
   },
   availability: [{
@@ -81,7 +48,6 @@ var studySchema = new Schema({
 
 /* create a 'pre' function that adds the updated_at (and created_at if not already there) property */
 studySchema.pre('save', function(next) {
-  /* your code here */
   var current = new Date();
   this.updated = current;
   if(!this.createdOn) {
