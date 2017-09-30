@@ -11,11 +11,11 @@
     "url": "https://github.com/meanjs/mean.git"
   },
   "engines": {
-    "node": ">=0.10.28",
+    "node": "6.x.x",
     "npm": ">=1.4.28"
   },
   "scripts": {
-    "start": "grunt",
+    "start": "grunt --force",
     "test": "grunt test",
     "postinstall": "bower install --config.interactive=false"
   },
