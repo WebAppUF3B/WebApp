@@ -11,7 +11,7 @@
     "url": "https://github.com/meanjs/mean.git"
   },
   "engines": {
-    "node": ">=6.1.13",
+    "node": "6.x.x",
     "npm": ">=1.4.28"
   },
   "scripts": {
