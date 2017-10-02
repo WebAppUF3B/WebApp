@@ -3,8 +3,9 @@
 /**
  * Module dependencies.
  */
-var _ = require('lodash'),
+const _ = require('lodash'),
   defaultAssets = require('./config/assets/default'),
+  mongoose = require('./config/lib/mongoose.js'),
   testAssets = require('./config/assets/test'),
   gulp = require('gulp'),
   gulpLoadPlugins = require('gulp-load-plugins'),
@@ -17,26 +18,26 @@ var _ = require('lodash'),
   path = require('path'),
   endOfLine = require('os').EOL,
   protractor = require('gulp-protractor').protractor,
-  webdriver_update = require('gulp-protractor').webdriver_update,
-  webdriver_standalone = require('gulp-protractor').webdriver_standalone;
+  webdriverUpdate = require('gulp-protractor').webdriver_update,
+  webdriverStandalone = require('gulp-protractor').webdriver_standalone;
 
 // Set NODE_ENV to 'test'
-gulp.task('env:test', function () {
+gulp.task('env:test', () => {
   process.env.NODE_ENV = 'test';
 });
 
 // Set NODE_ENV to 'development'
-gulp.task('env:dev', function () {
+gulp.task('env:dev', () => {
   process.env.NODE_ENV = 'development';
 });
 
 // Set NODE_ENV to 'production'
-gulp.task('env:prod', function () {
+gulp.task('env:prod', () => {
   process.env.NODE_ENV = 'production';
 });
 
 // Nodemon task
-gulp.task('nodemon', function () {
+gulp.task('nodemon', () => {
   return plugins.nodemon({
     script: 'server.js',
     nodeArgs: ['--debug'],
@@ -46,7 +47,7 @@ gulp.task('nodemon', function () {
 });
 
 // Watch Files For Changes
-gulp.task('watch', function () {
+gulp.task('watch', () => {
   // Start livereload
   plugins.livereload.listen();
 
@@ -68,11 +69,11 @@ gulp.task('watch', function () {
 });
 
 // CSS linting task
-gulp.task('csslint', function (done) {
+gulp.task('csslint', (done) => {
   return gulp.src(defaultAssets.client.css)
     .pipe(plugins.csslint('.csslintrc'))
     .pipe(plugins.csslint.reporter())
-    .pipe(plugins.csslint.reporter(function (file) {
+    .pipe(plugins.csslint.reporter((file) => {
       if (!file.csslint.errorCount) {
         done();
       }
@@ -80,8 +81,8 @@ gulp.task('csslint', function (done) {
 });
 
 // JS linting task
-gulp.task('jshint', function () {
-  var assets = _.union(
+gulp.task('jshint', () => {
+  const assets = _.union(
     defaultAssets.server.gulpConfig,
     defaultAssets.server.allJS,
     defaultAssets.client.js,
@@ -97,8 +98,8 @@ gulp.task('jshint', function () {
 });
 
 // ESLint JS linting task
-gulp.task('eslint', function () {
-  var assets = _.union(
+gulp.task('eslint', () => {
+  const assets = _.union(
     defaultAssets.server.gulpConfig,
     defaultAssets.server.allJS,
     defaultAssets.client.js,
@@ -113,8 +114,8 @@ gulp.task('eslint', function () {
 });
 
 // JS minifying task
-gulp.task('uglify', function () {
-  var assets = _.union(
+gulp.task('uglify', () => {
+  const assets = _.union(
     defaultAssets.client.js,
     defaultAssets.client.templates
   );
@@ -129,7 +130,7 @@ gulp.task('uglify', function () {
 });
 
 // CSS minifying task
-gulp.task('cssmin', function () {
+gulp.task('cssmin', () => {
   return gulp.src(defaultAssets.client.css)
     .pipe(plugins.cssmin())
     .pipe(plugins.concat('application.min.css'))
@@ -137,30 +138,30 @@ gulp.task('cssmin', function () {
 });
 
 // Sass task
-gulp.task('sass', function () {
+gulp.task('sass', () => {
   return gulp.src(defaultAssets.client.sass)
     .pipe(plugins.sass())
     .pipe(plugins.autoprefixer())
-    .pipe(plugins.rename(function (file) {
+    .pipe(plugins.rename((file) => {
       file.dirname = file.dirname.replace(path.sep + 'scss', path.sep + 'css');
     }))
     .pipe(gulp.dest('./modules/'));
 });
 
 // Less task
-gulp.task('less', function () {
+gulp.task('less', () => {
   return gulp.src(defaultAssets.client.less)
     .pipe(plugins.less())
     .pipe(plugins.autoprefixer())
-    .pipe(plugins.rename(function (file) {
+    .pipe(plugins.rename((file) => {
       file.dirname = file.dirname.replace(path.sep + 'less', path.sep + 'css');
     }))
     .pipe(gulp.dest('./modules/'));
 });
 
 // Angular template cache task
-gulp.task('templatecache', function () {
-  var re = new RegExp('\\' + path.sep + 'client\\' + path.sep, 'g');
+gulp.task('templatecache', () => {
+  const re = new RegExp('\\' + path.sep + 'client\\' + path.sep, 'g');
 
   return gulp.src(defaultAssets.client.views)
     .pipe(plugins.templateCache('templates.js', {
@@ -177,13 +178,12 @@ gulp.task('templatecache', function () {
 });
 
 // Mocha tests task
-gulp.task('mocha', function (done) {
+gulp.task('mocha', (done) => {
   // Open mongoose connections
-  var mongoose = require('./config/lib/mongoose.js');
-  var error;
+  let error;
 
   // Connect mongoose
-  mongoose.connect(function () {
+  mongoose.connect(() => {
     mongoose.loadModels();
     // Run the tests
     gulp.src(testAssets.tests.server)
@@ -191,13 +191,13 @@ gulp.task('mocha', function (done) {
         reporter: 'spec',
         timeout: 10000
       }))
-      .on('error', function (err) {
+      .on('error', (err) => {
         // If an error occurs, save it
         error = err;
       })
-      .on('end', function () {
+      .on('end', () => {
         // When the tests are done, disconnect mongoose and pass the error state back to gulp
-        mongoose.disconnect(function () {
+        mongoose.disconnect(() => {
           done(error);
         });
       });
@@ -206,7 +206,7 @@ gulp.task('mocha', function (done) {
 });
 
 // Karma test runner task
-gulp.task('karma', function (done) {
+gulp.task('karma', (done) => {
   return gulp.src([])
     .pipe(plugins.karma({
       configFile: 'karma.conf.js',
@@ -216,12 +216,10 @@ gulp.task('karma', function (done) {
 });
 
 // Drops the MongoDB database, used in e2e testing
-gulp.task('dropdb', function (done) {
+gulp.task('dropdb', (done) => {
   // Use mongoose configuration
-  var mongoose = require('./config/lib/mongoose.js');
-
-  mongoose.connect(function (db) {
-    db.connection.db.dropDatabase(function (err) {
+  mongoose.connect((db) => {
+    db.connection.db.dropDatabase((err) => {
       if(err) {
         console.log(err);
       } else {
@@ -233,68 +231,68 @@ gulp.task('dropdb', function (done) {
 });
 
 // Downloads the selenium webdriver
-gulp.task('webdriver_update', webdriver_update);
+gulp.task('webdriver_update', webdriverUpdate);
 
 // Start the standalone selenium server
 // NOTE: This is not needed if you reference the
 // seleniumServerJar in your protractor.conf.js
-gulp.task('webdriver_standalone', webdriver_standalone);
+gulp.task('webdriver_standalone', webdriverStandalone);
 
 // Protractor test runner task
-gulp.task('protractor', ['webdriver_update'], function () {
+gulp.task('protractor', ['webdriver_update'], () => {
   gulp.src([])
     .pipe(protractor({
       configFile: 'protractor.conf.js'
     }))
-    .on('end', function() {
+    .on('end', () => {
       console.log('E2E Testing complete');
       // exit with success.
       process.exit(0);
     })
-    .on('error', function(err) {
+    .on('error', (err) => {
       console.log('E2E Tests failed');
       process.exit(1);
     });
 });
 
 // Lint CSS and JavaScript files.
-gulp.task('lint', function (done) {
+gulp.task('lint', (done) => {
   runSequence('less', 'sass', ['csslint', 'eslint', 'jshint'], done);
 });
 
 // Lint project files and minify them into two production files.
-gulp.task('build', function (done) {
+gulp.task('build', (done) => {
   runSequence('env:dev', 'lint', ['uglify', 'cssmin'], done);
 });
 
 // Run the project tests
-gulp.task('test', function (done) {
+gulp.task('test', (done) => {
   runSequence('env:test', 'lint', 'mocha', 'karma', 'nodemon', 'protractor', done);
 });
 
-gulp.task('test:server', function (done) {
+gulp.task('test:server', (done) => {
   runSequence('env:test', 'lint', 'mocha', done);
 });
 
-gulp.task('test:client', function (done) {
+gulp.task('test:client', (done) => {
   runSequence('env:test', 'lint', 'karma', done);
 });
 
-gulp.task('test:e2e', function (done) {
+gulp.task('test:e2e', (done) => {
   runSequence('env:test', 'lint', 'dropdb', 'nodemon', 'protractor', done);
 });
 
 // Run the project in development mode
-gulp.task('default', function (done) {
+gulp.task('default', (done) => {
   runSequence('env:dev', 'lint', ['nodemon', 'watch'], done);
 });
 
 // Run the project in debug mode
-gulp.task('debug', function (done) {
+gulp.task('debug', (done) => {
   runSequence('env:dev', 'lint', ['nodemon', 'watch'], done);
 });
 
 // Run the project in production mode
-gulp.task('prod', function (done) {
+gulp.task('prod', (done) => {
   runSequence('templatecache', 'build', 'env:prod', 'lint', ['nodemon', 'watch'], done);
 });
