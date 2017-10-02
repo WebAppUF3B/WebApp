@@ -8,18 +8,17 @@ angular.module('users')
         passwordVerify: '='
       },
       link: function(scope, element, attrs, ngModel) {
-        var status = true;
-        scope.$watch(function() {
-          var combined;
+        scope.$watch(() => {
+          let combined;
           if (scope.passwordVerify || ngModel) {
             combined = scope.passwordVerify + '_' + ngModel;
           }
           return combined;
-        }, function(value) {
+        }, (value) => {
           if (value) {
             ngModel.$validators.passwordVerify = function (password) {
-              var origin = scope.passwordVerify;
-              return (origin !== password) ? false : true;
+              const origin = scope.passwordVerify;
+              return origin === password;
             };
           }
         });
