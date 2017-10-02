@@ -3,7 +3,8 @@
 /**
  * Module dependencies.
  */
-var _ = require('lodash'),
+const _ = require('lodash'),
+  mongoose = require('./config/lib/mongoose.js'),
   defaultAssets = require('./config/assets/default'),
   testAssets = require('./config/assets/test'),
   testConfig = require('./config/env/test'),
@@ -182,7 +183,7 @@ module.exports = function (grunt) {
         timeout: 10000
       }
     },
-    mocha_istanbul: {
+    mochaIstanbul: {
       coverage: {
         src: testAssets.tests.server,
         options: {
@@ -254,13 +255,10 @@ module.exports = function (grunt) {
   // Connect to the MongoDB instance and load the models
   grunt.task.registerTask('mongoose', 'Task that connects to the MongoDB instance and loads the application models.', function () {
     // Get the callback
-    var done = this.async();
-
-    // Use mongoose configuration
-    var mongoose = require('./config/lib/mongoose.js');
+    const done = this.async();
 
     // Connect to database
-    mongoose.connect(function (db) {
+    mongoose.connect((db) => {
       done();
     });
   });
@@ -270,11 +268,8 @@ module.exports = function (grunt) {
     // async mode
     var done = this.async();
 
-    // Use mongoose configuration
-    var mongoose = require('./config/lib/mongoose.js');
-
-    mongoose.connect(function (db) {
-      db.connection.db.dropDatabase(function (err) {
+    mongoose.connect((db) => {
+      db.connection.db.dropDatabase((err) => {
         if (err) {
           console.log(err);
         } else {
@@ -297,24 +292,24 @@ module.exports = function (grunt) {
   });
 
   // Lint CSS and JavaScript files.
-  grunt.registerTask('lint', ['sass', 'less', 'jshint', 'eslint', 'csslint']);
+  grunt.registerTask(['sass', 'less', 'jshint', 'eslint', 'csslint']);
 
   // Lint project files and minify them into two production files.
-  grunt.registerTask('build', ['env:dev', 'lint', 'ngAnnotate', 'uglify', 'cssmin']);
+  grunt.registerTask('build', ['env:dev', 'ngAnnotate', 'uglify', 'cssmin']);
 
   // Run the project tests
-  grunt.registerTask('test', ['env:test', 'lint', 'mkdir:upload', 'copy:localConfig', 'server', 'mochaTest', 'karma:unit', 'protractor']);
-  grunt.registerTask('test:server', ['env:test', 'lint', 'server', 'mochaTest']);
-  grunt.registerTask('test:client', ['env:test', 'lint', 'karma:unit']);
-  grunt.registerTask('test:e2e', ['env:test', 'lint', 'dropdb', 'server', 'protractor']);
+  grunt.registerTask('test', ['env:test', 'mkdir:upload', 'copy:localConfig', 'server', 'mochaTest', 'karma:unit', 'protractor']);
+  grunt.registerTask('test:server', ['env:test', 'server', 'mochaTest']);
+  grunt.registerTask('test:client', ['env:test', 'karma:unit']);
+  grunt.registerTask('test:e2e', ['env:test', 'dropdb', 'server', 'protractor']);
   // Run project coverage
-  grunt.registerTask('coverage', ['env:test', 'lint', 'mocha_istanbul:coverage', 'karma:unit']);
+  grunt.registerTask('coverage', ['env:test', 'mochaIstanbul:coverage', 'karma:unit']);
 
   // Run the project in development mode
-  grunt.registerTask('default', ['env:dev', 'lint', 'mkdir:upload', 'copy:localConfig', 'concurrent:default']);
+  grunt.registerTask('default', ['env:dev', 'mkdir:upload', 'copy:localConfig', 'concurrent:default']);
 
   // Run the project in debug mode
-  grunt.registerTask('debug', ['env:dev', 'lint', 'mkdir:upload', 'copy:localConfig', 'concurrent:debug']);
+  grunt.registerTask('debug', ['env:dev', 'mkdir:upload', 'copy:localConfig', 'concurrent:debug']);
 
   // Run the project in production mode
   grunt.registerTask('prod', ['build', 'env:prod', 'mkdir:upload', 'copy:localConfig', 'concurrent:default']);
