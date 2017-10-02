@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var config = require('../config'),
+const config = require('../config'),
   chalk = require('chalk'),
   path = require('path'),
   mongoose = require('mongoose');
@@ -11,8 +11,8 @@ var config = require('../config'),
 // Load the mongoose models
 module.exports.loadModels = function (callback) {
   // Globbing model files
-  config.files.server.models.forEach(function (modelPath) {
-    require(path.resolve(modelPath));
+  config.files.server.models.forEach((modelPath) => {
+    require(path.resolve(modelPath)); // eslint-disable-line
   });
 
   if (callback) callback();
@@ -20,9 +20,7 @@ module.exports.loadModels = function (callback) {
 
 // Initialize Mongoose
 module.exports.connect = function (cb) {
-  var _this = this;
-  console.log('db:', process.env.MONGOLAB_URI);
-  var db = mongoose.connect(config.db.uri, config.db.options, function (err) {
+  const db = mongoose.connect(config.db.uri, config.db.options, (err) => {
     // Log Error
     if (err) {
       console.error(chalk.red('Could not connect to MongoDB!'));
@@ -39,7 +37,7 @@ module.exports.connect = function (cb) {
 };
 
 module.exports.disconnect = function (cb) {
-  mongoose.disconnect(function (err) {
+  mongoose.disconnect((err) => {
     console.info(chalk.yellow('Disconnected from MongoDB.'));
     cb(err);
   });
