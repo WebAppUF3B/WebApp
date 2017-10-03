@@ -26,6 +26,17 @@
           </div>
         </div>
         <div class="form-group" show-errors>
+          <label for="birthday">Birthday</label>
+              <div class='input-group date' id='birthday'>
+                  <input type='text' class="form-control" />
+                  <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-time"></span>
+                  </span>
+                </div>
+          </div>
+
+
+        <div class="form-group" show-errors>
           <label for="username">Username</label>
           <input type="text" id="username" name="username" class="form-control" ng-model="credentials.username" placeholder="Username" lowercase required>
           <div ng-messages="userForm.username.$error" role="alert">
@@ -57,4 +68,13 @@
       </fieldset>
     </form>
   </div>
+  
+  <script type="text/javascript">
+    $(function () {
+        $('#birthday').datetimepicker({
+            format: 'L'
+        });
+    });
+</script>
+
 </div>
