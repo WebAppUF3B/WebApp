@@ -153,7 +153,7 @@ h2, h3, h4, h5, h6 {
 
 footer {
   background: url(/images/footer_wrap.jpg) repeat-x scroll 0 top white;
-  margin-top: auto;
+  margin-top: 50px;
 }
 
 footer .uf-monogram {
