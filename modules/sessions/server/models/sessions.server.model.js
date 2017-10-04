@@ -3,11 +3,15 @@ const mongoose = require('mongoose'),
 
 const sessionSchema = new Schema({
   participants: [{
-    userID: Number,
+    userID: ObjectID,
     attended: Boolean,
     compensationType: String,
+    enum: ['extraCredit', 'monetary'],
     compensationGiven: Boolean
   }],
+  studyID: {
+    type: ObjectID
+  },
   researchers: [{
     researcherID: Number
   }],

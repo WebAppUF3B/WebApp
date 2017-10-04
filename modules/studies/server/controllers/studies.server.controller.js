@@ -73,6 +73,17 @@ exports.delete = function(req, res) {
   })
 };
 
+/* TODO Make sure this function actually has access to ID without using middleware, also make sure that "find" gets all studies where 1 user id matches*/
+exports.getUserStudies = function(req, res, id) {
+  Session.find({ 'researchers.researcherID': id }).exec((err, studies) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.json(studies);
+    }
+  });
+};
+
 /*
   Middleware: find a study by its ID, then pass it to the next request handler.
  */
