@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+const mongoose = require('mongoose'),
   Schema = mongoose.Schema,
   crypto = require('crypto'),
   validator = require('validator'),
@@ -13,21 +13,21 @@ var mongoose = require('mongoose'),
 /**
  * A Validation function for local strategy properties
  */
-var validateLocalStrategyProperty = function (property) {
+const validateLocalStrategyProperty = function (property) {
   return ((this.provider !== 'local' && !this.updated) || property.length);
 };
 
 /**
  * A Validation function for local strategy email
  */
-var validateLocalStrategyEmail = function (email) {
+const validateLocalStrategyEmail = function (email) {
   return ((this.provider !== 'local' && !this.updated) || validator.isEmail(email));
 };
 
 /**
  * User Schema
  */
-var userSchema = new Schema({
+const userSchema = new Schema({
   username: {
     type: String,
     unique: 'Username already exists',
@@ -48,7 +48,7 @@ var userSchema = new Schema({
     validate: [validateLocalStrategyProperty, 'Please fill in your last name']
   },
   birthday: {
-    type: Date,
+    type: String,
     required: true
   },
   gender: {
@@ -66,9 +66,15 @@ var userSchema = new Schema({
     default: '',
     validate: [validateLocalStrategyEmail, 'Please fill a valid email address']
   },
+  emailValidated: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
   password: {
     type: String,
-    default: ''
+    default: '',
+    required: true
   },
   salt: {
     type: String
@@ -114,9 +120,9 @@ userSchema.pre('save', function (next) {
  */
 userSchema.pre('validate', function (next) {
   if (this.provider === 'local' && this.password && this.isModified('password')) {
-    var result = owasp.test(this.password);
+    const result = owasp.test(this.password);
     if (result.errors.length) {
-      var error = result.errors.join(' ');
+      const error = result.errors.join(' ');
       this.invalidate('password', error);
     }
   }
@@ -130,9 +136,9 @@ userSchema.pre('validate', function (next) {
 userSchema.methods.hashPassword = function (password) {
   if (this.salt && password) {
     return crypto.pbkdf2Sync(password, new Buffer(this.salt, 'base64'), 10000, 64).toString('base64');
-  } else {
-    return password;
   }
+  return password;
+
 };
 
 /**
@@ -146,8 +152,8 @@ userSchema.methods.authenticate = function (password) {
  * Find possible not used username
  */
 userSchema.statics.findUniqueUsername = function (username, suffix, callback) {
-  var _this = this;
-  var possibleUsername = username.toLowerCase() + (suffix || '');
+  const _this = this;
+  const possibleUsername = username.toLowerCase() + (suffix || '');
 
   _this.findOne({
     username: possibleUsername
@@ -171,8 +177,8 @@ userSchema.statics.findUniqueUsername = function (username, suffix, callback) {
 */
 userSchema.statics.generateRandomPassphrase = function () {
   return new Promise(function (resolve, reject) {
-    var password = '';
-    var repeatingCharacters = new RegExp('(.)\\1{2,}', 'g');
+    let password = '';
+    const repeatingCharacters = new RegExp('(.)\\1{2,}', 'g');
 
     // iterate until the we have a valid passphrase.
     // NOTE: Should rarely iterate more than once, but we need this to ensure no repeating characters are present.
