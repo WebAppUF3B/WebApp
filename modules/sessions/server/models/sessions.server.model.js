@@ -38,7 +38,7 @@ sessionSchema.pre('save', function(next) {
 });
 
 /* Use your schema to instantiate a Mongoose model */
-const session = mongoose.model('Session', sessionSchema);
+const session = mongoose.model('studySession', sessionSchema);
 
 /* Export the model to make it avaiable to other parts of your Node application */
 module.exports = session;

@@ -2,7 +2,7 @@
 
 /* Dependencies */
 const mongoose = require('mongoose'),
-  Session = mongoose.model('Session');
+  Session = mongoose.model('studySession');
 
 /**
  * Backend functions for CRUD operations on session collection
