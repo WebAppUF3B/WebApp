@@ -26,17 +26,6 @@
           </div>
         </div>
         <div class="form-group" show-errors>
-          <label for="birthday">Birthday</label>
-              <div class='input-group date' id='birthday'>
-                  <input type='text' class="form-control" />
-                  <span class="input-group-addon">
-                      <span class="glyphicon glyphicon-time"></span>
-                  </span>
-                </div>
-          </div>
-
-
-        <div class="form-group" show-errors>
           <label for="username">Username</label>
           <input type="text" id="username" name="username" class="form-control" ng-model="credentials.username" placeholder="Username" lowercase required>
           <div ng-messages="userForm.username.$error" role="alert">
@@ -45,7 +34,7 @@
         </div>
         <div class="form-group" show-errors>
           <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-control" ng-model="credentials.password" placeholder="Password" popover="{{popoverMsg}}" popover-trigger="focus" password-validator required>
+          <input type="password" id="password" name="password" class="form-control" ng-model="credentials.password" placeholder="Password" popover="{{popoverMsg}}" popover-trigger="focus" password-validator required>
           <div ng-messages="userForm.password.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Password is required.</p>
             <div ng-repeat="passwordError in passwordErrors">
@@ -56,6 +45,25 @@
         <div class="form-group" ng-show="!userForm.password.$error.required">
           <label>Password Requirements</label>
           <progressbar value="requirementsProgress" type="{{requirementsColor}}"><span style="color:white; white-space:nowrap;">{{requirementsProgress}}%</span></progressbar>
+        </div>
+        <div class="form-group" show-errors>
+          <label for="birthday">Birthday</label>
+          <div class='input-group date' id='birthday'>
+            <input type='text' name="birthday" class="form-control" ng-model="credentials.birthday" placeholder="MM/DD/YYYY" required/>
+            <span class="input-group-addon">
+                <span class="glyphicon glyphicon-time"></span>
+            </span>
+          </div>
+        </div>
+        <div show-errors>
+          <div id='gender' class="form-group">
+            <label>Gender</label>
+            <div>
+              <label class='radio-inline' for="male"><input type='radio' name="gender" id="male" value="male" ng-model="credentials.gender" required/>Male</label>
+              <label class='radio-inline' for="female"><input type='radio' name="gender" id="female" value="female" ng-model="credentials.gender" required/>Female</label>
+              <label class='radio-inline' for="other"><input type='radio' name="gender" id="other" value="other" ng-model="credentials.gender" required/>Other</label>
+            </div>
+          </div>
         </div>
         <div class="text-center form-group">
           <button type="submit" class="btn btn-primary">Sign up</button>
@@ -68,13 +76,19 @@
       </fieldset>
     </form>
   </div>
-  
+
   <script type="text/javascript">
-    $(function () {
-        $('#birthday').datetimepicker({
-            format: 'L'
-        });
-    });
+      $(function () {
+          const today = Date.now();
+          const _127YearsAgo = today - 4007732904000;
+          const twentyYearsAgo = today - 631139040000;
+          $('#birthday').datetimepicker({
+              viewMode: 'years',
+              format: 'MM/DD/YYYY',
+              minDate: _127YearsAgo,
+              defaultDate: twentyYearsAgo,
+          });
+      });
 </script>
 
 </div>
