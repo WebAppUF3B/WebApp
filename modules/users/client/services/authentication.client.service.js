@@ -3,7 +3,7 @@
 // Authentication service for user variables
 angular.module('users').factory('Authentication', ['$window',
   function ($window) {
-    const auth = {
+    var auth = {
       user: $window.user
     };
 

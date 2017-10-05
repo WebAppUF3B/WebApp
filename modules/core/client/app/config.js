@@ -1,13 +1,13 @@
 'use strict';
 
 // Init the application configuration module for AngularJS application
-const ApplicationConfiguration = (function () {
+var ApplicationConfiguration = (function () {
   // Init module configuration options
-  const applicationModuleName = 'mean';
-  const applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload', 'ngMaterial'];
+  var applicationModuleName = 'mean';
+  var applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload'];
 
   // Add a new vertical module
-  const registerModule = function (moduleName, dependencies) {
+  var registerModule = function (moduleName, dependencies) {
     // Create angular module
     angular.module(moduleName, dependencies || []);
 

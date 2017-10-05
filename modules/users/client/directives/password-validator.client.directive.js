@@ -6,13 +6,13 @@ angular.module('users')
       require: 'ngModel',
       link: function(scope, element, attrs, ngModel) {
         ngModel.$validators.requirements = function (password) {
-          let status = true;
+          var status = true;
           if (password) {
-            const result = PasswordValidator.getResult(password);
-            let requirementsIdx = 0;
+            var result = PasswordValidator.getResult(password);
+            var requirementsIdx = 0;
 
             // Requirements Meter - visual indicator for users
-            const requirementsMeter = [
+            var requirementsMeter = [
               { color: 'danger', progress: '20' },
               { color: 'warning', progress: '40' },
               { color: 'info', progress: '60' },

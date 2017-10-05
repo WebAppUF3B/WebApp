@@ -3,29 +3,15 @@
     indent: [2, 2, {"SwitchCase": 1}],
     no-multi-spaces: 2,
     no-underscore-dangle: 0,
+    no-use-before-define: [1, "nofunc"],
     no-unused-expressions: 0,
     no-empty-class: 0,
     object-curly-spacing: [2, "always"],
     quotes: [1, "single"],
-    space-in-parens: [2, "never"],
-    no-else-return: "error",
-    no-empty-function: "error",
-    global-require: "error",
-    brace-style: "error",
-    camelcase: "error",
-    comma-style: ["error", "last"],
-    arrow-spacing: "error",
-    "no-confusing-arrow": ["error", {"allowParens": false}],
-    no-const-assign: "error",
-    no-duplicate-imports: "error",
-    no-var: "error",
-    prefer-arrow-callback: "error",
-    prefer-const: "error"
-
+    space-in-parens: [2, "never"]
   },
   env: {
-    node: true,
-    "es6": true
+    node: true
   },
   globals: {
     angular: true,
