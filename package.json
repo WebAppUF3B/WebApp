@@ -11,11 +11,11 @@
     "url": "https://github.com/meanjs/mean.git"
   },
   "engines": {
-    "node": ">=0.10.28",
+    "node": "6.x.x",
     "npm": ">=1.4.28"
   },
   "scripts": {
-    "start": "grunt",
+    "start": "grunt build && grunt --force",
     "test": "grunt test",
     "postinstall": "bower install --config.interactive=false"
   },
@@ -35,7 +35,7 @@
     "express": "^4.13.1",
     "express-session": "^1.11.3",
     "file-stream-rotator": "~0.0.6",
-    "forever": "~0.14.2",
+    "forever": "^0.14.2",
     "generate-password": "^1.1.1",
     "glob": "^5.0.13",
     "grunt": "0.4.5",
@@ -66,6 +66,8 @@
   },
   "devDependencies": {
     "coveralls": "^2.11.4",
+    "eslint": "3.5.0",
+    "forever": "^0.14.2",
     "grunt-concurrent": "^2.0.0",
     "grunt-contrib-copy": "~0.8.0",
     "grunt-contrib-csslint": "~0.4.0",
@@ -73,7 +75,7 @@
     "grunt-contrib-jshint": "~0.11.2",
     "grunt-contrib-less": "^1.0.1",
     "grunt-contrib-sass": "~0.9.2",
-    "grunt-contrib-uglify": "~0.9.1",
+    "grunt-contrib-uglify": "git://github.com/gruntjs/grunt-contrib-uglify.git#harmony",
     "grunt-contrib-watch": "~0.6.1",
     "grunt-env": "~0.4.4",
     "grunt-eslint": "~17.3.1",

@@ -1,0 +1,184 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+/* For Phone */
+
+@media (max-width: 767px) {
+  .phone-center {
+    text-align: center;
+  }
+  .footer-logo {
+    float: none !important;
+  }
+  .left-panel {
+    border-bottom: 4px solid #fe8c35;
+    margin-right: 0px;
+  }
+  .right-divider{
+    border-right: none !important;
+  }
+  .title.title-pad{
+    padding-top: 10px !important;
+  }
+}
+
+/* For Tablet/Phone */
+
+@media (max-width: 991px) {
+  .tablet-center {
+    text-align: center;
+  }
+  .top-logo {
+    width: 80% !important;
+  }
+  .title-pad{
+    padding-top: 40px !important;
+  }
+}
+
+/* For Tablet/Desktop */
+
+@media (min-width: 768px) {
+  .landing-page-container {
+    margin-top: 80px !important;
+  }
+}
+
+/* For Desktop Only */
+
+@media (min-width: 992px) {
+
+}
+
+html {
+  overflow-x: hidden;
+  height: 100%
+}
+
+body {
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  position: relative;
+  border-top: solid 3px #fe8c35;
+  color: #383838;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 150%;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #243778;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: 300;
+}
+
+h1, h2, h3 {
+  line-height: 40px;
+}
+
+h2, h3, h4, h5, h6 {
+  line-height: 1.3em;
+}
+
+.navbar {
+  background: #f1f1f1;
+  color: #243778;
+  text-transform: uppercase;
+  border-top: 1px solid #9da3bd;
+  border-bottom: 3px solid #9da3bd;
+  margin-bottom: 0px;
+}
+
+.top-logo {
+  width: 50%;
+  padding: 10px 0px 10px 0px;
+}
+
+.main {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+
+.top-pad {
+  padding-top: 30px;
+}
+
+.gator-dark-blue {
+  background-color: #243778;
+  color: white;
+}
+
+.gator-light-blue {
+  background-color: #4d61a6;
+}
+
+.gator-orange {
+  background-color: #fe8c35;
+  color: white;
+}
+
+.left-panel {
+  padding: 20px 0px 20px 0px;
+  font-size: 1.2em;
+  margin-right: 5px;
+}
+
+.full-height {
+  height: 100vh;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.right-divider{
+  border-right: 4px solid #fe8c35;
+}
+
+.title {
+  font-size: 3em;
+}
+
+.title-pad{
+  padding-top: 15px;
+  padding-bottom: 20px;
+}
+
+footer {
+  background: url(/images/footer_wrap.jpg) repeat-x scroll 0 top white;
+  margin-top: 50px;
+}
+
+footer .uf-monogram {
+  background: url(/images/uf_monogram.png) no-repeat scroll 0 0 transparent;
+  display: block;
+  height: 48px;
+  left: 50%;
+  margin-left: -25px;
+  position: relative;
+  top: -20px;
+  width: 48px;
+}
+
+.btn-primary {
+  background: #007ec6;
+  border-radius: 0px;
+  font-size: 1.3em;
+  margin-bottom: 15px;
+}
+
+.btn-primary:hover{
+  background: #006ba8;
+}
+
+.landing-page-container {
+  margin-top: 10px;
+  margin-bottom: 40px;
+}

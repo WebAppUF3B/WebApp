@@ -22,13 +22,13 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return false;
       }
 
-      $http.post('/api/auth/signup', $scope.credentials).success(function (response) {
+      $http.post('/api/auth/signup', $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
         $state.go($state.previous.state.name || 'home', $state.previous.params);
-      }).error(function (response) {
+      }).error((response) => {
         $scope.error = response.message;
       });
     };
@@ -42,13 +42,13 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return false;
       }
 
-      $http.post('/api/auth/signin', $scope.credentials).success(function (response) {
+      $http.post('/api/auth/signin', $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
         $state.go($state.previous.state.name || 'home', $state.previous.params);
-      }).error(function (response) {
+      }).error((response) => {
         $scope.error = response.message;
       });
     };
@@ -56,7 +56,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
     // OAuth provider request
     $scope.callOauthProvider = function (url) {
       if ($state.previous && $state.previous.href) {
-        url += '?redirect_to=' + encodeURIComponent($state.previous.href);
+        url += '?redirectTo=' + encodeURIComponent($state.previous.href);
       }
 
       // Effectively call OAuth authentication route:
