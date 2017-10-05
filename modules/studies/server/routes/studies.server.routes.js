@@ -17,5 +17,5 @@ module.exports = function (app) {
     The 'router.param' method allows us to specify middleware we would like to use to handle
     requests with a parameter.
    */
-  router.param('studyId', studies.studyById);
+  app.param('studyId', studies.studyById);
 };
