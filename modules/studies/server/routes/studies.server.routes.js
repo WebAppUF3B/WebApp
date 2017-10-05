@@ -1,15 +1,21 @@
 'use strict';
 
+// Study Routes
+const studies = require('../controllers/studies.server.controller.js');
+
 module.exports = function (app) {
-  // Root routing
-  var studies = require('../controllers/studies.server.controller');
+  // Setting up the users profile api
+  app.route('/api/studies/all').get(studies.getAll);
+  app.route('/api/studies/:studyId')
+    .get(studies.get)
+    .put(studies.update)
+    .post(studies.create)
+    .delete(studies.delete);
+  app.route('/api/studies/user/:userId').get(studies.getUserStudies);
 
-  // Define error pages
-  app.route('/server-error').get(studies.renderServerError);
-
-  // Return a 404 for all undefined api, module or lib routes
-  app.route('/:url(api|modules|lib)/*').get(studies.renderNotFound);
-
-  // Define application route
-  app.route('/*').get(studies.renderIndex);
+  /*
+    The 'router.param' method allows us to specify middleware we would like to use to handle
+    requests with a parameter.
+   */
+  router.param('studyId', studies.studyById);
 };

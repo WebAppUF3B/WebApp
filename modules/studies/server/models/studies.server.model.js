@@ -1,7 +1,7 @@
-var mongoose = require('mongoose'),
+const mongoose = require('mongoose'),
   Schema = mongoose.Schema;
 
-var studySchema = new Schema({
+const studySchema = new Schema({
   title: {
     type: String,
     required: true
@@ -31,14 +31,6 @@ var studySchema = new Schema({
   },
   availability: [{
     slot: Date,
-  }],
-  sessions: [{
-    participants: [{ userID: Number, attended: Boolean }],
-    researcher: Number,
-    time: Date,
-    compensation: String,
-    completed: Boolean,
-    compensationGiven: Boolean
   }],
   createdOn: Date,
   updated: Date
