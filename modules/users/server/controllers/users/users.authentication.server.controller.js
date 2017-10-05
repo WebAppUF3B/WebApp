@@ -23,6 +23,14 @@ exports.signup = function (req, res) {
   // For security measurement we remove the roles from the req.body object
   delete req.body.roles;
 
+  // Server side validation of user, returns an object of errors.\
+  const errs = validateUser(req.body);
+
+  if (Object.keys(errs).length > 0) {
+    return res.json(err);
+  }
+
+
   // Init Variables
   const user = new User(req.body);
 
@@ -31,24 +39,19 @@ exports.signup = function (req, res) {
   user.displayName = user.firstName + ' ' + user.lastName;
 
   // Then save the user
-  user.save((err) => {
-    if (err) {
-      return res.status(400).send({
-        message: errorHandler.getErrorMessage(err)
-      });
-    }
-      // Remove sensitive data before login
-    user.password = undefined;
-    user.salt = undefined;
-
-    req.login(user, (err) => {
-      if (err) {
-        res.status(400).send(err);
-      } else {
-        res.json(user);
-      }
-    });
-  });
+  user.save()
+      .then((user) => {
+        //TODO: Hello Perry!
+        //user._id is this current user's mongo id after the save has successfully completed. good luck.
+        res.statusCode = 200;
+        return res.send();
+      })
+      .catch((err) => {
+        console.log('SingUp User Error:', err);
+        res.statusCode = 400;
+        res.body = err;
+        return res.send(err);
+      })
 };
 
 /**
@@ -237,4 +240,13 @@ exports.removeOAuthProvider = function (req, res, next) {
       return res.json(user);
     });
   });
+};
+
+const validateUser = (user) => {
+  const errs = {};
+
+  //TODO: TwF, server side validation for user here.
+
+  return errs;
+
 };
