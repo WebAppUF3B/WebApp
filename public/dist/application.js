@@ -1,13 +1,13 @@
 'use strict';
 
 // Init the application configuration module for AngularJS application
-var ApplicationConfiguration = (function () {
+const ApplicationConfiguration = (function () {
   // Init module configuration options
-  var applicationModuleName = 'mean';
-  var applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload'];
+  const applicationModuleName = 'mean';
+  const applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload', 'ngMaterial'];
 
   // Add a new vertical module
-  var registerModule = function (moduleName, dependencies) {
+  const registerModule = function (moduleName, dependencies) {
     // Create angular module
     angular.module(moduleName, dependencies || []);
 
@@ -940,6 +940,8 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
   function ($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
+    $scope.rightNow = Date.now();
+    $scope._127YearsAgo = rightNow - 4007732904000;
 
     // Get an eventual error defined in the URL query string:
     $scope.error = $location.search().err;
@@ -958,13 +960,13 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return false;
       }
 
-      $http.post('/api/auth/signup', $scope.credentials).success(function (response) {
+      $http.post('/api/auth/signup', $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
         $state.go($state.previous.state.name || 'home', $state.previous.params);
-      }).error(function (response) {
+      }).error((response) => {
         $scope.error = response.message;
       });
     };
@@ -978,13 +980,13 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return false;
       }
 
-      $http.post('/api/auth/signin', $scope.credentials).success(function (response) {
+      $http.post('/api/auth/signin', $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
         $state.go($state.previous.state.name || 'home', $state.previous.params);
-      }).error(function (response) {
+      }).error((response) => {
         $scope.error = response.message;
       });
     };
@@ -1028,7 +1030,7 @@ angular.module('users').controller('PasswordController', ['$scope', '$stateParam
         $scope.credentials = null;
         $scope.success = response.message;
 
-      }).error(function (response) {
+      }).error((response) => {
         // Show user error message and clear form
         $scope.credentials = null;
         $scope.error = response.message;
@@ -1054,7 +1056,7 @@ angular.module('users').controller('PasswordController', ['$scope', '$stateParam
 
         // And redirect to the index page
         $location.path('/password/reset/success');
-      }).error(function (response) {
+      }).error((response) => {
         $scope.error = response.message;
       });
     };
@@ -1092,80 +1094,6 @@ angular.module('users').controller('ChangePasswordController', ['$scope', '$http
 
 'use strict';
 
-angular.module('users').controller('ChangeProfilePictureController', ['$scope', '$timeout', '$window', 'Authentication', 'FileUploader',
-  function ($scope, $timeout, $window, Authentication, FileUploader) {
-    $scope.user = Authentication.user;
-    $scope.imageURL = $scope.user.profileImageURL;
-
-    // Create file uploader instance
-    $scope.uploader = new FileUploader({
-      url: 'api/users/picture',
-      alias: 'newProfilePicture'
-    });
-
-    // Set file uploader image filter
-    $scope.uploader.filters.push({
-      name: 'imageFilter',
-      fn: function (item, options) {
-        var type = '|' + item.type.slice(item.type.lastIndexOf('/') + 1) + '|';
-        return '|jpg|png|jpeg|bmp|gif|'.indexOf(type) !== -1;
-      }
-    });
-
-    // Called after the user selected a new picture file
-    $scope.uploader.onAfterAddingFile = function (fileItem) {
-      if ($window.FileReader) {
-        var fileReader = new FileReader();
-        fileReader.readAsDataURL(fileItem._file);
-
-        fileReader.onload = function (fileReaderEvent) {
-          $timeout(function () {
-            $scope.imageURL = fileReaderEvent.target.result;
-          }, 0);
-        };
-      }
-    };
-
-    // Called after the user has successfully uploaded a new picture
-    $scope.uploader.onSuccessItem = function (fileItem, response, status, headers) {
-      // Show success message
-      $scope.success = true;
-
-      // Populate user object
-      $scope.user = Authentication.user = response;
-
-      // Clear upload buttons
-      $scope.cancelUpload();
-    };
-
-    // Called after the user has failed to uploaded a new picture
-    $scope.uploader.onErrorItem = function (fileItem, response, status, headers) {
-      // Clear upload buttons
-      $scope.cancelUpload();
-
-      // Show error message
-      $scope.error = response.message;
-    };
-
-    // Change user profile picture
-    $scope.uploadProfilePicture = function () {
-      // Clear messages
-      $scope.success = $scope.error = null;
-
-      // Start upload
-      $scope.uploader.uploadAll();
-    };
-
-    // Cancel the upload process
-    $scope.cancelUpload = function () {
-      $scope.uploader.clearQueue();
-      $scope.imageURL = $scope.user.profileImageURL;
-    };
-  }
-]);
-
-'use strict';
-
 angular.module('users').controller('EditProfileController', ['$scope', '$http', '$location', 'Users', 'Authentication',
   function ($scope, $http, $location, Users, Authentication) {
     $scope.user = Authentication.user;
@@ -1196,45 +1124,6 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
 
 'use strict';
 
-angular.module('users').controller('SocialAccountsController', ['$scope', '$http', 'Authentication',
-  function ($scope, $http, Authentication) {
-    $scope.user = Authentication.user;
-
-    // Check if there are additional accounts
-    $scope.hasConnectedAdditionalSocialAccounts = function (provider) {
-      for (var i in $scope.user.additionalProvidersData) {
-        return true;
-      }
-
-      return false;
-    };
-
-    // Check if provider is already in use with current user
-    $scope.isConnectedSocialAccount = function (provider) {
-      return $scope.user.provider === provider || ($scope.user.additionalProvidersData && $scope.user.additionalProvidersData[provider]);
-    };
-
-    // Remove a user social account
-    $scope.removeUserSocialAccount = function (provider) {
-      $scope.success = $scope.error = null;
-
-      $http.delete('/api/users/accounts', {
-        params: {
-          provider: provider
-        }
-      }).success(function (response) {
-        // If successful show success message and clear form
-        $scope.success = true;
-        $scope.user = Authentication.user = response;
-      }).error(function (response) {
-        $scope.error = response.message;
-      });
-    };
-  }
-]);
-
-'use strict';
-
 angular.module('users').controller('SettingsController', ['$scope', 'Authentication',
   function ($scope, Authentication) {
     $scope.user = Authentication.user;
@@ -1249,13 +1138,13 @@ angular.module('users')
       require: 'ngModel',
       link: function(scope, element, attrs, ngModel) {
         ngModel.$validators.requirements = function (password) {
-          var status = true;
+          let status = true;
           if (password) {
-            var result = PasswordValidator.getResult(password);
-            var requirementsIdx = 0;
+            const result = PasswordValidator.getResult(password);
+            let requirementsIdx = 0;
 
             // Requirements Meter - visual indicator for users
-            var requirementsMeter = [
+            const requirementsMeter = [
               { color: 'danger', progress: '20' },
               { color: 'warning', progress: '40' },
               { color: 'info', progress: '60' },
@@ -1296,18 +1185,17 @@ angular.module('users')
         passwordVerify: '='
       },
       link: function(scope, element, attrs, ngModel) {
-        var status = true;
-        scope.$watch(function() {
-          var combined;
+        scope.$watch(() => {
+          let combined;
           if (scope.passwordVerify || ngModel) {
             combined = scope.passwordVerify + '_' + ngModel;
           }
           return combined;
-        }, function(value) {
+        }, (value) => {
           if (value) {
             ngModel.$validators.passwordVerify = function (password) {
-              var origin = scope.passwordVerify;
-              return (origin !== password) ? false : true;
+              const origin = scope.passwordVerify;
+              return origin === password;
             };
           }
         });
@@ -1318,11 +1206,11 @@ angular.module('users')
 'use strict';
 
 // Users directive used to force lowercase input
-angular.module('users').directive('lowercase', function () {
+angular.module('users').directive('lowercase', () => {
   return {
     require: 'ngModel',
     link: function (scope, element, attrs, modelCtrl) {
-      modelCtrl.$parsers.push(function (input) {
+      modelCtrl.$parsers.push((input) => {
         return input ? input.toLowerCase() : '';
       });
       element.css('text-transform', 'lowercase');
@@ -1335,7 +1223,7 @@ angular.module('users').directive('lowercase', function () {
 // Authentication service for user variables
 angular.module('users').factory('Authentication', ['$window',
   function ($window) {
-    var auth = {
+    const auth = {
       user: $window.user
     };
 
@@ -1348,16 +1236,14 @@ angular.module('users').factory('Authentication', ['$window',
 // PasswordValidator service used for testing the password strength
 angular.module('users').factory('PasswordValidator', ['$window',
   function ($window) {
-    var owaspPasswordStrengthTest = $window.owaspPasswordStrengthTest;
+    const owaspPasswordStrengthTest = $window.owaspPasswordStrengthTest;
 
     return {
       getResult: function (password) {
-        var result = owaspPasswordStrengthTest.test(password);
-        return result;
+        return owaspPasswordStrengthTest.test(password);
       },
       getPopoverMsg: function () {
-        var popoverMsg = 'Please enter a passphrase or password with greater than 10 characters, numbers, lowercase, upppercase, and special characters.';
-        return popoverMsg;
+        return 'Please enter a passphrase or password with greater than 10 characters, numbers, lowercase, upppercase, and special characters.';
       }
     };
   }
