@@ -1138,6 +1138,20 @@ angular.module('users').controller('SettingsController', ['$scope', 'Authenticat
 
 'use strict';
 
+angular.module('users').controller('VerificationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication',
+  function ($scope, $state, $http, $location, $window, Authentication) {
+    const verify = function () {
+      // mark verify field for this user as True (don't know if you need all the vars included above, just copied them from authentication controller)
+      alert('We made it');
+    };
+
+    // run after page loads
+    verify();
+  }
+]);
+
+'use strict';
+
 angular.module('users')
   .directive('passwordValidator', ['PasswordValidator', function(PasswordValidator) {
     return {
@@ -1274,6 +1288,20 @@ angular.module('users.admin').factory('Admin', ['$resource',
     return $resource('api/users/:userId', {
       userId: '@_id'
     }, {
+      update: {
+        method: 'PUT'
+      }
+    });
+  }
+]);
+
+'use strict';
+
+// Users service used for verifying user
+angular.module('users').factory('User', ['$resource',
+  function ($resource) {
+    // TODO update code here to verify in backend (need to add backend function too)
+    return $resource('api/users/verify', {}, {
       update: {
         method: 'PUT'
       }
