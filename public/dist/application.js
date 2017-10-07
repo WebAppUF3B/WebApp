@@ -1257,13 +1257,20 @@ angular.module('users').factory('Authentication', ['$window',
 angular.module('users').factory('PasswordValidator', ['$window',
   function ($window) {
     const owaspPasswordStrengthTest = $window.owaspPasswordStrengthTest;
+    owaspPasswordStrengthTest.config({
+      allowPassphrases       : false,
+      maxLength              : 128,
+      minLength              : 8,
+      minPhraseLength        : 20,
+      minOptionalTestsToPass : 4,
+    });
 
     return {
       getResult: function (password) {
         return owaspPasswordStrengthTest.test(password);
       },
       getPopoverMsg: function () {
-        return 'Please enter a passphrase or password with greater than 10 characters, numbers, lowercase, upppercase, and special characters.';
+        return 'Please enter a password with greater than 8 characters, numbers, lowercase, upppercase, and special characters.';
       }
     };
   }

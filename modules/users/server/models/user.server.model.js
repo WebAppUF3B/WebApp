@@ -28,13 +28,6 @@ const validateLocalStrategyEmail = function (email) {
  * User Schema
  */
 const userSchema = new Schema({
-  username: {
-    type: String,
-    unique: 'Username already exists',
-    required: 'Please fill in a username',
-    lowercase: true,
-    trim: true
-  },
   firstName: {
     type: String,
     trim: true,
@@ -53,7 +46,8 @@ const userSchema = new Schema({
   },
   gender: {
     type: String,
-    required: true
+    required: true,
+    validate: [validateLocalStrategyProperty, 'Please pick an option']
   },
   department: {
     type: String
@@ -119,6 +113,15 @@ userSchema.pre('save', function (next) {
  * Hook a pre validate method to test the local password
  */
 userSchema.pre('validate', function (next) {
+
+  owasp.config({
+    allowPassphrases       : false,
+    maxLength              : 128,
+    minLength              : 8,
+    minPhraseLength        : 20,
+    minOptionalTestsToPass : 4,
+  });
+
   if (this.provider === 'local' && this.password && this.isModified('password')) {
     const result = owasp.test(this.password);
     if (result.errors.length) {
