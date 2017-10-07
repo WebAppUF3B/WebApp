@@ -1153,7 +1153,7 @@ angular.module('users').controller('VerificationController', ['$scope', '$state'
       }).error((response) => {
         $scope.error = response.message;
       });
-      alert(request);
+      //alert(request);
     };
 
     // run after page loads
