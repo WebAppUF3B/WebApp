@@ -832,6 +832,14 @@ angular.module('users').config(['$stateProvider',
         url: '/signin?err',
         templateUrl: 'modules/users/client/views/authentication/signin.client.view.html'
       })
+      .state('authentication.email', {
+        url: '/email',
+        templateUrl: 'modules/users/client/views/authentication/email.client.view.html'
+      })
+      .state('authentication.verify', {
+        url: '/verify/:userId',
+        templateUrl: 'modules/users/client/views/authentication/verify.client.view.html'
+      })
       .state('password', {
         abstract: true,
         url: '/password',
@@ -940,8 +948,6 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
   function ($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
-    $scope.rightNow = Date.now();
-    $scope._127YearsAgo = rightNow - 4007732904000;
 
     // Get an eventual error defined in the URL query string:
     $scope.error = $location.search().err;
@@ -1132,6 +1138,20 @@ angular.module('users').controller('SettingsController', ['$scope', 'Authenticat
 
 'use strict';
 
+angular.module('users').controller('VerificationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication',
+  function ($scope, $state, $http, $location, $window, Authentication) {
+    const verify = function () {
+      // mark verify field for this user as True (don't know if you need all the vars included above, just copied them from authentication controller)
+      alert('We made it');
+    };
+
+    // run after page loads
+    verify();
+  }
+]);
+
+'use strict';
+
 angular.module('users')
   .directive('passwordValidator', ['PasswordValidator', function(PasswordValidator) {
     return {
@@ -1268,6 +1288,20 @@ angular.module('users.admin').factory('Admin', ['$resource',
     return $resource('api/users/:userId', {
       userId: '@_id'
     }, {
+      update: {
+        method: 'PUT'
+      }
+    });
+  }
+]);
+
+'use strict';
+
+// Users service used for verifying user
+angular.module('users').factory('User', ['$resource',
+  function ($resource) {
+    // TODO update code here to verify in backend (need to add backend function too)
+    return $resource('api/users/verify', {}, {
       update: {
         method: 'PUT'
       }
