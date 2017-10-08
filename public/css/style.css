@@ -23,7 +23,8 @@
     margin-left: 15px !important;
   }
   .mobile-no-pad{
-    padding: 0px !important;
+    padding-left: 0px !important;
+    padding-right: 0px !important;
   }
 }
 
@@ -202,6 +203,7 @@ footer .uf-monogram {
   margin-bottom: 15px !important;
   border: 0px !important;
   color: #fff !important;
+  white-space: normal !important;
 }
 
 .btn-primary {
@@ -279,4 +281,8 @@ md-datepicker {
 
 .forgot-password{
   margin-top: -8px;
+}
+
+.no-margin{
+  margin: 0px !important;
 }
