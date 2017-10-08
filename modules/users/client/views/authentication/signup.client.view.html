@@ -29,7 +29,7 @@
               <div class="form-group" show-errors>
                 <label for="birthday">Birthday</label>
                 <div id="birthday" class="date">
-                  <md-datepicker name="birthday" ng-model="credentials.birthday" md-current-view="year" md-placeholder="Enter date" md-open-on-focus="" required></md-datepicker>
+                  <md-datepicker name="birthday" ng-model="credentials.birthday" md-current-view="year" md-placeholder="Enter date" md-open-on-focus="" required md-min-date="minDate" md-max-date="maxDate"></md-datepicker>
                   <div ng-messages="userForm.birthday.$error" role="alert">
                     <p class="help-block error-text" ng-message="required">Birthday is required.</p>
                   </div>
