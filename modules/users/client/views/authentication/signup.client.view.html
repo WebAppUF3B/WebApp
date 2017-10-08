@@ -40,14 +40,14 @@
               <div class="form-group" show-errors>
                 <div id="gender" class="form-group">
                   <label>Gender</label>
-                  <select class="form-control" ng-model="credentials.gender">
+                  <select name="gender" class="form-control" ng-model="credentials.gender" required>
                     <option value="male">Male</option>
                     <option value="female">Female</option>
                     <option value="other">Other</option>
                     <option value="none">Prefer Not to Disclose</option>
                   </select>
                   <div ng-messages="userForm.gender.$error" role="alert">
-                    <p class="help-block error-text" ng-message="required">Gender is required.</p>
+                    <p class="help-block error-text" ng-message="required">picking an option required.</p>
                   </div>
                 </div>
               </div>
