@@ -948,8 +948,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
   function ($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
-
-    // Get an eventual error defined in the URL query string:
+      // Get an eventual error defined in the URL query string:
     $scope.error = $location.search().err;
 
     // If user is signed in then redirect back home
@@ -973,7 +972,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
-        $state.go($state.previous.state.name || 'home', $state.previous.params);
+        $state.go('authentication.verify');
       }).error((response) => {
         $scope.error = response.message;
       });
@@ -1008,6 +1007,17 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       // Effectively call OAuth authentication route:
       $window.location.href = url;
     };
+    const myDate = new Date();
+    $scope.maxDate = new Date(
+        myDate.getFullYear(),
+        myDate.getMonth(),
+        myDate.getDate()
+      );
+    $scope.minDate = new Date(
+        myDate.getFullYear() - 127,
+        myDate.getMonth(),
+        myDate.getDate()
+    );
     $scope.validateConfirmPassword = (confirmation) => {
       const password = $scope.userForm.password.$viewValue;
       if (confirmation && password && confirmation !== password) {
