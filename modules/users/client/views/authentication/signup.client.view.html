@@ -97,13 +97,11 @@
           <div class="row">
             <div class="col-sm-12">
               <div class="form-group">
-                <label for="reenter-password">Reenter Password</label>
-                <input type="reenter-password" id="reenter-password" name="reenter-password" class="form-control" ng-model="credentials.password" placeholder="Password">
-                <div ng-messages="userForm.password.$error" role="alert">
-                  <p class="help-block error-text" ng-message="required">Reenter Password is required.</p>
-                  <div ng-repeat="passwordError in passwordErrors">
-                    <p class="help-block error-text" ng-show="userForm.password.$error.requirements">{{passwordError}}</p>
-                  </div>
+                <label for="confirm">Confirm Password</label>
+                <input type="password" id="confirm" name="confirm" class="form-control" ng-model="credentials.confirm" placeholder="Confirm Password" ng-change="validateConfirmPassword(credentials.confirm)" required>
+                <div ng-messages="userForm.confirm.$error" role="alert">
+                  <p class="help-block error-text" ng-message="required">Password Confirmation is required.</p>
+                  <p class="help-block error-text" ng-message="goodConfirm">Passwords do not match.</p>
                 </div>
               </div>
             </div>

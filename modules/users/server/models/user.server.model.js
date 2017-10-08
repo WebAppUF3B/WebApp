@@ -42,19 +42,18 @@ const userSchema = new Schema({
   },
   birthday: {
     type: String,
-    required: true
+    required: [true, 'Please pick a birthday.']
   },
   gender: {
     type: String,
-    required: true,
-    validate: [validateLocalStrategyProperty, 'Please pick an option']
+    required: [true, 'Please pick a gender option.'],
   },
   department: {
     type: String
   },
   email: {
     type: String,
-    unique: true,
+    unique: [true, 'An account with this email already exists.'],
     lowercase: true,
     trim: true,
     default: '',
@@ -149,28 +148,6 @@ userSchema.methods.hashPassword = function (password) {
  */
 userSchema.methods.authenticate = function (password) {
   return this.password === this.hashPassword(password);
-};
-
-/**
- * Find possible not used username
- */
-userSchema.statics.findUniqueUsername = function (username, suffix, callback) {
-  const _this = this;
-  const possibleUsername = username.toLowerCase() + (suffix || '');
-
-  _this.findOne({
-    username: possibleUsername
-  }, function (err, user) {
-    if (!err) {
-      if (!user) {
-        callback(possibleUsername);
-      } else {
-        return _this.findUniqueUsername(username, (suffix || 0) + 1, callback);
-      }
-    } else {
-      callback(null);
-    }
-  });
 };
 
 /**
