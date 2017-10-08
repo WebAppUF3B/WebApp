@@ -24,11 +24,12 @@ exports.signup = function (req, res) {
   delete req.body.roles;
 
   // Server side validation of user, returns an object of errors.\
-  
+
 
   // Init Variables
   const user = new User(req.body);
   // Then save the user
+  const errs = user.validateSync();
   user.save()
       .then((user) => {
         //TODO: Hello Perry!
@@ -37,9 +38,12 @@ exports.signup = function (req, res) {
         return res.send();
       })
       .catch((err) => {
-        console.log('SingUp User Error:', err);
-        res.statusCode = 400;
-        return res.send(err);
+        const errJSON = err.toJSON();
+        if (errJSON.errors && errJSON.errors.email) {
+          errJSON.message = errJSON.errors.email.message;
+        }
+        console.log('SingUp User Error:\n', errJSON);
+        res.status(400).send(errJSON);
       })
 };
 
@@ -230,6 +234,7 @@ exports.removeOAuthProvider = function (req, res, next) {
     });
   });
 };
+
 
 const gatherErrors = (validationResults) => {
 

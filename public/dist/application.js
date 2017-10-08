@@ -966,6 +966,8 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return false;
       }
 
+      delete $scope.credentials.confirm;
+
       $http.post('/api/auth/signup', $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
@@ -1006,6 +1008,14 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       // Effectively call OAuth authentication route:
       $window.location.href = url;
     };
+    $scope.validateConfirmPassword = (confirmation) => {
+      const password = $scope.userForm.password.$viewValue;
+      if (confirmation && password && confirmation !== password) {
+        $scope.userForm.confirm.$setValidity('goodConfirm', false);
+        return;
+      }
+      $scope.userForm.confirm.$setValidity('goodConfirm', true);
+    }
   }
 ]);
 
@@ -1270,7 +1280,7 @@ angular.module('users').factory('PasswordValidator', ['$window',
         return owaspPasswordStrengthTest.test(password);
       },
       getPopoverMsg: function () {
-        return 'Please enter a password with greater than 8 characters, numbers, lowercase, upppercase, and special characters.';
+        return 'Please enter a password with at least 8 characters and at least one number, lowercase, uppercase, and special character.';
       }
     };
   }

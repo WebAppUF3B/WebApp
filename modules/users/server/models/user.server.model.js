@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 const mongoose = require('mongoose'),
+  uniqueValidator = require('mongoose-unique-validator'),
   Schema = mongoose.Schema,
   crypto = require('crypto'),
   validator = require('validator'),
@@ -53,7 +54,8 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
-    unique: [true, 'An account with this email already exists.'],
+    unique: true,
+    uniqueCaseInsensitive: true,
     lowercase: true,
     trim: true,
     default: '',
@@ -95,6 +97,8 @@ const userSchema = new Schema({
     type: Date
   }
 });
+
+userSchema.plugin(uniqueValidator, { message: 'An account with this email already exists' });
 
 /**
  * Hook a pre save method to hash the password
