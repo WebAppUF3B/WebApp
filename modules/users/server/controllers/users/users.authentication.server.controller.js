@@ -20,26 +20,17 @@ const noReturnUrls = [
  * Signup
  */
 exports.signup = function (req, res) {
-  console.log(req.body);
+  console.log('tw', req.body);
   // For security measurement we remove the roles from the req.body object
   delete req.body.roles;
 
   // Server side validation of user, returns an object of errors.\
-  const errs = validateUser(req.body);
-
-  if (Object.keys(errs).length > 0) {
-    return res.json(err);
-  }
 
 
   // Init Variables
   const user = new User(req.body);
-
-  // Add missing user fields
-  user.provider = 'local';
-  user.displayName = user.firstName + ' ' + user.lastName;
-
   // Then save the user
+  const errs = user.validateSync();
   user.save()
       .then((user) => {
         //established modemailer email transporter object to send email with mailOptions populating mail with link
@@ -56,10 +47,12 @@ exports.signup = function (req, res) {
         return res.send();
       })
       .catch((err) => {
-        console.log('SingUp User Error:', err);
-        res.statusCode = 400;
-        res.body = err;
-        return res.send(err);
+        const errJSON = err.toJSON();
+        if (errJSON.errors && errJSON.errors.email) {
+          errJSON.message = errJSON.errors.email.message;
+        }
+        console.log('SingUp User Error:\n', errJSON);
+        res.status(400).send(errJSON);
       })
 };
 
@@ -269,11 +262,11 @@ exports.removeOAuthProvider = function (req, res, next) {
   });
 };
 
-const validateUser = (user) => {
-  const errs = {};
+
+const gatherErrors = (validationResults) => {
 
   //TODO: TwF, server side validation for user here.
 
-  return errs;
+  return validationResults;
 
 };

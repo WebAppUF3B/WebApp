@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 const mongoose = require('mongoose'),
+  uniqueValidator = require('mongoose-unique-validator'),
   Schema = mongoose.Schema,
   crypto = require('crypto'),
   validator = require('validator'),
@@ -28,13 +29,6 @@ const validateLocalStrategyEmail = function (email) {
  * User Schema
  */
 const userSchema = new Schema({
-  username: {
-    type: String,
-    unique: 'Username already exists',
-    required: 'Please fill in a username',
-    lowercase: true,
-    trim: true
-  },
   firstName: {
     type: String,
     trim: true,
@@ -49,11 +43,11 @@ const userSchema = new Schema({
   },
   birthday: {
     type: String,
-    required: true
+    required: [true, 'Please pick a birthday.']
   },
   gender: {
     type: String,
-    required: true
+    required: [true, 'Please pick a gender option.'],
   },
   department: {
     type: String
@@ -61,6 +55,7 @@ const userSchema = new Schema({
   email: {
     type: String,
     unique: true,
+    uniqueCaseInsensitive: true,
     lowercase: true,
     trim: true,
     default: '',
@@ -103,6 +98,8 @@ const userSchema = new Schema({
   }
 });
 
+userSchema.plugin(uniqueValidator, { message: 'An account with this email already exists' });
+
 /**
  * Hook a pre save method to hash the password
  */
@@ -119,6 +116,15 @@ userSchema.pre('save', function (next) {
  * Hook a pre validate method to test the local password
  */
 userSchema.pre('validate', function (next) {
+
+  owasp.config({
+    allowPassphrases       : false,
+    maxLength              : 128,
+    minLength              : 8,
+    minPhraseLength        : 20,
+    minOptionalTestsToPass : 4,
+  });
+
   if (this.provider === 'local' && this.password && this.isModified('password')) {
     const result = owasp.test(this.password);
     if (result.errors.length) {
@@ -146,28 +152,6 @@ userSchema.methods.hashPassword = function (password) {
  */
 userSchema.methods.authenticate = function (password) {
   return this.password === this.hashPassword(password);
-};
-
-/**
- * Find possible not used username
- */
-userSchema.statics.findUniqueUsername = function (username, suffix, callback) {
-  const _this = this;
-  const possibleUsername = username.toLowerCase() + (suffix || '');
-
-  _this.findOne({
-    username: possibleUsername
-  }, function (err, user) {
-    if (!err) {
-      if (!user) {
-        callback(possibleUsername);
-      } else {
-        return _this.findUniqueUsername(username, (suffix || 0) + 1, callback);
-      }
-    } else {
-      callback(null);
-    }
-  });
 };
 
 /**
