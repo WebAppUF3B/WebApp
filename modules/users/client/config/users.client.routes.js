@@ -42,8 +42,8 @@ angular.module('users').config(['$stateProvider',
         url: '/signin?err',
         templateUrl: 'modules/users/client/views/authentication/signin.client.view.html'
       })
-      .state('authentication.email', {
-        url: '/email',
+      .state('authentication.email-sent', {
+        url: '/email-sent',
         templateUrl: 'modules/users/client/views/authentication/email.client.view.html'
       })
       .state('authentication.verify', {
