@@ -4,8 +4,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
   function ($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
-
-    // Get an eventual error defined in the URL query string:
+      // Get an eventual error defined in the URL query string:
     $scope.error = $location.search().err;
 
     // If user is signed in then redirect back home
@@ -21,6 +20,8 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
         return false;
       }
+
+      delete $scope.credentials.confirm;
 
       $http.post('/api/auth/signup', $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
@@ -62,5 +63,24 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       // Effectively call OAuth authentication route:
       $window.location.href = url;
     };
+    const myDate = new Date();
+    $scope.maxDate = new Date(
+        myDate.getFullYear(),
+        myDate.getMonth(),
+        myDate.getDate()
+      );
+    $scope.minDate = new Date(
+        myDate.getFullYear() - 127,
+        myDate.getMonth(),
+        myDate.getDate()
+    );
+    $scope.validateConfirmPassword = (confirmation) => {
+      const password = $scope.userForm.password.$viewValue;
+      if (confirmation && password && confirmation !== password) {
+        $scope.userForm.confirm.$setValidity('goodConfirm', false);
+        return;
+      }
+      $scope.userForm.confirm.$setValidity('goodConfirm', true);
+    }
   }
 ]);
