@@ -832,6 +832,14 @@ angular.module('users').config(['$stateProvider',
         url: '/signin?err',
         templateUrl: 'modules/users/client/views/authentication/signin.client.view.html'
       })
+      .state('authentication.email', {
+        url: '/email',
+        templateUrl: 'modules/users/client/views/authentication/email.client.view.html'
+      })
+      .state('authentication.verify', {
+        url: '/verify/:userId',
+        templateUrl: 'modules/users/client/views/authentication/verify.client.view.html'
+      })
       .state('password', {
         abstract: true,
         url: '/password',
@@ -940,8 +948,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
   function ($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
-
-    // Get an eventual error defined in the URL query string:
+      // Get an eventual error defined in the URL query string:
     $scope.error = $location.search().err;
 
     // If user is signed in then redirect back home
@@ -958,12 +965,14 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return false;
       }
 
+      delete $scope.credentials.confirm;
+
       $http.post('/api/auth/signup', $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
-        $state.go($state.previous.state.name || 'home', $state.previous.params);
+        $state.go('authentication.verify');
       }).error((response) => {
         $scope.error = response.message;
       });
@@ -998,6 +1007,25 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       // Effectively call OAuth authentication route:
       $window.location.href = url;
     };
+    const myDate = new Date();
+    $scope.maxDate = new Date(
+        myDate.getFullYear(),
+        myDate.getMonth(),
+        myDate.getDate()
+      );
+    $scope.minDate = new Date(
+        myDate.getFullYear() - 127,
+        myDate.getMonth(),
+        myDate.getDate()
+    );
+    $scope.validateConfirmPassword = (confirmation) => {
+      const password = $scope.userForm.password.$viewValue;
+      if (confirmation && password && confirmation !== password) {
+        $scope.userForm.confirm.$setValidity('goodConfirm', false);
+        return;
+      }
+      $scope.userForm.confirm.$setValidity('goodConfirm', true);
+    }
   }
 ]);
 
@@ -1129,6 +1157,31 @@ angular.module('users').controller('SettingsController', ['$scope', 'Authenticat
 ]);
 
 'use strict';
+angular.module('users').controller('VerificationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication',
+  function ($scope, $state, $http, $location, $window, Authentication) {
+    const verify = function () {
+      // mark verify field for this user as True (don't know if you need all the vars included above, just copied them from authentication controller)
+      const request = window.location.pathname;
+      const pass = request.slice(23);
+      $http.post('/api/auth/verify/'+pass, $scope.credentials).success((response) => {
+        //+$stateParams.id
+        // If successful we assign the response to the global user model
+        $scope.authentication.user = response;
+
+        // And redirect to the previous or home page
+        $state.go($state.previous.state.name || 'home', $state.previous.params);
+      }).error((response) => {
+        $scope.error = response.message;
+      });
+      //alert(request);
+    };
+
+    // run after page loads
+    verify();
+  }
+]);
+
+'use strict';
 
 angular.module('users')
   .directive('passwordValidator', ['PasswordValidator', function(PasswordValidator) {
@@ -1235,13 +1288,20 @@ angular.module('users').factory('Authentication', ['$window',
 angular.module('users').factory('PasswordValidator', ['$window',
   function ($window) {
     const owaspPasswordStrengthTest = $window.owaspPasswordStrengthTest;
+    owaspPasswordStrengthTest.config({
+      allowPassphrases       : false,
+      maxLength              : 128,
+      minLength              : 8,
+      minPhraseLength        : 20,
+      minOptionalTestsToPass : 4,
+    });
 
     return {
       getResult: function (password) {
         return owaspPasswordStrengthTest.test(password);
       },
       getPopoverMsg: function () {
-        return 'Please enter a passphrase or password with greater than 10 characters, numbers, lowercase, upppercase, and special characters.';
+        return 'Please enter a password with at least 8 characters and at least one number, lowercase, uppercase, and special character.';
       }
     };
   }
@@ -1272,3 +1332,27 @@ angular.module('users.admin').factory('Admin', ['$resource',
     });
   }
 ]);
+
+'use strict';
+
+// Users service used for verifying user
+/* Kyle's factory
+angular.module('users').factory('User', ['$resource',
+  function ($resource) {
+    // TODO update code here to verify in backend (need to add backend function too)
+    return $resource('api/users/verify/:user_.id', {}, {
+      update: {
+        method: 'PUT'
+      }
+    });
+  }
+]);
+*/
+
+angular.module('users').factory('User', ["$resource", function($resource) {
+  return $resource('/api/users/:id', { id: '_id' }, {
+    update: {
+      method: 'PUT'
+    }
+  });
+}]);

@@ -7,7 +7,8 @@ const path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   mongoose = require('mongoose'),
   passport = require('passport'),
-  User = mongoose.model('User');
+  User = mongoose.model('User'),
+  nodemailer = require('nodemailer');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
@@ -19,38 +20,39 @@ const noReturnUrls = [
  * Signup
  */
 exports.signup = function (req, res) {
-  console.log(req.body);
+  console.log('tw', req.body);
   // For security measurement we remove the roles from the req.body object
   delete req.body.roles;
 
   // Server side validation of user, returns an object of errors.\
-  const errs = validateUser(req.body);
-
-  if (Object.keys(errs).length > 0) {
-    return res.json(err);
-  }
 
 
   // Init Variables
   const user = new User(req.body);
-
-  // Add missing user fields
-  user.provider = 'local';
-  user.displayName = user.firstName + ' ' + user.lastName;
-
   // Then save the user
+  const errs = user.validateSync();
   user.save()
       .then((user) => {
-        //TODO: Hello Perry!
-        //user._id is this current user's mongo id after the save has successfully completed. good luck.
+        //established modemailer email transporter object to send email with mailOptions populating mail with link
+        const transporter = nodemailer.createTransport({ service: 'Gmail', auth: { user: 'no.replyhccresearch@gmail.com', pass: 'whatisgamenight' } });
+        var mailOptions = { from: 'no.replyhccresearch@gmail.com', to: user.email, subject: 'HCC Research Pool Account Verification', text: 'Hello '+user.firstName+' '+user.lastName+',\n\n'+'Please verify your account by clicking the link: \n\nhttps:\/\/ciseresearchpool.herokuapp.com\/authentication\/verify\/'+user._id+'\n' };
+        //'Please verify your account by clicking the link: \n\nhttps:\/\/ciseresearchpool.herokuapp.com\/authentication\/validate\/'+user._id+'\n'
+        console.log('Email sent!');
+        transporter.sendMail(mailOptions, function(err){
+          if (err) {
+            return res.status(500).send({ msg: err.message });
+          }
+        });
         res.statusCode = 200;
         return res.send();
       })
       .catch((err) => {
-        console.log('SingUp User Error:', err);
-        res.statusCode = 400;
-        res.body = err;
-        return res.send(err);
+        const errJSON = err.toJSON();
+        if (errJSON.errors && errJSON.errors.email) {
+          errJSON.message = errJSON.errors.email.message;
+        }
+        console.log('SingUp User Error:\n', errJSON);
+        res.status(400).send(errJSON);
       })
 };
 
@@ -83,6 +85,24 @@ exports.signin = function (req, res, next) {
 exports.signout = function (req, res) {
   req.logout();
   res.redirect('/');
+};
+
+exports.verify = function (req, res) {
+  console.log('Verify Here!');
+  console.log(req.params.id);
+
+  User.findOne({ _id:req.params.id }, function (err, user) {
+    if(!user) return res.status(400).send({ msg: 'Unable to find a user with that ID. Please create another account!' });
+    if(user.emailValidated) return res.status(400).send({ type:'already-verified', msg: 'Unable to find a user with that ID. Please create another account!' });
+
+    user.emailValidated = true;
+    user.save(function (err) {
+      if(err) {
+        return res.status(500).send({ msg: err.message });
+      }
+      res.status(200).send('The account is now active and available for login!');
+    });
+  });
 };
 
 /**
@@ -242,11 +262,11 @@ exports.removeOAuthProvider = function (req, res, next) {
   });
 };
 
-const validateUser = (user) => {
-  const errs = {};
+
+const gatherErrors = (validationResults) => {
 
   //TODO: TwF, server side validation for user here.
 
-  return errs;
+  return validationResults;
 
 };
