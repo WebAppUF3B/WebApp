@@ -35,7 +35,7 @@ exports.signup = function (req, res) {
       .then((user) => {
         //established modemailer email transporter object to send email with mailOptions populating mail with link
         const transporter = nodemailer.createTransport({ service: 'Gmail', auth: { user: 'no.replyhccresearch@gmail.com', pass: 'whatisgamenight' } });
-        var mailOptions = { from: 'no.replyhccresearch@gmail.com', to: user.email, subject: 'HCC Research Pool Account Verification', text: 'Hello, '+user.displayName+',\n\n'+'Please verify your account by clicking the link: \n\nhttps:\/\/ciseresearchpool.herokuapp.com\/authentication\/verify\/'+user._id+'\n' };
+        var mailOptions = { from: 'no.replyhccresearch@gmail.com', to: user.email, subject: 'HCC Research Pool Account Verification', text: 'Hello '+user.firstName+' '+user.lastName+',\n\n'+'Please verify your account by clicking the link: \n\nhttps:\/\/ciseresearchpool.herokuapp.com\/authentication\/verify\/'+user._id+'\n' };
         //'Please verify your account by clicking the link: \n\nhttps:\/\/ciseresearchpool.herokuapp.com\/authentication\/validate\/'+user._id+'\n'
         console.log('Email sent!');
         transporter.sendMail(mailOptions, function(err){
