@@ -8,7 +8,8 @@ const path = require('path'),
   mongoose = require('mongoose'),
   passport = require('passport'),
   User = mongoose.model('User'),
-  nodemailer = require('nodemailer');
+  nodemailer = require('nodemailer'),
+  url = require('url');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
@@ -32,6 +33,10 @@ exports.signup = function (req, res) {
   // Then save the user
   user.save()
       .then((user) => {
+        const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${user._id}`;
+        const verificationText = `Hello, ${user.firstName} ${user.lastName},
+                                  \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
+
         //established modemailer email transporter object to send email with mailOptions populating mail with link
         const transporter = nodemailer.createTransport({
           service: 'Gmail',
@@ -41,9 +46,8 @@ exports.signup = function (req, res) {
           from: 'no.replyhccresearch@gmail.com',
           to: user.email,
           subject: 'HCC Research Pool Account Verification',
-          text: 'Hello, ' + user.displayName + ',\n\n' + 'Please verify your account by clicking the link: \n\nhttp:\/\/localhost:5000\/authentication\/verify\/' + user._id + '\n'
+          text: verificationText
         };
-        //'Please verify your account by clicking the link: \n\nhttps:\/\/ciseresearchpool.herokuapp.com\/authentication\/validate\/'+user._id+'\n'
         console.log('tw Sending email');
         transporter.sendMail(mailOptions);
       })
