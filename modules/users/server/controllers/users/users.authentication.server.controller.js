@@ -8,8 +8,7 @@ const path = require('path'),
   mongoose = require('mongoose'),
   passport = require('passport'),
   User = mongoose.model('User'),
-  nodemailer = require('nodemailer'),
-  url = require('url');
+  nodemailer = require('nodemailer');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
