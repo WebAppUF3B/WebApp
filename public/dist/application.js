@@ -832,8 +832,8 @@ angular.module('users').config(['$stateProvider',
         url: '/signin?err',
         templateUrl: 'modules/users/client/views/authentication/signin.client.view.html'
       })
-      .state('authentication.email', {
-        url: '/email',
+      .state('authentication.email-sent', {
+        url: '/email-sent',
         templateUrl: 'modules/users/client/views/authentication/email.client.view.html'
       })
       .state('authentication.verify', {
@@ -972,7 +972,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
-        $state.go('authentication.verify');
+        $state.go('authentication.email-sent');
       }).error((response) => {
         $scope.error = response.message;
       });
