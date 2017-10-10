@@ -336,6 +336,10 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/',
       templateUrl: 'modules/core/client/views/home.client.view.html'
     })
+    .state('participant-portal', {
+      url: '/participant',
+      templateUrl: 'modules/core/client/views/participant-portal.client.view.html'
+    })
     .state('not-found', {
       url: '/not-found',
       templateUrl: 'modules/core/client/views/404.client.view.html',
@@ -390,6 +394,16 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
   function ($scope, Authentication) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
+  }
+]);
+
+'use strict';
+
+// angular.module('core', ["ngTable"]).controller('ParticipantPortalController', ['$scope',
+angular.module('core').controller('ParticipantPortalController', ['$scope',
+  function($scope) {
+    /* Get all the listings, then bind it to the scope */
+
   }
 ]);
 
@@ -832,8 +846,8 @@ angular.module('users').config(['$stateProvider',
         url: '/signin?err',
         templateUrl: 'modules/users/client/views/authentication/signin.client.view.html'
       })
-      .state('authentication.email', {
-        url: '/email',
+      .state('authentication.email-sent', {
+        url: '/email-sent',
         templateUrl: 'modules/users/client/views/authentication/email.client.view.html'
       })
       .state('authentication.verify', {
@@ -972,7 +986,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
-        $state.go('authentication.verify');
+        $state.go('authentication.email-sent');
       }).error((response) => {
         $scope.error = response.message;
       });
