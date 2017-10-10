@@ -90,14 +90,17 @@ exports.signin = function (req, res, next) {
         }
 
         console.log('authentication worked');
-        delete user.password;
-        delete user.salt;
-        delete user.updated;
-        delete user.created;
-        delete user.emailValidated;
+        const minimalUser = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          gender: user.gender,
+          birthday: user.firstName,
+          email: user.firstName,
+          roles: user.firstName,
+        };
 
-        console.log(user);
-        return res.status(200).send(user.toJSON());
+        console.log('minimal user info:\n', minimalUser);
+        return res.status(200).send(minimalUser);
       })
       .catch((err) => {
         console.log('Signin Error:\n', err);
