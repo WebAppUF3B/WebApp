@@ -52,7 +52,7 @@ exports.signup = function (req, res) {
       })
       .then(() => {
         console.log('tw Email sent!')
-        res.status(200).send();
+        return res.status(200).send();
       })
       .catch((err) => {
         const errJSON = err.toJSON();
@@ -60,7 +60,7 @@ exports.signup = function (req, res) {
           errJSON.message = errJSON.errors.email.message;
         }
         console.log('SingUp User Error:\n', errJSON);
-        res.status(400).send(errJSON);
+        return res.status(400).send(errJSON);
       })
 };
 
@@ -68,23 +68,44 @@ exports.signup = function (req, res) {
  * Signin after passport authentication
  */
 exports.signin = function (req, res, next) {
-  passport.authenticate('local', (err, user, info) => {
-    if (err || !user) {
-      res.status(400).send(info);
-    } else {
-      // Remove sensitive data before login
-      user.password = undefined;
-      user.salt = undefined;
+  console.log(req.body);
+  const signInErr = Error('Invalid email or password');
+  signInErr.code = 400;
 
-      req.login(user, (err) => {
-        if (err) {
-          res.status(400).send(err);
-        } else {
-          res.json(user);
+  const notVerifiedErr = Error('Email has not been verified');
+  notVerifiedErr.code = 400;
+
+  User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          throw signInErr;
         }
-      });
-    }
-  })(req, res, next);
+
+        if (!user.emailValidated) {
+          throw notVerifiedErr;
+        }
+
+        if (!user.authenticate(req.body.password)) {
+          throw signInErr;
+        }
+
+        console.log('authentication worked');
+        const minimalUser = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          gender: user.gender,
+          birthday: user.firstName,
+          email: user.firstName,
+          roles: user.firstName,
+        };
+
+        console.log('minimal user info:\n', minimalUser);
+        return res.status(200).send(minimalUser);
+      })
+      .catch((err) => {
+        console.log('Signin Error:\n', err);
+        return res.status(err.code).send(err.toJSON());
+      })
 };
 
 /**
@@ -95,6 +116,7 @@ exports.signout = function (req, res) {
   res.redirect('/');
 };
 
+//verify
 exports.verify = function (req, res) {
   console.log('Verify Here!');
   console.log(req.params.id);

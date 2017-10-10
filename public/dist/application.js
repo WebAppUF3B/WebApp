@@ -1003,10 +1003,11 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
+        console.log(response);
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
-        $state.go($state.previous.state.name || 'home', $state.previous.params);
+        $state.go('participant-portal', $state.previous.params);
       }).error((response) => {
         $scope.error = response.message;
       });
