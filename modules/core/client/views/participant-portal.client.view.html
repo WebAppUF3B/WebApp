@@ -1,0 +1,80 @@
+<div class="container inner-container" ng-controller="ParticipantPortalController">
+  <div class="row">
+    <div class="col-sm-6">
+      <h1 class="phone-center">Participant Portal</h1>
+    </div>
+    <div class="col-sm-6">
+      <a class="btn btn-primary margin-top mobile-full-width float-right" ui-sref="study-discovery">Participate in a New Study</a>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col-md-8 col-md-push-4 col-sm-7 col-sm-push-5">
+
+      <div class="row">
+        <div class="col-sm-12">
+          <h2 class="text-center">My Upcoming Sessions</h2>
+          <table class="ng-table table table-hover">
+            <thead>
+              <tr>
+                <td>Title</td>
+                <td>Location</td>
+                <td>Date</td>
+                <td>Time</td>
+              </tr>
+            </thead>
+            <tr ng-repeat="">
+              <td title="'Title'" filter="{ title: 'text'}" sortable="'Title'">
+                {{session.title}}</td>
+              <td title="'Location'" filter="{ location: 'text'}" sortable="'Location'">
+                {{session.location}}</td>
+              <td title="'Date'" filter="{ Date: 'text'}" sortable="'Date'">
+                {{session.date}}</td>
+              <td title="'Time'" filter="{ Time: 'text'}" sortable="'Time'">
+                {{session.time}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12">
+          <h2 class="text-center">My Past Sessions</h2>
+          <table class="ng-table table table-hover">
+            <thead>
+              <tr>
+                <td>Title</td>
+                <td>Location</td>
+                <td>Date</td>
+                <td>Time</td>
+              </tr>
+            </thead>
+            <tr ng-repeat="">
+              <td title="'Title'" filter="{ title: 'text'}" sortable="'Title'">
+                {{session.title}}</td>
+              <td title="'Location'" filter="{ location: 'text'}" sortable="'Location'">
+                {{session.location}}</td>
+              <td title="'Date'" filter="{ Date: 'text'}" sortable="'Date'">
+                {{session.date}}</td>
+              <td title="'Time'" filter="{ Time: 'text'}" sortable="'Time'">
+                {{session.time}}</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 col-md-pull-8 col-sm-5 col-sm-pull-7">
+      <div class="profile-box">
+        <div class="profile-box-inner">
+          <h3 class="text-center no-margin pad-bottom">My Profile</h3>
+          <p>Name: {{user.firstName}} {{user.lastName}}</p>
+          <p>Email: {{user.email}}</p>
+          <p>Address: {{user.address}}</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

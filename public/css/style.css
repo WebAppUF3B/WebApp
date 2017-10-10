@@ -26,6 +26,9 @@
     padding-left: 0px !important;
     padding-right: 0px !important;
   }
+  .mobile-full-width{
+    width: 100% !important;
+  }
 }
 
 /* For Tablet/Phone */
@@ -197,6 +200,14 @@ footer .uf-monogram {
   padding-top: 15px;
 }
 
+.pad-bottom{
+  padding-bottom: 15px;
+}
+
+.margin-top{
+  margin-top: 20px;
+}
+
 .btn{
   border-radius: 0px !important;
   font-size: 1.3em !important;
@@ -285,4 +296,68 @@ md-datepicker {
 
 .no-margin{
   margin: 0px !important;
+}
+
+.profile-box{
+  margin-top: 20px;
+  border: 2px solid #c3c3c3;
+  border-radius: 4px;
+}
+
+.profile-box-inner{
+  padding: 15px;
+}
+
+table.ng-table tbody td, table.ng-table thead th {
+  border: 1px solid gray;
+}
+
+tr:nth-child(even) {
+    background-color: #d9d9d9;
+}
+
+tr:nth-child(odd) {
+    background-color: #f8f8f8;
+}
+
+.white tr{
+	background-color: white !important;
+}
+
+.ng-table th.sortable .sort-indicator:after {
+   	border-color: white transparent;
+}
+
+.ng-table th.sortable .sort-indicator:before{
+  	border-top: 4px solid white;
+}
+
+.ng-table th.sortable.sort-desc .sort-indicator:after{
+	border-top: 4px solid white;
+}
+
+.ng-table th.sortable.sort-desc,
+.ng-table th.sortable.sort-asc {
+  background-color: #316cb9;
+}
+
+td {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.table-hover{
+	font-size: 15px;
+}
+
+.table-hover tbody tr:hover{
+	background-color: #fe8c35;
+}
+
+.table-hover thead tr{
+	height: 30px;
+	background-color: #3676c9;
+	color: white;
 }
