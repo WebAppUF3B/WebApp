@@ -312,16 +312,12 @@ table.ng-table tbody td, table.ng-table thead th {
   border: 1px solid gray;
 }
 
-tr:nth-child(even) {
+.ng-table tr:nth-child(even) {
     background-color: #d9d9d9;
 }
 
-tr:nth-child(odd) {
+.ng-table tr:nth-child(odd) {
     background-color: #f8f8f8;
-}
-
-.white tr{
-	background-color: white !important;
 }
 
 .ng-table th.sortable .sort-indicator:after {
@@ -341,7 +337,7 @@ tr:nth-child(odd) {
   background-color: #316cb9;
 }
 
-td {
+.ng-table td {
     max-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
