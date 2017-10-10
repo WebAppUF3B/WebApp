@@ -1,0 +1,288 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+/* For Phone */
+
+@media (max-width: 767px) {
+  .phone-center {
+    text-align: center;
+  }
+  .footer-logo {
+    float: none !important;
+  }
+  .left-panel {
+    border-bottom: 4px solid #fe8c35;
+    margin-right: 0px;
+  }
+  .right-divider{
+    border-right: none !important;
+  }
+  .title.title-pad{
+    padding-top: 10px !important;
+  }
+  .panel-container{
+    margin-right: 15px !important;
+    margin-left: 15px !important;
+  }
+  .mobile-no-pad{
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+}
+
+/* For Tablet/Phone */
+
+@media (max-width: 991px) {
+  .tablet-center {
+    text-align: center;
+  }
+  .top-logo {
+    width: 80% !important;
+  }
+  .title-pad{
+    padding-top: 40px !important;
+  }
+}
+
+/* For Tablet/Desktop */
+
+@media (min-width: 768px) {
+  .landing-page-container {
+    margin-top: 50px !important;
+  }
+  .jumbotron h1, .jumbotron .h1 {
+      font-size: 45px !important;
+  }
+}
+
+/* For Desktop Only */
+
+@media (min-width: 992px) {
+
+}
+
+html {
+  overflow-x: hidden;
+  height: 100%;
+  background-color: white;
+}
+
+body {
+  height: 100%;
+  display: flex;
+  flex-flow: column;
+  position: relative;
+  border-top: solid 3px #fe8c35;
+  color: #383838;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 150%;
+}
+
+section.ng-scope {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #243778 !important;
+  font-family: 'Roboto Condensed', sans-serif !important;
+  font-weight: 300 !important;
+}
+
+h1, h2, h3 {
+  line-height: 40px;
+}
+
+h2, h3, h4, h5, h6 {
+  line-height: 1.3em;
+}
+
+.navbar {
+  background: #f1f1f1;
+  color: #243778;
+  text-transform: uppercase;
+  border-top: 1px solid #9da3bd;
+  border-bottom: 3px solid #9da3bd;
+  margin-bottom: 0px !important;
+}
+
+.top-logo {
+  width: 50%;
+  padding: 10px 0px 10px 0px;
+}
+
+.main {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+
+.float-left {
+  float: left;
+}
+
+.float-right {
+  float: right;
+}
+
+.top-pad {
+  padding-top: 30px;
+}
+
+.small-top-pad {
+  padding-top: 10px;
+}
+
+.gator-dark-blue {
+  background-color: #243778 !important;
+  color: white !important;
+}
+
+.gator-light-blue {
+  background-color: #4d61a6 !important;
+  color: white !important;
+}
+
+.gator-orange {
+  background-color: #fe8c35 !important;
+  color: white !important;
+}
+
+.left-panel {
+  padding: 20px 0px 20px 0px;
+  font-size: 1.2em;
+  margin-right: 5px;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.vertical-center{
+  vertical-align: middle;
+}
+
+.right-divider{
+  border-right: 4px solid #fe8c35;
+}
+
+.title {
+  font-size: 3em;
+}
+
+.title-pad{
+  padding-top: 15px;
+  padding-bottom: 20px;
+}
+
+footer {
+  background: url(/images/footer_wrap.jpg) repeat-x scroll 0 top white;
+  margin-top: auto;
+}
+
+footer .uf-monogram {
+  background: url(/images/uf_monogram.png) no-repeat scroll 0 0 transparent;
+  display: block;
+  height: 48px;
+  left: 50%;
+  margin-left: -25px;
+  position: relative;
+  top: -20px;
+  width: 48px;
+}
+
+.pad-top{
+  padding-top: 15px;
+}
+
+.btn{
+  border-radius: 0px !important;
+  font-size: 1.3em !important;
+  margin-bottom: 15px !important;
+  border: 0px !important;
+  color: #fff !important;
+  white-space: normal !important;
+}
+
+.btn-primary {
+  background: #007ec6;
+}
+
+.btn-primary:hover{
+  background: #006ba8;
+}
+
+.btn-orange{
+  background: #ff7f16;
+}
+
+.btn-orange:hover{
+  background: #dd6c0f;
+}
+
+.btn-green{
+  background: #32c256;
+}
+
+.btn-green:hover{
+  background: #32aa50;
+}
+
+.inner-container{
+  margin-bottom: 40px;
+}
+
+.panel-container{
+  padding-top: 50px;
+}
+
+.jumbotron h1{
+  padding-bottom: 20px;
+  color: white !important;
+}
+
+.jumbotron-container{
+  border-radius: 6px;
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
+.lowercase {
+    text-transform: lowercase;
+}
+::-webkit-input-placeholder { /* WebKit browsers */
+    text-transform: none;
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    text-transform: none;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+    text-transform: none;
+}
+:-ms-input-placeholder { /* Internet Explorer 10+ */
+    text-transform: none;
+}
+
+md-datepicker {
+    width: 100%;
+}
+
+.form-panel{
+  background-color: white;
+  box-shadow: -2px 2px 5px #888888;
+  border: 1px solid #c3c3c3;
+}
+
+.form-panel form{
+  padding: 20px;
+}
+
+.forgot-password{
+  margin-top: -8px;
+}
+
+.no-margin{
+  margin: 0px !important;
+}
