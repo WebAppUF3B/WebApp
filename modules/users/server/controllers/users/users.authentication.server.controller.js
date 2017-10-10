@@ -33,7 +33,7 @@ exports.signup = function (req, res) {
   user.save()
       .then((user) => {
         const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${user._id}`;
-        const verificationText = `Hello, ${user.firstName} ${user.lastName},
+        const verificationText = `Hello ${user.firstName} ${user.lastName},
                                   \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
 
         //established modemailer email transporter object to send email with mailOptions populating mail with link
