@@ -30,21 +30,29 @@ exports.signup = function (req, res) {
   // Init Variables
   const user = new User(req.body);
   // Then save the user
-  const errs = user.validateSync();
   user.save()
       .then((user) => {
+        const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${user._id}`;
+        const verificationText = `Hello, ${user.firstName} ${user.lastName},
+                                  \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
+
         //established modemailer email transporter object to send email with mailOptions populating mail with link
-        const transporter = nodemailer.createTransport({ service: 'Gmail', auth: { user: 'no.replyhccresearch@gmail.com', pass: 'whatisgamenight' } });
-        var mailOptions = { from: 'no.replyhccresearch@gmail.com', to: user.email, subject: 'HCC Research Pool Account Verification', text: 'Hello '+user.firstName+' '+user.lastName+',\n\n'+'Please verify your account by clicking the link: \n\nhttps:\/\/ciseresearchpool.herokuapp.com\/authentication\/verify\/'+user._id+'\n' };
-        //'Please verify your account by clicking the link: \n\nhttps:\/\/ciseresearchpool.herokuapp.com\/authentication\/validate\/'+user._id+'\n'
-        console.log('Email sent!');
-        transporter.sendMail(mailOptions, function(err){
-          if (err) {
-            return res.status(500).send({ msg: err.message });
-          }
+        const transporter = nodemailer.createTransport({
+          service: 'Gmail',
+          auth: { user: 'no.replyhccresearch@gmail.com', pass: 'whatisgamenight' }
         });
-        res.statusCode = 200;
-        return res.send();
+        const mailOptions = {
+          from: 'no.replyhccresearch@gmail.com',
+          to: user.email,
+          subject: 'HCC Research Pool Account Verification',
+          text: verificationText
+        };
+        console.log('tw Sending email');
+        transporter.sendMail(mailOptions);
+      })
+      .then(() => {
+        console.log('tw Email sent!')
+        res.status(200).send();
       })
       .catch((err) => {
         const errJSON = err.toJSON();
