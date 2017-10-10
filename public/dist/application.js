@@ -336,6 +336,10 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/',
       templateUrl: 'modules/core/client/views/home.client.view.html'
     })
+    .state('participant-portal', {
+      url: '/participant',
+      templateUrl: 'modules/core/client/views/participant-portal.client.view.html'
+    })
     .state('not-found', {
       url: '/not-found',
       templateUrl: 'modules/core/client/views/404.client.view.html',
@@ -390,6 +394,16 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
   function ($scope, Authentication) {
     // This provides Authentication context.
     $scope.authentication = Authentication;
+  }
+]);
+
+'use strict';
+
+// angular.module('core', ["ngTable"]).controller('ParticipantPortalController', ['$scope',
+angular.module('core').controller('ParticipantPortalController', ['$scope',
+  function($scope) {
+    /* Get all the listings, then bind it to the scope */
+
   }
 ]);
 
