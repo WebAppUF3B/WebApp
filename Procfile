@@ -1,2 +1,3 @@
-dev: grunt build && grunt --force
-web: ./node_modules/.bin/forever -m 5 server.js
+dev: npm run start
+web: npm run start:prod
+test: npm test

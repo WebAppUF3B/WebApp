@@ -14,14 +14,14 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
         return false;
       }
 
-      var user = new Users($scope.user);
+      const user = new Users($scope.user);
 
-      user.$update(function (response) {
+      user.$update((response) => {
         $scope.$broadcast('show-errors-reset', 'userForm');
 
         $scope.success = true;
         Authentication.user = response;
-      }, function (response) {
+      }, (response) => {
         $scope.error = response.data.message;
       });
     };

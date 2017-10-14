@@ -6,37 +6,37 @@
 
 angular.module('core')
   .directive('showErrors', ['$timeout', '$interpolate', function ($timeout, $interpolate) {
-    var linkFn = function (scope, el, attrs, formCtrl) {
-      var inputEl, inputName, inputNgEl, options, showSuccess, toggleClasses,
-        initCheck = false,
-        showValidationMessages = false,
-        blurred = false;
+    const linkFn = function (scope, el, attrs, formCtrl) {
+      let initCheck = false,
+        showValidationMessages = false;
 
-      options = scope.$eval(attrs.showErrors) || {};
-      showSuccess = options.showSuccess || false;
-      inputEl = el[0].querySelector('.form-control[name]') || el[0].querySelector('[name]');
-      inputNgEl = angular.element(inputEl);
-      inputName = $interpolate(inputNgEl.attr('name') || '')(scope);
+      let toggleClasses; // eslint-disable-line
+
+      const options = scope.$eval(attrs.showErrors) || {};
+      const showSuccess = options.showSuccess || false;
+      const inputEl = el[0].querySelector('.form-control[name]') || el[0].querySelector('[name]');
+      const inputNgEl = angular.element(inputEl);
+      const inputName = $interpolate(inputNgEl.attr('name') || '')(scope);
 
       if (!inputName) {
         throw 'show-errors element has no child input elements with a \'name\' attribute class';
       }
 
-      var reset = function () {
-        return $timeout(function () {
+      const reset = function () {
+        return $timeout(() => {
           el.removeClass('has-error');
           el.removeClass('has-success');
           showValidationMessages = false;
         }, 0, false);
       };
 
-      scope.$watch(function () {
+      scope.$watch(() => {
         return formCtrl[inputName] && formCtrl[inputName].$invalid;
-      }, function (invalid) {
+      }, (invalid) => {
         return toggleClasses(invalid);
       });
 
-      scope.$on('show-errors-check-validity', function (event, name) {
+      scope.$on('show-errors-check-validity', (event, name) => {
         if (angular.isUndefined(name) || formCtrl.$name === name) {
           initCheck = true;
           showValidationMessages = true;
@@ -45,7 +45,7 @@ angular.module('core')
         }
       });
 
-      scope.$on('show-errors-reset', function (event, name) {
+      scope.$on('show-errors-reset', (event, name) => {
         if (angular.isUndefined(name) || formCtrl.$name === name) {
           return reset();
         }

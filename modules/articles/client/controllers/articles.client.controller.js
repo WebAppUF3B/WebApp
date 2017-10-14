@@ -16,19 +16,19 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
       }
 
       // Create new Article object
-      var article = new Articles({
+      const article = new Articles({
         title: this.title,
         content: this.content
       });
 
       // Redirect after save
-      article.$save(function (response) {
+      article.$save((response) => {
         $location.path('articles/' + response._id);
 
         // Clear form fields
         $scope.title = '';
         $scope.content = '';
-      }, function (errorResponse) {
+      }, (errorResponse) => {
         $scope.error = errorResponse.data.message;
       });
     };
@@ -38,13 +38,13 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
       if (article) {
         article.$remove();
 
-        for (var i in $scope.articles) {
+        for (const i in $scope.articles) {
           if ($scope.articles[i] === article) {
             $scope.articles.splice(i, 1);
           }
         }
       } else {
-        $scope.article.$remove(function () {
+        $scope.article.$remove(() => {
           $location.path('articles');
         });
       }
@@ -60,11 +60,11 @@ angular.module('articles').controller('ArticlesController', ['$scope', '$statePa
         return false;
       }
 
-      var article = $scope.article;
+      const article = $scope.article;
 
-      article.$update(function () {
+      article.$update(() => {
         $location.path('articles/' + article._id);
-      }, function (errorResponse) {
+      }, (errorResponse) => {
         $scope.error = errorResponse.data.message;
       });
     };

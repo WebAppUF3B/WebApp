@@ -51,7 +51,7 @@ exports.signup = function (req, res) {
         transporter.sendMail(mailOptions);
       })
       .then(() => {
-        console.log('tw Email sent!')
+        console.log('tw Email sent!');
         return res.status(200).send();
       })
       .catch((err) => {
@@ -121,12 +121,12 @@ exports.verify = function (req, res) {
   console.log('Verify Here!');
   console.log(req.params.id);
 
-  User.findOne({ _id:req.params.id }, function (err, user) {
+  User.findOne({ _id:req.params.id }, (err, user) => {
     if(!user) return res.status(400).send({ msg: 'Unable to find a user with that ID. Please create another account!' });
     if(user.emailValidated) return res.status(400).send({ type:'already-verified', msg: 'Unable to find a user with that ID. Please create another account!' });
 
     user.emailValidated = true;
-    user.save(function (err) {
+    user.save((err) => {
       if(err) {
         return res.status(500).send({ msg: err.message });
       }

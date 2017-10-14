@@ -1,18 +1,18 @@
 'use strict';
 
-var _ = require('lodash'),
+const _ = require('lodash'),
   config = require('../config'),
   mongoose = require('mongoose'),
   chalk = require('chalk'),
   crypto = require('crypto');
 
 // global seed options object
-var seedOptions = {};
+let seedOptions = {};
 
 function removeUser (user) {
-  return new Promise(function (resolve, reject) {
-    var User = mongoose.model('User');
-    User.find({ username: user.username }).remove(function (err) {
+  return new Promise((resolve, reject) => {
+    const User = mongoose.model('User');
+    User.find({ username: user.username }).remove((err) => {
       if (err) {
         reject(new Error('Failed to remove local ' + user.username));
       }
@@ -23,9 +23,9 @@ function removeUser (user) {
 
 function saveUser (user) {
   return function() {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
       // Then save the user
-      user.save(function (err, theuser) {
+      user.save((err, theuser) => {
         if (err) {
           reject(new Error('Failed to add local ' + user.username));
         } else {
@@ -37,9 +37,9 @@ function saveUser (user) {
 }
 
 function checkUserNotExists (user) {
-  return new Promise(function (resolve, reject) {
-    var User = mongoose.model('User');
-    User.find({ username: user.username }, function (err, users) {
+  return new Promise((resolve, reject) => {
+    const User = mongoose.model('User');
+    User.find({ username: user.username }, (err, users) => {
       if (err) {
         reject(new Error('Failed to find local account ' + user.username));
       }
@@ -55,7 +55,7 @@ function checkUserNotExists (user) {
 
 function reportSuccess (password) {
   return function (user) {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
       if (seedOptions.logResults) {
         console.log(chalk.bold.red('Database Seeding:\t\t\tLocal ' + user.username + ' added with password set to ' + password));
       }
@@ -67,9 +67,9 @@ function reportSuccess (password) {
 // save the specified user with the password provided from the resolved promise
 function seedTheUser (user) {
   return function (password) {
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
 
-      var User = mongoose.model('User');
+      const User = mongoose.model('User');
       // set the new password
       user.password = password;
 
@@ -77,20 +77,20 @@ function seedTheUser (user) {
         checkUserNotExists(user)
           .then(saveUser(user))
           .then(reportSuccess(password))
-          .then(function () {
+          .then(() => {
             resolve();
           })
-          .catch(function (err) {
+          .catch((err) => {
             reject(err);
           });
       } else {
         removeUser(user)
           .then(saveUser(user))
           .then(reportSuccess(password))
-          .then(function () {
+          .then(() => {
             resolve();
           })
-          .catch(function (err) {
+          .catch((err) => {
             reject(err);
           });
       }
@@ -128,17 +128,17 @@ module.exports.start = function start(options) {
     seedOptions.seedAdmin = options.seedAdmin;
   }
 
-  var User = mongoose.model('User');
-  return new Promise(function (resolve, reject) {
+  const User = mongoose.model('User');
+  return new Promise((resolve, reject) => {
 
-    var adminAccount = new User(seedOptions.seedAdmin);
-    var userAccount = new User(seedOptions.seedUser);
+    const adminAccount = new User(seedOptions.seedAdmin);
+    const userAccount = new User(seedOptions.seedUser);
 
     //If production only seed admin if it does not exist
     if (process.env.NODE_ENV === 'production') {
       User.generateRandomPassphrase()
         .then(seedTheUser(adminAccount))
-        .then(function () {
+        .then(() => {
           resolve();
         })
         .catch(reportError(reject));
@@ -149,7 +149,7 @@ module.exports.start = function start(options) {
         .then(seedTheUser(userAccount))
         .then(User.generateRandomPassphrase)
         .then(seedTheUser(adminAccount))
-        .then(function () {
+        .then(() => {
           resolve();
         })
         .catch(reportError(reject));

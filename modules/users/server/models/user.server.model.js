@@ -160,7 +160,7 @@ userSchema.methods.authenticate = function (password) {
 * NOTE: Passphrases are only tested against the required owasp strength tests, and not the optional tests.
 */
 userSchema.statics.generateRandomPassphrase = function () {
-  return new Promise(function (resolve, reject) {
+  return new Promise((resolve, reject) => {
     let password = '';
     const repeatingCharacters = new RegExp('(.)\\1{2,}', 'g');
 

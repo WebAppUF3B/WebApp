@@ -14,7 +14,7 @@ angular.module('users').factory('User', ['$resource',
 ]);
 */
 
-angular.module('users').factory('User', function($resource) {
+angular.module('users').factory('User', ($resource) => {
   return $resource('/api/users/:id', { id: '_id' }, {
     update: {
       method: 'PUT'

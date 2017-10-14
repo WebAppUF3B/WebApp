@@ -3,12 +3,12 @@
 /**
  * Module dependencies
  */
-var path = require('path'),
+const path = require('path'),
   config = require(path.resolve('./config/config'));
 
 /**
  * Module init function.
  */
-module.exports = function (app, db) {
+module.exports = function (app, db) { // eslint-disable-line
 
 };

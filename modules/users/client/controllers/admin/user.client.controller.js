@@ -12,7 +12,7 @@ angular.module('users.admin').controller('UserController', ['$scope', '$state', 
 
           $scope.users.splice($scope.users.indexOf(user), 1);
         } else {
-          $scope.user.$remove(function () {
+          $scope.user.$remove(() => {
             $state.go('admin.users');
           });
         }
@@ -26,13 +26,13 @@ angular.module('users.admin').controller('UserController', ['$scope', '$state', 
         return false;
       }
 
-      var user = $scope.user;
+      const user = $scope.user;
 
-      user.$update(function () {
+      user.$update(() => {
         $state.go('admin.user', {
           userId: user._id
         });
-      }, function (errorResponse) {
+      }, (errorResponse) => {
         $scope.error = errorResponse.data.message;
       });
     };

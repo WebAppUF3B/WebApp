@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var _ = require('lodash'),
+const _ = require('lodash'),
   fs = require('fs'),
   path = require('path'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
@@ -17,7 +17,7 @@ var _ = require('lodash'),
  */
 exports.update = function (req, res) {
   // Init Variables
-  var user = req.user;
+  let user = req.user;
 
   // For security measurement we remove the roles from the req.body object
   delete req.body.roles;
@@ -28,20 +28,19 @@ exports.update = function (req, res) {
     user.updated = Date.now();
     user.displayName = user.firstName + ' ' + user.lastName;
 
-    user.save(function (err) {
+    user.save((err) => {
       if (err) {
         return res.status(400).send({
           message: errorHandler.getErrorMessage(err)
         });
-      } else {
-        req.login(user, function (err) {
-          if (err) {
-            res.status(400).send(err);
-          } else {
-            res.json(user);
-          }
-        });
       }
+      req.login(user, (err) => {
+        if (err) {
+          res.status(400).send(err);
+        } else {
+          res.json(user);
+        }
+      });
     });
   } else {
     res.status(400).send({
@@ -54,45 +53,42 @@ exports.update = function (req, res) {
  * Update profile picture
  */
 exports.changeProfilePicture = function (req, res) {
-  var user = req.user;
-  var message = null;
-  var upload = multer(config.uploads.profileUpload).single('newProfilePicture');
-  var profileUploadFileFilter = require(path.resolve('./config/lib/multer')).profileUploadFileFilter;
+  const user = req.user;
+  const message = null;
+  const upload = multer(config.uploads.profileUpload).single('newProfilePicture');
+  const profileUploadFileFilter = require(path.resolve('./config/lib/multer')).profileUploadFileFilter; // eslint-disable-line global-require
   
   // Filtering to upload only images
   upload.fileFilter = profileUploadFileFilter;
 
   if (user) {
-    upload(req, res, function (uploadError) {
+    upload(req, res, (uploadError) => {
       if(uploadError) {
         return res.status(400).send({
           message: 'Error occurred while uploading profile picture'
         });
-      } else {
-        user.profileImageURL = config.uploads.profileUpload.dest + req.file.filename;
+      }
+      user.profileImageURL = config.uploads.profileUpload.dest + req.file.filename;
 
-        user.save(function (saveError) {
-          if (saveError) {
-            return res.status(400).send({
-              message: errorHandler.getErrorMessage(saveError)
-            });
+      user.save((saveError) => {
+        if (saveError) {
+          return res.status(400).send({
+            message: errorHandler.getErrorMessage(saveError)
+          });
+        }
+        req.login(user, (err) => {
+          if (err) {
+            res.status(400).send(err);
           } else {
-            req.login(user, function (err) {
-              if (err) {
-                res.status(400).send(err);
-              } else {
-                res.json(user);
-              }
-            });
+            res.json(user);
           }
         });
-      }
-    });
-  } else {
-    res.status(400).send({
-      message: 'User is not signed in'
+      });
     });
   }
+  res.status(400).send({
+    message: 'User is not signed in'
+  });
 };
 
 /**

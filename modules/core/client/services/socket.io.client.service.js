@@ -15,8 +15,8 @@ angular.module('core').service('Socket', ['Authentication', '$state', '$timeout'
     // Wrap the Socket.io 'on' method
     this.on = function (eventName, callback) {
       if (this.socket) {
-        this.socket.on(eventName, function (data) {
-          $timeout(function () {
+        this.socket.on(eventName, (data) => {
+          $timeout(() => {
             callback(data);
           });
         });

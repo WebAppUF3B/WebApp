@@ -39,7 +39,7 @@ const studySchema = new Schema({
 
 /* create a 'pre' function that adds the updated_at (and created_at if not already there) property */
 studySchema.pre('save', function(next) {
-  var current = new Date();
+  const current = new Date();
   this.updated = current;
   if(!this.createdOn) {
     this.createdOn = current;
@@ -48,7 +48,7 @@ studySchema.pre('save', function(next) {
 });
 
 /* Use your schema to instantiate a Mongoose model */
-var study = mongoose.model('Study', studySchema);
+const study = mongoose.model('Study', studySchema);
 
 /* Export the model to make it avaiable to other parts of your Node application */
 module.exports = study;

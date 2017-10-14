@@ -3,12 +3,12 @@
 /**
  * Module dependencies.
  */
-var adminPolicy = require('../policies/admin.server.policy'),
+const adminPolicy = require('../policies/admin.server.policy'),
   admin = require('../controllers/admin.server.controller');
 
 module.exports = function (app) {
   // User route registration first. Ref: #713
-  require('./users.server.routes.js')(app);
+  require('./users.server.routes.js')(app); // eslint-disable-line
 
   // Users collection routes
   app.route('/api/users')

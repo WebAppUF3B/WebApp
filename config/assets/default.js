@@ -19,7 +19,10 @@ module.exports = {
         'public/lib/angular-ui-utils/ui-utils.js',
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
         'public/lib/angular-file-upload/angular-file-upload.js',
-        'public/lib/owasp-password-strength-test/owasp-password-strength-test.js'
+        'public/lib/ng-file-upload/ng-file-upload.js',
+        'public/lib/angular-mocks/angular-mocks.js',
+        'public/lib/angular-ui-notification/dist/angular-ui-notification.js',
+        'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
       ],
       tests: ['public/lib/angular-mocks/angular-mocks.js']
     },
@@ -42,7 +45,6 @@ module.exports = {
     templates: ['build/templates.js']
   },
   server: {
-    gruntConfig: 'gruntfile.js',
     gulpConfig: 'gulpfile.js',
     allJS: ['server.js', 'config/**/*.js', 'modules/*/server/**/*.js'],
     models: 'modules/*/server/models/**/*.js',

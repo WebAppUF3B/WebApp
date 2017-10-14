@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var config = require('../config'),
+const config = require('../config'),
   express = require('express'),
   morgan = require('morgan'),
   logger = require('./logger'),
@@ -20,10 +20,10 @@ var config = require('../config'),
   path = require('path');
 
 /**
- * Initialize local variables
+ * Initialize local constiables
  */
 module.exports.initLocalVariables = function (app) {
-  // Setting application local variables
+  // Setting application local constiables
   app.locals.title = config.app.title;
   app.locals.description = config.app.description;
   if (config.secure && config.secure.ssl === true) {
@@ -39,7 +39,7 @@ module.exports.initLocalVariables = function (app) {
   app.locals.favicon = config.favicon;
 
   // Passing the request url to environment locals
-  app.use(function (req, res, next) {
+  app.use((req, res, next) => {
     res.locals.host = req.protocol + '://' + req.hostname;
     res.locals.url = req.protocol + '://' + req.headers.host + req.originalUrl;
     next();
@@ -128,8 +128,8 @@ module.exports.initSession = function (app, db) {
  * Invoke modules server configuration
  */
 module.exports.initModulesConfiguration = function (app, db) {
-  config.files.server.configs.forEach(function (configPath) {
-    require(path.resolve(configPath))(app, db);
+  config.files.server.configs.forEach((configPath) => {
+    require(path.resolve(configPath))(app, db); // eslint-disable-line global-require
   });
 };
 
@@ -138,11 +138,11 @@ module.exports.initModulesConfiguration = function (app, db) {
  */
 module.exports.initHelmetHeaders = function (app) {
   // Use helmet to secure Express headers
-  var SIX_MONTHS = 15778476000;
-  app.use(helmet.xframe());
+  const SIX_MONTHS = 15778476000;
+  app.use(helmet.frameguard());
   app.use(helmet.xssFilter());
-  app.use(helmet.nosniff());
-  app.use(helmet.ienoopen());
+  app.use(helmet.noSniff());
+  app.use(helmet.ieNoOpen());
   app.use(helmet.hsts({
     maxAge: SIX_MONTHS,
     includeSubdomains: true,
@@ -159,7 +159,7 @@ module.exports.initModulesClientRoutes = function (app) {
   app.use('/', express.static(path.resolve('./public')));
 
   // Globbing static routing
-  config.folders.client.forEach(function (staticPath) {
+  config.folders.client.forEach((staticPath) => {
     app.use(staticPath, express.static(path.resolve('./' + staticPath)));
   });
 };
@@ -169,8 +169,8 @@ module.exports.initModulesClientRoutes = function (app) {
  */
 module.exports.initModulesServerPolicies = function (app) {
   // Globbing policy files
-  config.files.server.policies.forEach(function (policyPath) {
-    require(path.resolve(policyPath)).invokeRolesPolicies();
+  config.files.server.policies.forEach((policyPath) => {
+    require(path.resolve(policyPath)).invokeRolesPolicies(); // eslint-disable-line global-require
   });
 };
 
@@ -179,8 +179,8 @@ module.exports.initModulesServerPolicies = function (app) {
  */
 module.exports.initModulesServerRoutes = function (app) {
   // Globbing routing files
-  config.files.server.routes.forEach(function (routePath) {
-    require(path.resolve(routePath))(app);
+  config.files.server.routes.forEach((routePath) => {
+    require(path.resolve(routePath))(app); // eslint-disable-line global-require
   });
 };
 
@@ -188,7 +188,7 @@ module.exports.initModulesServerRoutes = function (app) {
  * Configure error handling
  */
 module.exports.initErrorRoutes = function (app) {
-  app.use(function (err, req, res, next) {
+  app.use((err, req, res, next) => {
     // If the error object doesn't exists
     if (!err) {
       return next();
@@ -207,7 +207,7 @@ module.exports.initErrorRoutes = function (app) {
  */
 module.exports.configureSocketIO = function (app, db) {
   // Load the Socket.io configuration
-  var server = require('./socket.io')(app, db);
+  const server = require('./socket.io')(app, db); // eslint-disable-line global-require
 
   // Return server object
   return server;
@@ -218,9 +218,9 @@ module.exports.configureSocketIO = function (app, db) {
  */
 module.exports.init = function (db) {
   // Initialize express app
-  var app = express();
+  let app = express();
 
-  // Initialize local variables
+  // Initialize local constiables
   this.initLocalVariables(app);
 
   // Initialize Express middleware

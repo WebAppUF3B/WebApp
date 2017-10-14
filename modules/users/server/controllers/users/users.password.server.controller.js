@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var path = require('path'),
+const path = require('path'),
   config = require(path.resolve('./config/config')),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
   mongoose = require('mongoose'),
@@ -12,7 +12,7 @@ var path = require('path'),
   async = require('async'),
   crypto = require('crypto');
 
-var smtpTransport = nodemailer.createTransport(config.mailer.options);
+const smtpTransport = nodemailer.createTransport(config.mailer.options);
 
 /**
  * Forgot for reset password (forgot POST)
@@ -21,8 +21,8 @@ exports.forgot = function (req, res, next) {
   async.waterfall([
     // Generate random token
     function (done) {
-      crypto.randomBytes(20, function (err, buffer) {
-        var token = buffer.toString('hex');
+      crypto.randomBytes(20, (err, buffer) => {
+        const token = buffer.toString('hex');
         done(err, token);
       });
     },
@@ -31,7 +31,7 @@ exports.forgot = function (req, res, next) {
       if (req.body.username) {
         User.findOne({
           username: req.body.username.toLowerCase()
-        }, '-salt -password', function (err, user) {
+        }, '-salt -password', (err, user) => {
           if (!user) {
             return res.status(400).send({
               message: 'No account with that username has been found'
@@ -40,11 +40,11 @@ exports.forgot = function (req, res, next) {
             return res.status(400).send({
               message: 'It seems like you signed up using your ' + user.provider + ' account'
             });
-          } else {
+          } else { // eslint-disable-line
             user.resetPasswordToken = token;
             user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
-            user.save(function (err) {
+            user.save((err) => {
               done(err, token, user);
             });
           }
@@ -57,7 +57,7 @@ exports.forgot = function (req, res, next) {
     },
     function (token, user, done) {
 
-      var httpTransport = 'http://';
+      let httpTransport = 'http://';
       if (config.secure && config.secure.ssl === true) {
         httpTransport = 'https://';
       }
@@ -65,19 +65,19 @@ exports.forgot = function (req, res, next) {
         name: user.displayName,
         appName: config.app.title,
         url: httpTransport + req.headers.host + '/api/auth/reset/' + token
-      }, function (err, emailHTML) {
+      }, (err, emailHTML) => {
         done(err, emailHTML, user);
       });
     },
     // If valid email, send reset email using service
     function (emailHTML, user, done) {
-      var mailOptions = {
+      const mailOptions = {
         to: user.email,
         from: config.mailer.from,
         subject: 'Password Reset',
         html: emailHTML
       };
-      smtpTransport.sendMail(mailOptions, function (err) {
+      smtpTransport.sendMail(mailOptions, (err) => {
         if (!err) {
           res.send({
             message: 'An email has been sent to the provided email with further instructions.'
@@ -91,7 +91,7 @@ exports.forgot = function (req, res, next) {
         done(err);
       });
     }
-  ], function (err) {
+  ], (err) => {
     if (err) {
       return next(err);
     }
@@ -107,7 +107,7 @@ exports.validateResetToken = function (req, res) {
     resetPasswordExpires: {
       $gt: Date.now()
     }
-  }, function (err, user) {
+  }, (err, user) => {
     if (!user) {
       return res.redirect('/password/reset/invalid');
     }
@@ -121,8 +121,8 @@ exports.validateResetToken = function (req, res) {
  */
 exports.reset = function (req, res, next) {
   // Init Variables
-  var passwordDetails = req.body;
-  var message = null;
+  const passwordDetails = req.body;
+  const message = null;
 
   async.waterfall([
 
@@ -132,20 +132,20 @@ exports.reset = function (req, res, next) {
         resetPasswordExpires: {
           $gt: Date.now()
         }
-      }, function (err, user) {
+      }, (err, user) => {
         if (!err && user) {
           if (passwordDetails.newPassword === passwordDetails.verifyPassword) {
             user.password = passwordDetails.newPassword;
             user.resetPasswordToken = undefined;
             user.resetPasswordExpires = undefined;
 
-            user.save(function (err) {
+            user.save((err) => {
               if (err) {
                 return res.status(400).send({
                   message: errorHandler.getErrorMessage(err)
                 });
-              } else {
-                req.login(user, function (err) {
+              } else { // eslint-disable-line
+                req.login(user, (err) => {
                   if (err) {
                     res.status(400).send(err);
                   } else {
@@ -176,24 +176,24 @@ exports.reset = function (req, res, next) {
       res.render('modules/users/server/templates/reset-password-confirm-email', {
         name: user.displayName,
         appName: config.app.title
-      }, function (err, emailHTML) {
+      }, (err, emailHTML) => {
         done(err, emailHTML, user);
       });
     },
     // If valid email, send reset email using service
     function (emailHTML, user, done) {
-      var mailOptions = {
+      const mailOptions = {
         to: user.email,
         from: config.mailer.from,
         subject: 'Your password has been changed',
         html: emailHTML
       };
 
-      smtpTransport.sendMail(mailOptions, function (err) {
+      smtpTransport.sendMail(mailOptions, (err) => {
         done(err, 'done');
       });
     }
-  ], function (err) {
+  ], (err) => {
     if (err) {
       return next(err);
     }
@@ -205,24 +205,24 @@ exports.reset = function (req, res, next) {
  */
 exports.changePassword = function (req, res, next) {
   // Init Variables
-  var passwordDetails = req.body;
-  var message = null;
+  const passwordDetails = req.body;
+  const message = null;
 
   if (req.user) {
     if (passwordDetails.newPassword) {
-      User.findById(req.user.id, function (err, user) {
+      User.findById(req.user.id, (err, user) => {
         if (!err && user) {
           if (user.authenticate(passwordDetails.currentPassword)) {
             if (passwordDetails.newPassword === passwordDetails.verifyPassword) {
               user.password = passwordDetails.newPassword;
 
-              user.save(function (err) {
+              user.save((err) => {
                 if (err) {
                   return res.status(400).send({
                     message: errorHandler.getErrorMessage(err)
                   });
-                } else {
-                  req.login(user, function (err) {
+                } else { // eslint-disable-line
+                  req.login(user, (err) => {
                     if (err) {
                       res.status(400).send(err);
                     } else {

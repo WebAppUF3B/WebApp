@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var path = require('path'),
+const path = require('path'),
   mongoose = require('mongoose'),
   Article = mongoose.model('Article'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
@@ -12,17 +12,16 @@ var path = require('path'),
  * Create a article
  */
 exports.create = function (req, res) {
-  var article = new Article(req.body);
+  const article = new Article(req.body);
   article.user = req.user;
 
-  article.save(function (err) {
+  article.save((err) => {
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
       });
-    } else {
-      res.json(article);
     }
+    res.json(article);
   });
 };
 
@@ -37,19 +36,18 @@ exports.read = function (req, res) {
  * Update a article
  */
 exports.update = function (req, res) {
-  var article = req.article;
+  const article = req.article;
 
   article.title = req.body.title;
   article.content = req.body.content;
 
-  article.save(function (err) {
+  article.save((err) => {
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
       });
-    } else {
-      res.json(article);
     }
+    res.json(article);
   });
 };
 
@@ -57,16 +55,15 @@ exports.update = function (req, res) {
  * Delete an article
  */
 exports.delete = function (req, res) {
-  var article = req.article;
+  const article = req.article;
 
-  article.remove(function (err) {
+  article.remove((err) => {
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
       });
-    } else {
-      res.json(article);
     }
+    res.json(article);
   });
 };
 
@@ -74,14 +71,13 @@ exports.delete = function (req, res) {
  * List of Articles
  */
 exports.list = function (req, res) {
-  Article.find().sort('-created').populate('user', 'displayName').exec(function (err, articles) {
+  Article.find().sort('-created').populate('user', 'displayName').exec((err, articles) => {
     if (err) {
       return res.status(400).send({
         message: errorHandler.getErrorMessage(err)
       });
-    } else {
-      res.json(articles);
     }
+    res.json(articles);
   });
 };
 
@@ -96,7 +92,7 @@ exports.articleByID = function (req, res, next, id) {
     });
   }
 
-  Article.findById(id).populate('user', 'displayName').exec(function (err, article) {
+  Article.findById(id).populate('user', 'displayName').exec((err, article) => {
     if (err) {
       return next(err);
     } else if (!article) {

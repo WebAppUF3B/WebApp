@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var _ = require('lodash'),
+const _ = require('lodash'),
   mongoose = require('mongoose'),
   User = mongoose.model('User');
 
@@ -19,7 +19,7 @@ exports.userByID = function (req, res, next, id) {
 
   User.findOne({
     _id: id
-  }).exec(function (err, user) {
+  }).exec((err, user) => {
     if (err) {
       return next(err);
     } else if (!user) {

@@ -1,17 +1,16 @@
 'use strict';
 
-var cfenv = require('cfenv'),
+const cfenv = require('cfenv'),
   appEnv = cfenv.getAppEnv();
-var cfMongoUrl = (function() {
+const cfMongoUrl = (function() {
   if (appEnv.getService('mean-mongo')) {
-    var mongoCreds = appEnv.getService('mean-mongo').credentials;
+    const mongoCreds = appEnv.getService('mean-mongo').credentials;
     return mongoCreds.uri || mongoCreds.url;
-  } else {
-    throw new Error('No service names "mean-mongo" bound to the application.');
   }
+  throw new Error('No service names "mean-mongo" bound to the application.');
 }());
 
-var getCred = function (serviceName, credProp) {
+const getCred = function (serviceName, credProp) {
   return appEnv.getService(serviceName) ?
     appEnv.getService(serviceName).credentials[credProp] : undefined;
 };

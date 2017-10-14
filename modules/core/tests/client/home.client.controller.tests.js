@@ -1,15 +1,15 @@
 'use strict';
 
 (function () {
-  describe('HomeController', function () {
+  describe('HomeController', () => {
     //Initialize global variables
-    var scope,
+    let scope,
       HomeController;
 
     // Load the main application module
     beforeEach(module(ApplicationConfiguration.applicationModuleName));
 
-    beforeEach(inject(function ($controller, $rootScope) {
+    beforeEach(inject(($controller, $rootScope) => {
       scope = $rootScope.$new();
 
       HomeController = $controller('HomeController', {
@@ -17,7 +17,7 @@
       });
     }));
 
-    it('should expose the authentication service', function () {
+    it('should expose the authentication service', () => {
       expect(scope.authentication).toBeTruthy();
     });
   });
