@@ -308,24 +308,29 @@ md-datepicker {
   padding: 15px;
 }
 
+table.ng-table th{
+  background-color: #316cb9;
+  text-shadow: none !important;
+}
+
 table.ng-table tbody td, table.ng-table thead th {
   border: 1px solid gray;
 }
 
 .ng-table tr:nth-child(even) {
-    background-color: #d9d9d9;
+  background-color: #d9d9d9;
 }
 
 .ng-table tr:nth-child(odd) {
-    background-color: #f8f8f8;
+  background-color: #f8f8f8;
 }
 
 .ng-table th.sortable .sort-indicator:after {
-   	border-color: white transparent;
+ 	border-color: white transparent;
 }
 
 .ng-table th.sortable .sort-indicator:before{
-  	border-top: 4px solid white;
+	border-top: 4px solid white;
 }
 
 .ng-table th.sortable.sort-desc .sort-indicator:after{
@@ -334,14 +339,14 @@ table.ng-table tbody td, table.ng-table thead th {
 
 .ng-table th.sortable.sort-desc,
 .ng-table th.sortable.sort-asc {
-  background-color: #316cb9;
+  background-color: #22589e;
 }
 
 .ng-table td {
-    max-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .table-hover{
