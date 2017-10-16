@@ -310,6 +310,8 @@ md-datepicker {
 
 table.ng-table th{
   background-color: #316cb9;
+  height: 30px;
+  color: white;
   text-shadow: none !important;
 }
 
@@ -318,7 +320,7 @@ table.ng-table tbody td, table.ng-table thead th {
 }
 
 .ng-table tr:nth-child(even) {
-  background-color: #d9d9d9;
+  background-color: #eeeded;
 }
 
 .ng-table tr:nth-child(odd) {
@@ -354,11 +356,5 @@ table.ng-table tbody td, table.ng-table thead th {
 }
 
 .table-hover tbody tr:hover{
-	background-color: #fe8c35;
-}
-
-.table-hover thead tr{
-	height: 30px;
-	background-color: #3676c9;
-	color: white;
+	background-color: #fca05a !important;
 }
