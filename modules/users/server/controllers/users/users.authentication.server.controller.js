@@ -39,7 +39,7 @@ exports.signup = function (req, res) {
         //established modemailer email transporter object to send email with mailOptions populating mail with link
         const transporter = nodemailer.createTransport({
           service: 'Gmail',
-          auth: { user: 'no.replyhccresearch@gmail.com', pass: 'whatisgamenight' }
+          auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
         });
         const mailOptions = {
           from: 'no.replyhccresearch@gmail.com',
