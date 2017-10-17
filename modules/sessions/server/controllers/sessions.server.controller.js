@@ -10,7 +10,10 @@ const mongoose = require('mongoose'),
 
 /* Retreive all the sessions */
 exports.getAll = function(req, res) {
-  Session.find().exec()
+  Session.find()
+    .populate('studyID')
+    .populate('researchers.userID')
+    .exec()
     .then((sessions) => {
       res.json(sessions);
     })
@@ -89,6 +92,8 @@ exports.sessionById = function(req, res, next, id) {
 exports.sessionsByUserId = function(req, res, next, id) {
   console.log(id);
   Session.find({ $or:[ { 'participants.userID': id }, { 'researchers.userID': id } ] })
+    .populate('studyID')
+    .populate('researchers.userID')
     .exec()
     .then((sessions) => {
       req.studySession = sessions;

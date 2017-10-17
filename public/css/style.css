@@ -358,3 +358,11 @@ table.ng-table tbody td, table.ng-table thead th {
 .table-hover tbody tr:hover{
 	background-color: #fca05a !important;
 }
+
+.pagination>.active>a{
+  background-color: #316cb9 !important;
+}
+
+.pagination{
+  margin: 0px !important;
+}
