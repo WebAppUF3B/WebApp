@@ -82,6 +82,9 @@ const userSchema = new Schema({
     default: ['user'],
     required: 'Please provide at least one role'
   },
+  adminApproved: {
+    type: Boolean,
+  },
   updated: {
     type: Date
   },

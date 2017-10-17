@@ -48,10 +48,10 @@ exports.signup = function (req, res) {
           text: verificationText
         };
         console.log('tw Sending email');
-        transporter.sendMail(mailOptions);
+        return transporter.sendMail(mailOptions);
       })
       .then(() => {
-        console.log('tw Email sent!')
+        console.log('tw Email sent!');
         return res.status(200).send();
       })
       .catch((err) => {
