@@ -3,7 +3,8 @@
 /**
  * Module dependencies.
  */
-var mongoose = require('mongoose'),
+const mongoose = require('mongoose'),
+  uniqueValidator = require('mongoose-unique-validator'),
   Schema = mongoose.Schema,
   crypto = require('crypto'),
   validator = require('validator'),
@@ -13,28 +14,21 @@ var mongoose = require('mongoose'),
 /**
  * A Validation function for local strategy properties
  */
-var validateLocalStrategyProperty = function (property) {
+const validateLocalStrategyProperty = function (property) {
   return ((this.provider !== 'local' && !this.updated) || property.length);
 };
 
 /**
  * A Validation function for local strategy email
  */
-var validateLocalStrategyEmail = function (email) {
+const validateLocalStrategyEmail = function (email) {
   return ((this.provider !== 'local' && !this.updated) || validator.isEmail(email));
 };
 
 /**
  * User Schema
  */
-var userSchema = new Schema({
-  username: {
-    type: String,
-    unique: 'Username already exists',
-    required: 'Please fill in a username',
-    lowercase: true,
-    trim: true
-  },
+const userSchema = new Schema({
   firstName: {
     type: String,
     trim: true,
@@ -48,12 +42,12 @@ var userSchema = new Schema({
     validate: [validateLocalStrategyProperty, 'Please fill in your last name']
   },
   birthday: {
-    type: Date,
-    required: true
+    type: String,
+    required: [true, 'Please pick a birthday.']
   },
   gender: {
     type: String,
-    required: true
+    required: [true, 'Please pick a gender option.'],
   },
   department: {
     type: String
@@ -61,14 +55,21 @@ var userSchema = new Schema({
   email: {
     type: String,
     unique: true,
+    uniqueCaseInsensitive: true,
     lowercase: true,
     trim: true,
     default: '',
     validate: [validateLocalStrategyEmail, 'Please fill a valid email address']
   },
+  emailValidated: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
   password: {
     type: String,
-    default: ''
+    default: '',
+    required: true
   },
   salt: {
     type: String
@@ -97,6 +98,8 @@ var userSchema = new Schema({
   }
 });
 
+userSchema.plugin(uniqueValidator, { message: 'An account with this email already exists' });
+
 /**
  * Hook a pre save method to hash the password
  */
@@ -113,10 +116,19 @@ userSchema.pre('save', function (next) {
  * Hook a pre validate method to test the local password
  */
 userSchema.pre('validate', function (next) {
+
+  owasp.config({
+    allowPassphrases       : false,
+    maxLength              : 128,
+    minLength              : 8,
+    minPhraseLength        : 20,
+    minOptionalTestsToPass : 4,
+  });
+
   if (this.provider === 'local' && this.password && this.isModified('password')) {
-    var result = owasp.test(this.password);
+    const result = owasp.test(this.password);
     if (result.errors.length) {
-      var error = result.errors.join(' ');
+      const error = result.errors.join(' ');
       this.invalidate('password', error);
     }
   }
@@ -130,9 +142,9 @@ userSchema.pre('validate', function (next) {
 userSchema.methods.hashPassword = function (password) {
   if (this.salt && password) {
     return crypto.pbkdf2Sync(password, new Buffer(this.salt, 'base64'), 10000, 64).toString('base64');
-  } else {
-    return password;
   }
+  return password;
+
 };
 
 /**
@@ -143,36 +155,14 @@ userSchema.methods.authenticate = function (password) {
 };
 
 /**
- * Find possible not used username
- */
-userSchema.statics.findUniqueUsername = function (username, suffix, callback) {
-  var _this = this;
-  var possibleUsername = username.toLowerCase() + (suffix || '');
-
-  _this.findOne({
-    username: possibleUsername
-  }, function (err, user) {
-    if (!err) {
-      if (!user) {
-        callback(possibleUsername);
-      } else {
-        return _this.findUniqueUsername(username, (suffix || 0) + 1, callback);
-      }
-    } else {
-      callback(null);
-    }
-  });
-};
-
-/**
 * Generates a random passphrase that passes the owasp test.
 * Returns a promise that resolves with the generated passphrase, or rejects with an error if something goes wrong.
 * NOTE: Passphrases are only tested against the required owasp strength tests, and not the optional tests.
 */
 userSchema.statics.generateRandomPassphrase = function () {
   return new Promise(function (resolve, reject) {
-    var password = '';
-    var repeatingCharacters = new RegExp('(.)\\1{2,}', 'g');
+    let password = '';
+    const repeatingCharacters = new RegExp('(.)\\1{2,}', 'g');
 
     // iterate until the we have a valid passphrase.
     // NOTE: Should rarely iterate more than once, but we need this to ensure no repeating characters are present.
