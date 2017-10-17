@@ -74,13 +74,11 @@ const userSchema = new Schema({
   salt: {
     type: String
   },
-  roles: {
-    type: [{
-      type: String,
-      enum: ['user', 'researcher', 'faculty', 'admin']
-    }],
-    default: ['user'],
-    required: 'Please provide at least one role'
+  role: {
+    type: String,
+    enum: ['user', 'researcher', 'faculty', 'admin'],
+    default: 'user',
+    required: true
   },
   adminApproved: {
     type: Boolean,
