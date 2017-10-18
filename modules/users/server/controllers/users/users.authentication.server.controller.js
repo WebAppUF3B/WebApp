@@ -53,6 +53,7 @@ exports.signup = function (req, res) {
         return res.status(200).send();
       })
       .catch((err) => {
+        console.log('Signup Error:\n', err);
         const errJSON = err.toJSON();
         if (errJSON.errors && errJSON.errors.email) {
           errJSON.message = errJSON.errors.email.message;
@@ -76,15 +77,25 @@ exports.signin = function (req, res, next) {
     code: 400
   };
 
+  const notAdminApproved = {
+    message: 'Researchers and Faculty members need approval before being able to log in.',
+    code: 400
+  };
+
   User.findOne({ email: req.body.email })
       .then((user) => {
         if (!user) {
           throw signInErr;
         }
 
+        if ((user.role === 'researcher' || user.role === 'faculty') && !user.adminApproved) {
+          throw notAdminApproved;
+        }
+
         if (!user.emailValidated) {
           throw notVerifiedErr;
         }
+
 
         if (!user.authenticate(req.body.password)) {
           throw signInErr;
