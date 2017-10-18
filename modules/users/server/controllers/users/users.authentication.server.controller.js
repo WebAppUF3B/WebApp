@@ -95,9 +95,9 @@ exports.signin = function (req, res, next) {
           firstName: user.firstName,
           lastName: user.lastName,
           gender: user.gender,
-          birthday: user.firstName,
-          email: user.firstName,
-          roles: user.firstName,
+          birthday: user.birthday,
+          email: user.email,
+          roles: user.role,
         };
 
         console.log('minimal user info:\n', minimalUser);
