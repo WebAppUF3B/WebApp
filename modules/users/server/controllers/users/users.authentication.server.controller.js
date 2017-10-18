@@ -66,11 +66,15 @@ exports.signup = function (req, res) {
  * Signin after passport authentication
  */
 exports.signin = function (req, res, next) {
-  const signInErr = Error('Invalid email or password');
-  signInErr.code = 400;
+  const signInErr = {
+    message: 'Invalid email or password',
+    code: 400
+  };
 
-  const notVerifiedErr = Error('Email has not been verified');
-  notVerifiedErr.code = 400;
+  const notVerifiedErr = {
+    message: 'Email has not been verified',
+    code: 400
+  };
 
   User.findOne({ email: req.body.email })
       .then((user) => {
@@ -100,8 +104,8 @@ exports.signin = function (req, res, next) {
         return res.status(200).send(minimalUser);
       })
       .catch((err) => {
-        console.log('Signin Error:\n', err);
-        return res.status(err.code).send(err.toJSON());
+        console.log('Signin Error:\n', err.message);
+        return res.status(err.code).send(err);
       })
 };
 
@@ -117,12 +121,16 @@ exports.signout = function (req, res) {
 exports.verify = function (req, res) {
   const id = req.params.id;
 
-  const noUserErr = Error('Unable to find a user with that ID. Please create another account!');
-  noUserErr.code = 400;
+  const noUserErr = {
+    message: 'Unable to find a user with that ID. Please create another account!',
+    code: 400
+  };
 
-  const alreadyVerifiedErr = Error('Unable to find a user with that ID. Please create another account!');
-  alreadyVerifiedErr.code = 400;
-  alreadyVerifiedErr.type = 'already-verified';
+  const alreadyVerifiedErr = {
+    message: 'Unable to find a user with that ID. Please create another account!',
+    code: 400,
+    type: 'already-verified'
+  };
 
   User.findById(id)
     .then((user) => {
