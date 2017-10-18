@@ -7,29 +7,69 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     // Called after page loads
     function init(){
       $scope.upcomingSessions = {};
+      $scope.upcomingSessions.data = [];
+      $scope.pastSessions = {};
+      $scope.pastSessions.data = [];
 
-      // TODO Get all sessions for this user
+      // TODO Get all sessions for this USER (find user details)
       $scope.sessions.getAll()
         .then((results) => {
-          // TODO separate upcomingSessions and pastSessions (also might want to break these sessions up in the backend)
-          // TODO get study info for each session (probably want to grab extra info while in backend) - Check out JOIN for mongo
-          // TODO get date/time field seperate (also might want to add two fields in backend)
           // Assign results to upcomingSessions.data
-          $scope.upcomingSessions.data = results.data;
-          console.log($scope.upcomingSessions.data);
+          $scope.allSessions = results.data;
+          console.log($scope.allSessions);
+
+          // Populate date and time fields for each sessions
+          const today = new Date();
+          $scope.allSessions.forEach((session) => {
+            let date = new Date(session.sessionTime);
+            session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? "PM" : "AM"}`
+
+            // Place session in correct array
+            if(date >= today){
+              $scope.upcomingSessions.data.push(session);
+            } else{
+              $scope.pastSessions.data.push(session);
+            }
+          });
+
           $scope.upcomingSessions = new NgTableParams({
             count: 5,
             sorting: {
-              Time: 'desc'
+              sessionTime: 'asc'
             }
           }, {
             counts: [], // hides page sizes
             dataset: $scope.upcomingSessions.data // select data
           });
+
+          $scope.pastSessions = new NgTableParams({
+            count: 5,
+            sorting: {
+              sessionTime: 'desc'
+            }
+          }, {
+            counts: [], // hides page sizes
+            dataset: $scope.pastSessions.data // select data
+          });
+
         })
         .catch((err) => {
           console.log(err);
         });
+    }
+
+    // Show modal and populate it with session data
+    $scope.sessionDetails = function(session){
+      $scope.currentSession = session;
+      $('#detailModal').modal('show');
+
+
+    }
+
+    // Remove session from DB and notify all users associated with it by email
+    $scope.cancelSession = function(session){
+      // Also remove entry from table
     }
 
     // Declare methods that can be used to access session data

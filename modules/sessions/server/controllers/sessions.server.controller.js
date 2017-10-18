@@ -79,6 +79,8 @@ exports.delete = function(req, res) {
  */
 exports.sessionById = function(req, res, next, id) {
   Session.findById(id)
+    .populate('studyID')
+    .populate('researchers.userID')
     .exec()
     .then((session) => {
       req.studySession = session;

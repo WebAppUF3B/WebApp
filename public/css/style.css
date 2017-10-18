@@ -205,7 +205,11 @@ footer .uf-monogram {
 }
 
 .margin-top{
-  margin-top: 20px;
+  margin-top: 30px;
+}
+
+.btn.no-margin-bottom{
+  margin-bottom: 0px !important;
 }
 
 .btn{
@@ -218,11 +222,11 @@ footer .uf-monogram {
 }
 
 .btn-primary {
-  background: #007ec6;
+  background: #007ec6 !important;
 }
 
 .btn-primary:hover{
-  background: #006ba8;
+  background: #006ba8 !important;
 }
 
 .btn-orange{
@@ -365,4 +369,8 @@ table.ng-table tbody td, table.ng-table thead th {
 
 .pagination{
   margin: 0px !important;
+}
+
+.entries-selectable tbody tr:hover{
+  cursor: pointer;
 }

@@ -4,7 +4,7 @@
       <h1 class="phone-center">Participant Portal</h1>
     </div>
     <div class="col-sm-6">
-      <a class="btn btn-primary margin-top mobile-full-width float-right" ui-sref="study-discovery">Participate in a New Study</a>
+      <a class="btn btn-primary margin-top mobile-full-width float-right no-margin-bottom" ui-sref="study-discovery">Participate in a New Study</a>
     </div>
   </div>
 
@@ -15,12 +15,12 @@
       <div class="row">
         <div class="col-sm-12">
           <h2 class="text-center">My Upcoming Sessions</h2>
-          <table ng-table="upcomingSessions" class="table table-hover" show-filter="false">
-            <tr ng-repeat="session in upcomingSessions.data">
+          <table ng-table="upcomingSessions" class="table table-hover entries-selectable" show-filter="false">
+            <tr ng-click="sessionDetails(session)" ng-repeat="session in upcomingSessions.data">
               <td title="'Title'" filter="{ title: 'text'}" sortable="'Title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
               <td title="'Location'" filter="{ location: 'text'}" sortable="'Location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
-              <td title="'Date'" filter="{ Date: 'text'}" sortable="'Date'" ng-attr-title="{{null}}">{{session.date}}</td>
-              <td title="'Time'" filter="{ Time: 'text'}" sortable="'Time'" ng-attr-title="{{null}}">{{session.sessionTime}}</td>
+              <td title="'Date'" filter="{ Date: 'text'}" sortable="'sessionTime'" ng-attr-title="{{null}}">{{session.date}}</td>
+              <td title="'Time'" filter="{ Time: 'text'}" sortable="'sessionTime'" ng-attr-title="{{null}}">{{session.time}}</td>
             </tr>
           </table>
         </div>
@@ -29,12 +29,12 @@
       <div class="row">
         <div class="col-sm-12">
           <h2 class="text-center">My Past Sessions</h2>
-          <table ng-table="pastSessions" class="table table-hover" show-filter="false">
-            <tr ng-repeat="session in pastSessions.data">
+          <table ng-table="pastSessions" class="table table-hover entries-selectable" show-filter="false">
+            <tr ng-click="sessionDetails(session)" ng-repeat="session in pastSessions.data">
               <td title="'Title'" filter="{ title: 'text'}" sortable="'Title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
               <td title="'Location'" filter="{ location: 'text'}" sortable="'Location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
-              <td title="'Date'" filter="{ Date: 'text'}" sortable="'Date'" ng-attr-title="{{null}}">{{session.date}}</td>
-              <td title="'Time'" filter="{ Time: 'text'}" sortable="'Time'" ng-attr-title="{{null}}">{{session.sessionTime}}</td>
+              <td title="'Date'" filter="{ Date: 'text'}" sortable="'sessionTime'" ng-attr-title="{{null}}">{{session.date}}</td>
+              <td title="'Time'" filter="{ Time: 'text'}" sortable="'sessionTime'" ng-attr-title="{{null}}">{{session.time}}</td>
             </tr>
           </table>
         </div>
@@ -53,4 +53,90 @@
     </div>
 
   </div>
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="row">
+            <div class="col-xs-3">
+              <button class="btn cancel-btn" data-dismiss="modal">Close</button>
+            </div>
+            <div class="col-xs-6 text-center">
+              <h3><strong>Detailed Information</strong></h3>
+            </div>
+          </div>
+        </div>
+        <div class="pane">
+          <!-- Name Area -->
+          <div class="form-group">
+            <div class="row">
+              <div class="col-xs-2 center-label">
+                <label><strong>Name</strong></label>
+              </div>
+              <div class="col-xs-10">
+                <div class="row vpad">
+                  <div class="col-xs-3">
+                    <label>Code</label>
+                    <input type="text" class="form-control" ng-model="detailedInfo.code" disabled="disabled">
+                  </div>
+                  <div class="col-xs-9">
+                    <label>Building Name</label>
+                    <input type="text" class="form-control" ng-model="detailedInfo.name" disabled="disabled">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <!-- Coordinate Area -->
+          <div class="form-group">
+            <div class="row">
+              <div class="col-xs-2 center-label">
+                <label><strong>Coordinates</strong></label>
+              </div>
+              <div class="col-xs-10">
+                <div class="row vpad">
+                  <div class="col-xs-6">
+                    <label>Latitude</label>
+                    <input type="text" class="form-control" ng-model="detailedInfo.coordinates.latitude" disabled="disabled">
+                  </div>
+                  <div class="col-xs-6">
+                    <label>Longitude</label>
+                    <input type="text" class="form-control" ng-model="detailedInfo.coordinates.longitude" disabled="disabled">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-12">
+            <hr>
+          </div>
+          <!-- Address Area -->
+          <div class="form-group">
+            <div class="row">
+              <div class="col-xs-2 center-label">
+                <label><strong>Address</strong></label>
+              </div>
+              <div class="col-xs-10">
+                <div class="row vpad">
+                  <div class="col-xs-12">
+                    <label>Address</label>
+                    <input type="text" class="form-control" ng-model="detailedInfo.address" disabled="disabled">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Detail Modal -->
+
 </div>
