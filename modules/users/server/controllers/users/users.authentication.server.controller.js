@@ -20,7 +20,6 @@ const noReturnUrls = [
  * Signup
  */
 exports.signup = function (req, res) {
-  console.log('tw', req.body);
   // For security measurement we remove the roles from the req.body object
   delete req.body.roles;
 
@@ -32,6 +31,7 @@ exports.signup = function (req, res) {
   // Then save the user
   user.save()
       .then((user) => {
+        console.log('tw', user);
         const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${user._id}`;
         const verificationText = `Hello, ${user.firstName} ${user.lastName},
                                   \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
@@ -47,11 +47,9 @@ exports.signup = function (req, res) {
           subject: 'HCC Research Pool Account Verification',
           text: verificationText
         };
-        console.log('tw Sending email');
         return transporter.sendMail(mailOptions);
       })
       .then(() => {
-        console.log('tw Email sent!');
         return res.status(200).send();
       })
       .catch((err) => {
@@ -68,7 +66,6 @@ exports.signup = function (req, res) {
  * Signin after passport authentication
  */
 exports.signin = function (req, res, next) {
-  console.log(req.body);
   const signInErr = Error('Invalid email or password');
   signInErr.code = 400;
 
@@ -118,21 +115,29 @@ exports.signout = function (req, res) {
 
 //verify
 exports.verify = function (req, res) {
-  console.log('Verify Here!');
-  console.log(req.params.id);
+  const id = req.params.id;
 
-  User.findOne({ _id:req.params.id }, function (err, user) {
-    if(!user) return res.status(400).send({ msg: 'Unable to find a user with that ID. Please create another account!' });
-    if(user.emailValidated) return res.status(400).send({ type:'already-verified', msg: 'Unable to find a user with that ID. Please create another account!' });
+  const noUserErr = Error('Unable to find a user with that ID. Please create another account!');
+  noUserErr.code = 400;
 
-    user.emailValidated = true;
-    user.save(function (err) {
-      if(err) {
-        return res.status(500).send({ msg: err.message });
-      }
-      res.status(200).send('The account is now active and available for login!');
+  const alreadyVerifiedErr = Error('Unable to find a user with that ID. Please create another account!');
+  alreadyVerifiedErr.code = 400;
+  alreadyVerifiedErr.type = 'already-verified';
+
+  User.findById(id)
+    .then((user) => {
+      if(user === null) throw noUserErr;
+      if(user.emailValidated) throw alreadyVerifiedErr;
+      user.emailValidated = true;
+      return user.save();
+    })
+    .then(() => {
+      return res.status(200).send('The account is now active and available for login!');
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(err.code).send(err);
     });
-  });
 };
 
 /**
