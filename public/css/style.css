@@ -29,6 +29,9 @@
   .mobile-full-width{
     width: 100% !important;
   }
+  .phone-hidden{
+    display: none !important;
+  }
 }
 
 /* For Tablet/Phone */

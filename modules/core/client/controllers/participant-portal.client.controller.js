@@ -12,11 +12,11 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $scope.pastSessions.data = [];
 
       // TODO Get all sessions for this USER (find user details)
+      // TODO Resize table columns and possibly hide column on mobile
       $scope.sessions.getAll()
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.allSessions = results.data;
-          console.log($scope.allSessions);
 
           // Populate date and time fields for each sessions
           const today = new Date();
