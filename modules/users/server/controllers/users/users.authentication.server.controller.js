@@ -20,7 +20,6 @@ const noReturnUrls = [
  * Signup
  */
 exports.signup = function (req, res) {
-  console.log('tw', req.body);
   // For security measurement we remove the roles from the req.body object
   delete req.body.roles;
 
@@ -32,6 +31,7 @@ exports.signup = function (req, res) {
   // Then save the user
   user.save()
       .then((user) => {
+        console.log('tw', user);
         const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${user._id}`;
         const verificationText = `Hello ${user.firstName} ${user.lastName},
                                   \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
@@ -47,14 +47,13 @@ exports.signup = function (req, res) {
           subject: 'HCC Research Pool Account Verification',
           text: verificationText
         };
-        console.log('tw Sending email');
         return transporter.sendMail(mailOptions);
       })
       .then(() => {
-        console.log('tw Email sent!');
         return res.status(200).send();
       })
       .catch((err) => {
+        console.log('Signup Error:\n', err);
         const errJSON = err.toJSON();
         if (errJSON.errors && errJSON.errors.email) {
           errJSON.message = errJSON.errors.email.message;
@@ -68,12 +67,20 @@ exports.signup = function (req, res) {
  * Signin after passport authentication
  */
 exports.signin = function (req, res, next) {
-  console.log(req.body);
-  const signInErr = Error('Invalid email or password');
-  signInErr.code = 400;
+  const signInErr = {
+    message: 'Invalid email or password',
+    code: 400
+  };
 
-  const notVerifiedErr = Error('Email has not been verified');
-  notVerifiedErr.code = 400;
+  const notVerifiedErr = {
+    message: 'Email has not been verified',
+    code: 400
+  };
+
+  const notAdminApproved = {
+    message: 'Researchers and Faculty members need approval before being able to log in.',
+    code: 400
+  };
 
   User.findOne({ email: req.body.email })
       .then((user) => {
@@ -81,9 +88,14 @@ exports.signin = function (req, res, next) {
           throw signInErr;
         }
 
+        if ((user.role === 'researcher' || user.role === 'faculty') && !user.adminApproved) {
+          throw notAdminApproved;
+        }
+
         if (!user.emailValidated) {
           throw notVerifiedErr;
         }
+
 
         if (!user.authenticate(req.body.password)) {
           throw signInErr;
@@ -94,17 +106,17 @@ exports.signin = function (req, res, next) {
           firstName: user.firstName,
           lastName: user.lastName,
           gender: user.gender,
-          birthday: user.firstName,
-          email: user.firstName,
-          roles: user.firstName,
+          birthday: user.birthday,
+          email: user.email,
+          roles: user.role,
         };
 
         console.log('minimal user info:\n', minimalUser);
         return res.status(200).send(minimalUser);
       })
       .catch((err) => {
-        console.log('Signin Error:\n', err);
-        return res.status(err.code).send(err.toJSON());
+        console.log('Signin Error:\n', err.message);
+        return res.status(err.code).send(err);
       })
 };
 
@@ -118,21 +130,33 @@ exports.signout = function (req, res) {
 
 //verify
 exports.verify = function (req, res) {
-  console.log('Verify Here!');
-  console.log(req.params.id);
+  const id = req.params.id;
 
-  User.findOne({ _id:req.params.id }, function (err, user) {
-    if(!user) return res.status(400).send({ msg: 'Unable to find a user with that ID. Please create another account!' });
-    if(user.emailValidated) return res.status(400).send({ type:'already-verified', msg: 'Unable to find a user with that ID. Please create another account!' });
+  const noUserErr = {
+    message: 'Unable to find a user with that ID. Please create another account!',
+    code: 400
+  };
 
-    user.emailValidated = true;
-    user.save(function (err) {
-      if(err) {
-        return res.status(500).send({ msg: err.message });
-      }
-      res.status(200).send('The account is now active and available for login!');
+  const alreadyVerifiedErr = {
+    message: 'Unable to find a user with that ID. Please create another account!',
+    code: 400,
+    type: 'already-verified'
+  };
+
+  User.findById(id)
+    .then((user) => {
+      if(user === null) throw noUserErr;
+      if(user.emailValidated) throw alreadyVerifiedErr;
+      user.emailValidated = true;
+      return user.save();
+    })
+    .then(() => {
+      return res.status(200).send('The account is now active and available for login!');
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(err.code).send(err);
     });
-  });
 };
 
 /**
