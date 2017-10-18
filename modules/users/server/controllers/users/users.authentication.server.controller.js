@@ -33,13 +33,13 @@ exports.signup = function (req, res) {
       .then((user) => {
         console.log('tw', user);
         const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${user._id}`;
-        const verificationText = `Hello, ${user.firstName} ${user.lastName},
+        const verificationText = `Hello ${user.firstName} ${user.lastName},
                                   \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
 
         //established modemailer email transporter object to send email with mailOptions populating mail with link
         const transporter = nodemailer.createTransport({
           service: 'Gmail',
-          auth: { user: 'no.replyhccresearch@gmail.com', pass: 'whatisgamenight' }
+          auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
         });
         const mailOptions = {
           from: 'no.replyhccresearch@gmail.com',
