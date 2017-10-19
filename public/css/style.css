@@ -32,6 +32,15 @@
   .phone-hidden{
     display: none !important;
   }
+  .hide-col-1-phone th:nth-child(1), .hide-col-1-phone td:nth-child(1){
+    display: none !important;
+  }
+  .phone-top-margin{
+    margin-top: 10px;
+  }
+  .pane{
+  	padding: 0px 15px 15px !important;
+  }
 }
 
 /* For Tablet/Phone */
@@ -137,6 +146,14 @@ h2, h3, h4, h5, h6 {
   padding-top: 10px;
 }
 
+.top-margin {
+  margin-top: 30px;
+}
+
+.small-top-margin {
+  margin-top: 10px;
+}
+
 .gator-dark-blue {
   background-color: #243778 !important;
   color: white !important;
@@ -216,7 +233,7 @@ footer .uf-monogram {
 }
 
 .btn{
-  border-radius: 0px !important;
+  border-radius: 2px !important;
   font-size: 1.3em !important;
   margin-bottom: 15px !important;
   border: 0px !important;
@@ -246,6 +263,14 @@ footer .uf-monogram {
 
 .btn-green:hover{
   background: #32aa50;
+}
+
+.btn-red{
+  background: #de4444;
+}
+
+.btn-red:hover{
+  background: #be2b2b;
 }
 
 .inner-container{
@@ -376,4 +401,81 @@ table.ng-table tbody td, table.ng-table thead th {
 
 .entries-selectable tbody tr:hover{
   cursor: pointer;
+}
+
+.mini-title{
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.modal{
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}
+
+.modal-dialog{
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.session-modal{
+  margin-top: 60px !important;
+  max-width: 500px;
+}
+
+.modal-header {
+  border: none !important;
+  padding: 20px;
+  color: white;
+}
+
+.small-modal{
+	margin: 250px auto;
+	width: 500px;
+	height: 150px;
+}
+
+.small-modal .modal-content{
+	height: 100%;
+	padding: 20px;
+}
+
+.small-modal-btn{
+	margin-top: 15px;
+	width: 100%;
+	height: 50px;
+	background-color: white;
+	border: 1px solid gray;
+}
+
+.small-modal-btn:hover{
+	background-color: buttonface;
+}
+
+.close {
+  font-size: 35px !important;
+}
+
+.close:focus{
+  outline: none !important;
+}
+
+.modal h3{
+	font-size: 28px;
+}
+
+.modal h4{
+	font-size: 22px;
+}
+
+hr {
+  border-top: 1px solid #eee !important;
+}
+
+.pane{
+	padding: 0px 35px 15px;
+}
+
+.underline{
+  text-decoration: underline;
 }

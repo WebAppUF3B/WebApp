@@ -14,6 +14,18 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['$locatio
 
 angular.module(ApplicationConfiguration.applicationModuleName).run(function ($rootScope, $state, Authentication) {
 
+  $rootScope.getMockUser = function() {
+    return {
+      _id: '59e8f85f4fec93497c42b75e',
+      firstName: 'mock',
+      lastName: 'user',
+      gender: 'male',
+      birthday: '2015-02-03T05:00:00.000Z',
+      email: 'trenflem@gmail.com',
+      role: 'participant'
+    }
+  };
+
   // Check authentication before changing state
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
     if (toState.data && toState.data.roles && toState.data.roles.length > 0) {
@@ -45,7 +57,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(function ($ro
 
   // Store previous state
   function storePreviousState(state, params) {
-    // only store this state if it shouldn't be ignored 
+    // only store this state if it shouldn't be ignored
     if (!state.data || !state.data.ignoreState) {
       $state.previous = {
         state: state,

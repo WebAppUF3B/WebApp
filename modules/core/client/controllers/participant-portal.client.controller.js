@@ -1,8 +1,8 @@
 'use strict';
 
 // TODO consider replacing $http requests with controller (sessions.client.service.js)
-angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams',
-  function($scope, $http, NgTableParams) {
+angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams', '$rootScope',
+  function($scope, $http, NgTableParams, $rootScope) {
 
     // Called after page loads
     function init(){
@@ -11,9 +11,12 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
 
+      // TODO Assign user
+      $scope.user = $rootScope.getMockUser();
+
       // TODO Get all sessions for this USER (find user details)
       // TODO Resize table columns and possibly hide column on mobile
-      $scope.sessions.getAll()
+      $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.allSessions = results.data;
