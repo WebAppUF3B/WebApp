@@ -4,10 +4,8 @@ var defaultEnvConfig = require('./default');
 
 module.exports = {
   db: {
-    uri: process.env.MONGOHQ_URL || process.env.TESTDB
+    uri: process.env.MONGOHQ_URL || process.env.TESTDB,
     options: {
-      user: '',
-      pass: ''
     },
     // Enable mongoose debug mode
     debug: process.env.MONGODB_DEBUG || false
