@@ -4,7 +4,7 @@ var should = require('should'),
   request = require('supertest'),
   path = require('path'),
   mongoose = require('mongoose'),
-  User = mongoose.model('User'),
+  User = require('../../server/models/user.server.model'),
   express = require(path.resolve('./config/lib/express'));
 
 /**
