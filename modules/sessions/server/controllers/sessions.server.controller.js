@@ -85,11 +85,11 @@ exports.delete = function(req, res) {
       })
       .then(() => {
         console.log('session removed!');
-        return res.end()
+        res.json(session);
       })
       .catch((errs) => {
         console.log('Remove Session Errors:\n', errs);
-        return res.status(400).send(err);
+        res.status(400).send(err);
       });
   }
 };

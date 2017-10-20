@@ -4,6 +4,9 @@
 angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams', '$rootScope',
   function($scope, $http, NgTableParams, $rootScope) {
 
+    // Prevent race conditions
+    let alreadyClicked = false;
+
     // Called after page loads
     $scope.init = function(){
       $scope.upcomingSessions = {};
@@ -72,25 +75,32 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     }
 
     // Open cancel modal
-    $scope.cancelOpen = function(){
-      $('#detailModal').modal('hide');
-      $('#cancelModal').modal('show');
+    $scope.cancelClose = function(){
+      if(!alreadyClicked){
+        $('#cancelModal').modal('hide');
+      }
     }
 
     // Cancel session and remove from table
     $scope.confirmCancel = function(){
-      let cancellor = $scope.user;
-      cancellor.date = $scope.currentSession.date;
-      cancellor.time = $scope.currentSession.time
-      $scope.sessions.cancel($scope.currentSession._id, cancellor)
-        .then(() => {
-          // Refetch sessions
-          $scope.init();
-          $('#cancelModal').modal('hide');
-        })
-        .catch((err) => {
-          $scope.error = true;
-        });
+      if(!alreadyClicked) {
+        alreadyClicked = true;
+        let cancellor = $scope.user;
+        cancellor.date = $scope.currentSession.date;
+        cancellor.time = $scope.currentSession.time;
+        $scope.sessions.cancel($scope.currentSession._id, cancellor)
+          .then(() => {
+            console.log("Made it!");
+            // Refetch sessions
+            $scope.init();
+            $('#cancelModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            $scope.error = true;
+            console.log(err);
+          });
+        }
     }
 
     // Declare methods that can be used to access session data
