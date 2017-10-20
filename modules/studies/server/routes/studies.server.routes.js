@@ -9,9 +9,10 @@ module.exports = function (app) {
   app.route('/api/studies/:studyId')
     .get(studies.get)
     .put(studies.update)
-    .post(studies.create)
     .delete(studies.delete);
   app.route('/api/studies/user/:userId').get(studies.getUserStudies);
+
+  app.route('/api/studies/create').post(studies.create);
 
   /*
     The 'router.param' method allows us to specify middleware we would like to use to handle
