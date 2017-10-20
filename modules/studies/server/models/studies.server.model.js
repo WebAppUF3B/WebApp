@@ -14,9 +14,7 @@ const studySchema = new Schema({
     required: true
   },
   location: {
-    room: String,
-    building: String,
-    address: String
+    type: String
   },
   maxParticipants: {
     type: Number

@@ -16,12 +16,13 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(function ($ro
 
   $rootScope.getMockUser = function() {
     return {
-      firstName: 'mock',
-      lastName: 'user',
+      _id: '59e955038b69ba05c2bf2e6e',
+      firstName: 'Tim',
+      lastName: 'Tebow',
       gender: 'male',
       birthday: '2015-02-03T05:00:00.000Z',
       email: 'trenflem@gmail.com',
-      roles: 'user'
+      role: 'participant'
     }
   };
 
@@ -56,7 +57,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(function ($ro
 
   // Store previous state
   function storePreviousState(state, params) {
-    // only store this state if it shouldn't be ignored 
+    // only store this state if it shouldn't be ignored
     if (!state.data || !state.data.ignoreState) {
       $state.previous = {
         state: state,
