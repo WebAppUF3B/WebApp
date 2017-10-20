@@ -5,7 +5,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
   function($scope, $http, NgTableParams, $rootScope) {
 
     // Called after page loads
-    function init(){
+    $scope.init = function(){
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
@@ -63,16 +63,34 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     }
 
     // Show modal and populate it with session data
-    $scope.sessionDetails = function(session){
+    $scope.sessionDetails = function(session, currentTable, index){
       $scope.currentSession = session;
+      $scope.currentIndex = index;
+      $scope.currentTable = currentTable;
+      $scope.error = false;
       $('#detailModal').modal('show');
-
-
     }
 
-    // Remove session from DB and notify all users associated with it by email
-    $scope.cancelSession = function(session){
-      // Also remove entry from table
+    // Open cancel modal
+    $scope.cancelOpen = function(){
+      $('#detailModal').modal('hide');
+      $('#cancelModal').modal('show');
+    }
+
+    // Cancel session and remove from table
+    $scope.confirmCancel = function(){
+      let cancellor = $scope.user;
+      cancellor.date = $scope.currentSession.date;
+      cancellor.time = $scope.currentSession.time
+      $scope.sessions.cancel($scope.currentSession._id, cancellor)
+        .then(() => {
+          // Refetch sessions
+          $scope.init();
+          $('#cancelModal').modal('hide');
+        })
+        .catch((err) => {
+          $scope.error = true;
+        });
     }
 
     // Declare methods that can be used to access session data
@@ -127,8 +145,8 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           });
       },
 
-      delete: function(id) {
-        return $http.delete(window.location.origin + '/api/sessions/' + id)
+      cancel: function(id, cancellor) {
+        return $http.delete(window.location.origin + '/api/sessions/' + id, cancellor)
           .then((results) => {
             return results;
           })
@@ -139,6 +157,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     };
 
     // Run our init function
-    init();
+    $scope.init();
   }
 ]);

@@ -241,6 +241,10 @@ footer .uf-monogram {
   white-space: normal !important;
 }
 
+.btn:focus{
+  outline: none !important;
+}
+
 .btn-primary {
   background: #007ec6 !important;
 }
@@ -429,10 +433,14 @@ table.ng-table tbody td, table.ng-table thead th {
   color: white;
 }
 
+body.modal-open{
+  overflow: hidden;
+}
+
 .small-modal{
 	margin: 250px auto;
-	width: 500px;
-	height: 150px;
+	max-width: 500px;
+	min-height: 150px;
 }
 
 .small-modal .modal-content{
@@ -445,7 +453,8 @@ table.ng-table tbody td, table.ng-table thead th {
 	width: 100%;
 	height: 50px;
 	background-color: white;
-	border: 1px solid gray;
+  color: black !important;
+	border: 1px solid gray !important;
 }
 
 .small-modal-btn:hover{
@@ -478,4 +487,8 @@ hr {
 
 .underline{
   text-decoration: underline;
+}
+
+.error{
+  color: #a94442;
 }
