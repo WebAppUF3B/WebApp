@@ -1,6 +1,6 @@
 'use strict';
 
-// TODO consider replacing $http requests with controller (sessions.client.service.js)
+// TODO consider replacing $http requests with factory (sessions.client.service.js)
 angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams', '$rootScope',
   function($scope, $http, NgTableParams, $rootScope) {
 
@@ -17,8 +17,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       // TODO Assign user
       $scope.user = $rootScope.getMockUser();
 
-      // TODO Get all sessions for this USER (find user details)
-      // TODO Resize table columns and possibly hide column on mobile
       $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
           // Assign results to upcomingSessions.data
@@ -26,8 +24,9 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
 
           // Populate date and time fields for each sessions
           const today = new Date();
+          let date;
           $scope.allSessions.forEach((session) => {
-            let date = new Date(session.sessionTime);
+            date = new Date(session.sessionTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
             session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? "PM" : "AM"}`
 
@@ -85,7 +84,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     $scope.confirmCancel = function(){
       if(!alreadyClicked) {
         alreadyClicked = true;
-        let cancellor = $scope.user;
+        const cancellor = $scope.user;
         cancellor.date = $scope.currentSession.date;
         cancellor.time = $scope.currentSession.time;
         $scope.sessions.cancel($scope.currentSession._id, cancellor)
@@ -99,8 +98,9 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           .catch((err) => {
             $scope.error = true;
             console.log(err);
+            alreadyClicked = false;
           });
-        }
+      }
     }
 
     // Declare methods that can be used to access session data
