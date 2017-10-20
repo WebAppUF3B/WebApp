@@ -29,6 +29,18 @@
   .mobile-full-width{
     width: 100% !important;
   }
+  .phone-hidden{
+    display: none !important;
+  }
+  .hide-col-1-phone th:nth-child(1), .hide-col-1-phone td:nth-child(1){
+    display: none !important;
+  }
+  .phone-top-margin{
+    margin-top: 10px;
+  }
+  .pane{
+  	padding: 0px 15px 15px !important;
+  }
 }
 
 /* For Tablet/Phone */
@@ -134,6 +146,14 @@ h2, h3, h4, h5, h6 {
   padding-top: 10px;
 }
 
+.top-margin {
+  margin-top: 30px;
+}
+
+.small-top-margin {
+  margin-top: 10px;
+}
+
 .gator-dark-blue {
   background-color: #243778 !important;
   color: white !important;
@@ -205,11 +225,15 @@ footer .uf-monogram {
 }
 
 .margin-top{
-  margin-top: 20px;
+  margin-top: 30px;
+}
+
+.btn.no-margin-bottom{
+  margin-bottom: 0px !important;
 }
 
 .btn{
-  border-radius: 0px !important;
+  border-radius: 2px !important;
   font-size: 1.3em !important;
   margin-bottom: 15px !important;
   border: 0px !important;
@@ -217,12 +241,16 @@ footer .uf-monogram {
   white-space: normal !important;
 }
 
+.btn:focus{
+  outline: none !important;
+}
+
 .btn-primary {
-  background: #007ec6;
+  background: #007ec6 !important;
 }
 
 .btn-primary:hover{
-  background: #006ba8;
+  background: #006ba8 !important;
 }
 
 .btn-orange{
@@ -239,6 +267,14 @@ footer .uf-monogram {
 
 .btn-green:hover{
   background: #32aa50;
+}
+
+.btn-red{
+  background: #de4444;
+}
+
+.btn-red:hover{
+  background: #be2b2b;
 }
 
 .inner-container{
@@ -308,24 +344,31 @@ md-datepicker {
   padding: 15px;
 }
 
+table.ng-table th{
+  background-color: #316cb9;
+  height: 30px;
+  color: white;
+  text-shadow: none !important;
+}
+
 table.ng-table tbody td, table.ng-table thead th {
   border: 1px solid gray;
 }
 
 .ng-table tr:nth-child(even) {
-    background-color: #d9d9d9;
+  background-color: #eeeded;
 }
 
 .ng-table tr:nth-child(odd) {
-    background-color: #f8f8f8;
+  background-color: #f8f8f8;
 }
 
 .ng-table th.sortable .sort-indicator:after {
-   	border-color: white transparent;
+ 	border-color: white transparent;
 }
 
 .ng-table th.sortable .sort-indicator:before{
-  	border-top: 4px solid white;
+	border-top: 4px solid white;
 }
 
 .ng-table th.sortable.sort-desc .sort-indicator:after{
@@ -334,14 +377,14 @@ table.ng-table tbody td, table.ng-table thead th {
 
 .ng-table th.sortable.sort-desc,
 .ng-table th.sortable.sort-asc {
-  background-color: #316cb9;
+  background-color: #22589e;
 }
 
 .ng-table td {
-    max-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .table-hover{
@@ -349,11 +392,105 @@ table.ng-table tbody td, table.ng-table thead th {
 }
 
 .table-hover tbody tr:hover{
-	background-color: #fe8c35;
+	background-color: #fca05a !important;
 }
 
-.table-hover thead tr{
-	height: 30px;
-	background-color: #3676c9;
-	color: white;
+.pagination>.active>a{
+  background-color: #316cb9 !important;
+}
+
+.pagination{
+  margin: 0px !important;
+}
+
+.entries-selectable tbody tr:hover{
+  cursor: pointer;
+}
+
+.mini-title{
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.modal{
+  padding-left: 5px !important;
+  padding-right: 5px !important;
+}
+
+.modal-dialog{
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+.session-modal{
+  margin-top: 60px !important;
+  max-width: 500px;
+}
+
+.modal-header {
+  border: none !important;
+  padding: 20px;
+  color: white;
+}
+
+body.modal-open{
+  overflow: hidden;
+}
+
+.small-modal{
+	margin: 250px auto;
+	max-width: 500px;
+	min-height: 150px;
+}
+
+.small-modal .modal-content{
+	height: 100%;
+	padding: 20px;
+}
+
+.small-modal-btn{
+	margin-top: 15px;
+	width: 100%;
+	height: 50px;
+	background-color: white;
+  color: black !important;
+	border: 1px solid gray !important;
+}
+
+.small-modal-btn:hover{
+	background-color: buttonface;
+}
+
+.close {
+  font-size: 35px !important;
+}
+
+.close:focus{
+  outline: none !important;
+}
+
+.modal h3{
+	font-size: 28px;
+}
+
+.modal h4{
+	font-size: 22px;
+}
+
+hr {
+  border-top: 1px solid #eee !important;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+}
+
+.pane{
+	padding: 0px 35px 15px;
+}
+
+.underline{
+  text-decoration: underline;
+}
+
+.error{
+  color: #a94442;
 }
