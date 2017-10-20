@@ -23,7 +23,7 @@ courseSchema.pre('save', function(next) {
 });
 
 /* Use your schema to instantiate a Mongoose model */
-const course = mongoose.model('course', courseSchema);
+const course = mongoose.model('Course', courseSchema);
 
 /* Export the model to make it avaiable to other parts of your Node application */
 module.exports = course;

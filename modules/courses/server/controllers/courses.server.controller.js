@@ -2,7 +2,7 @@
 
 /* Dependencies */
 const mongoose = require('mongoose'),
-  Course = mongoose.model('course');
+  Course = mongoose.model('Course');
 
 /**
  * Backend functions for CRUD operations on course collection
@@ -39,8 +39,10 @@ exports.create = function(req, res) {
 /* Delete a course */
 exports.delete = function(req, res) {
   const course = req.course;
+  console.log(course);
 
-  /* Remove the article */
+  /* Remove the course */
+  // TODO FIGURE OUT WHY THIS DOESN'T WORK?????
   course.remove((err) => {
     if (err) {
       res.status(400).send(err);
@@ -51,10 +53,10 @@ exports.delete = function(req, res) {
 };
 
 /*
-  Middleware: find a course by its ID, then pass it to the next request handler.
+  Middleware: find a course by its name, then pass it to the next request handler.
  */
-exports.courseById = function(req, res, next, id) {
-  Course.findById(id)
+exports.courseByName = function(req, res, next, name) {
+  Course.find({ 'name': name })
     .exec()
     .then((course) => {
       req.course = course;

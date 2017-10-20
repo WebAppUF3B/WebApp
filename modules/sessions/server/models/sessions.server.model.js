@@ -9,6 +9,7 @@ const sessionSchema = new Schema({
     },
     attended: Boolean,
     compensationType: String,
+    extraCreditCourse: String,
     compensationGiven: Boolean
   }],
   studyID: {

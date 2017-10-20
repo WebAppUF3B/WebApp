@@ -128,6 +128,41 @@ exports.sessionsByUserId = function(req, res, next, id) {
     });
 };
 
+/* Get the students who recieved extra */
+exports.getExtraCredit = function(req, res) {
+  const sessions = req.studySession;
+  const users = [];
+
+  // TODO Possibly filter out students based on semester as well
+  // Loop through each session
+  sessions.forEach((session) => {
+    // Loop through each participant of each session
+    session.participants.forEach((participant) => {
+      if(participant.attended && !users.find((e) => {
+        return e._id == participant.userID._id
+      })){
+        users.push({ '_id': participant.userID._id, 'firstName': participant.userID.firstName, 'lastName': participant.userID.lastName, 'email': participant.userID.email });
+      }
+    })
+  })
+
+  /* send back the list of users as json from the request */
+  res.json(users);
+};
+
+exports.extraCreditByCourse = function(req, res, next, name) {
+  Session.find({ 'participants.extraCreditCourse': name })
+    .populate('participants.userID')
+    .exec()
+    .then((sessions) => {
+      req.studySession = sessions;
+      next();
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+};
+
 const generateMailOptions = (affectedUsers, cancellor, studyTitle) => {
   // Email any other participants involved
   const mailOptionArray = [];

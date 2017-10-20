@@ -13,7 +13,7 @@ module.exports = function (app) {
     .put(sessions.update)
     .delete(sessions.delete);
   app.route('/api/sessions/user/:userId').get(sessions.get);
-  app.route('/api/sessions/class/:classId')
+  app.route('/api/sessions/course/:courseName').get(sessions.getExtraCredit);
 
   /*
     The 'router.param' method allows us to specify middleware we would like to use to handle
@@ -21,4 +21,5 @@ module.exports = function (app) {
    */
   app.param('sessionId', sessions.sessionById);
   app.param('userId', sessions.sessionsByUserId);
+  app.param('courseName', sessions.extraCreditByCourse);
 };
