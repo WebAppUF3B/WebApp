@@ -40,9 +40,9 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(["$rootScope"
 
   $rootScope.getMockUser = function() {
     return {
-      _id: '59e8f85f4fec93497c42b75e',
-      firstName: 'mock',
-      lastName: 'user',
+      _id: '59e955038b69ba05c2bf2e6e',
+      firstName: 'Tim',
+      lastName: 'Tebow',
       gender: 'male',
       birthday: '2015-02-03T05:00:00.000Z',
       email: 'trenflem@gmail.com',
@@ -459,6 +459,9 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams', '$rootScope',
   function($scope, $http, NgTableParams, $rootScope) {
 
+    // Prevent race conditions
+    let alreadyClicked = false;
+
     // Called after page loads
     $scope.init = function(){
       $scope.upcomingSessions = {};
@@ -527,25 +530,32 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     }
 
     // Open cancel modal
-    $scope.cancelOpen = function(){
-      $('#detailModal').modal('hide');
-      $('#cancelModal').modal('show');
+    $scope.cancelClose = function(){
+      if(!alreadyClicked){
+        $('#cancelModal').modal('hide');
+      }
     }
 
     // Cancel session and remove from table
     $scope.confirmCancel = function(){
-      let cancellor = $scope.user;
-      cancellor.date = $scope.currentSession.date;
-      cancellor.time = $scope.currentSession.time
-      $scope.sessions.cancel($scope.currentSession._id, cancellor)
-        .then(() => {
-          // Refetch sessions
-          $scope.init();
-          $('#cancelModal').modal('hide');
-        })
-        .catch((err) => {
-          $scope.error = true;
-        });
+      if(!alreadyClicked) {
+        alreadyClicked = true;
+        let cancellor = $scope.user;
+        cancellor.date = $scope.currentSession.date;
+        cancellor.time = $scope.currentSession.time;
+        $scope.sessions.cancel($scope.currentSession._id, cancellor)
+          .then(() => {
+            console.log("Made it!");
+            // Refetch sessions
+            $scope.init();
+            $('#cancelModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            $scope.error = true;
+            console.log(err);
+          });
+        }
     }
 
     // Declare methods that can be used to access session data
@@ -571,13 +581,13 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       },
 
       create: function(newSession) {
-        return $http.post(window.location.origin + '/api/sessions/', newSession)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/',
+          type: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(newSession)
+        });
       },
 
       get: function(id) {
@@ -591,23 +601,23 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       },
 
       update: function(id, newSession) {
-        return $http.put(window.location.origin + '/api/sessions/' + id, newSession)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/' + id, newSession,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(newSession)
+        });
       },
 
       cancel: function(id, cancellor) {
-        return $http.delete(window.location.origin + '/api/sessions/' + id, cancellor)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/' + id,
+          type: 'DELETE',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(cancellor)
+        });
       }
     };
 
