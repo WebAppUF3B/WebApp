@@ -83,14 +83,14 @@
               <h4 class="underline">Researchers</h4>
             </div>
           </div>
-          <div class="row" ng-repeat="researcher in currentSession.studyID.researchers">
+          <div class="row" ng-repeat="researcher in currentSession.researchers">
             <div class="col-sm-6">
               <p class="mini-title">Name:</p>
-              <p>{{researcher.firstName}} {{researcher.lastName}}</p>
+              <p>{{researcher.userID.firstName}} {{researcher.userID.lastName}}</p>
             </div>
             <div class="col-sm-6">
               <p class="mini-title">Email:</p>
-              <p><a href="mailto:{{researcher.email}}">{{researcher.email}}</a></p>
+              <p><a href="mailto:{{researcher.email}}">{{researcher.userID.email}}</a></p>
             </div>
           </div>
 
@@ -119,7 +119,7 @@
             </div>
           </div>
 
-          <div class="row pad-top">
+          <div class="row pad-top" ng-if="currentTable=='upcoming'">
             <div class="col-sm-6 col-sm-offset-3">
               <a class="btn btn-red full-width" ng-click="cancelOpen()">Cancel Your Session</a>
             </div>

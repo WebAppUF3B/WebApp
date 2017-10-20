@@ -14,7 +14,7 @@ const studySchema = new Schema({
     required: true
   },
   location: {
-    String
+    type: String
   },
   maxParticipants: {
     type: Number
