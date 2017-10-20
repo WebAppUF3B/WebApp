@@ -74,13 +74,14 @@ const userSchema = new Schema({
   salt: {
     type: String
   },
-  roles: {
-    type: [{
-      type: String,
-      enum: ['user', 'researcher', 'faculty', 'admin']
-    }],
-    default: ['user'],
-    required: 'Please provide at least one role'
+  role: {
+    type: String,
+    enum: ['user', 'researcher', 'faculty', 'admin'],
+    default: 'user',
+    required: true
+  },
+  adminApproved: {
+    type: Boolean,
   },
   updated: {
     type: Date
@@ -190,4 +191,8 @@ userSchema.statics.generateRandomPassphrase = function () {
   });
 };
 
-mongoose.model('User', userSchema);
+/* Instantiate User model */
+var User = mongoose.model('User', userSchema);
+
+/* Export model */
+module.exports = User;
