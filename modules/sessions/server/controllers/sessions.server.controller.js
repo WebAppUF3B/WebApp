@@ -66,62 +66,28 @@ exports.delete = function(req, res) {
   const session = req.studySession;
   // Grab user object if it's placed into body for delete
   const cancellor = req.body;
+  const participants = req.studySession.participants;
+  const researchers = req.studySession.researchers;
+  const studyTitle = req.studySession.studyID.title;
 
   //established modemailer email transporter object to send email with mailOptions populating mail with link
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
   });
-  let emailBody;
-  let mailOptions;
+  const mailOptionArray = generateMailOptions(participants.concat(researchers), cancellor, studyTitle);
 
-  // Email any other participants involved
-  for(let i=0; i < req.studySession.participants.length; i++){
-    if(req.studySession.participants[i].userID._id !== cancellor._id){
-      console.log(req.studySession.participants[i]);
-      emailBody = `Hello ${req.studySession.participants[i].userID.firstName} ${req.studySession.participants[i].userID.lastName},
-                   \n\nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${req.studySession.studyID.title}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
-
-      mailOptions = {
-        from: 'no.replyhccresearch@gmail.com',
-        to: req.studySession.participants[i].userID.email,
-        subject: 'Research Session Cancellation - ' + cancellor.date,
-        text: emailBody
-      };
-      console.log(mailOptions);
-      transporter.sendMail(mailOptions)
-        .then(() => {
-          console.log('kw Email sent!');
-        })
-        .catch((err) => {
-          console.log(err);
-          return res.status(400).send(err);
-        });
-    }
-  }
-
-  // Email any researchers involved
-  for(let i=0; i < req.studySession.researchers.length; i++){
-    if(req.studySession.researchers[i].userID._id !== cancellor._id){
-      emailBody = `Hello ${req.studySession.researchers[i].userID.firstName} ${req.studySession.researchers[i].userID.lastName},
-                   \n\nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${req.studySession.studyID.title}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
-
-      mailOptions = {
-        from: 'no.replyhccresearch@gmail.com',
-        to: req.studySession.researchers[i].userID.email,
-        subject: 'Research Session Cancellation - ' + cancellor.date,
-        text: emailBody
-      };
-      console.log(mailOptions);
-      transporter.sendMail(mailOptions)
-        .then(() => {
-          console.log('kw Email sent!');
-        })
-        .catch((err) => {
-          console.log(err);
-          return res.status(400).send(err);
-        });
-    }
+  if (mailOptionArray.length > 0) {
+    Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)))
+      .then((results) => {
+        // console.log('tw', results);
+        console.log('tw emails sent!');
+        res.status(200).send(results);
+      })
+      .catch((errs) => {
+        console.log('tw', errs);
+        res.status(400).send(err);
+      });
   }
 
   return;
@@ -171,4 +137,24 @@ exports.sessionsByUserId = function(req, res, next, id) {
     .catch((err) => {
       res.status(400).send(err);
     });
+};
+
+const generateMailOptions = (affectedUsers, cancellor, studyTitle) => {
+  // Email any other participants involved
+  const mailOptionArray = [];
+  affectedUsers.forEach((affectedUser) => {
+    if(affectedUser.userID._id !== cancellor._id) {
+      const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
+                   \n\nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${studyTitle}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
+
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: affectedUser.userID.email,
+        subject: 'Research Session Cancellation - ' + cancellor.date,
+        text: emailBody
+      };
+      mailOptionArray.push(mailOptions);
+    }
+  });
+  return mailOptionArray
 };
