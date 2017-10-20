@@ -14,6 +14,17 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['$locatio
 
 angular.module(ApplicationConfiguration.applicationModuleName).run(function ($rootScope, $state, Authentication) {
 
+  $rootScope.getMockUser = function() {
+    return {
+      firstName: 'mock',
+      lastName: 'user',
+      gender: 'male',
+      birthday: '2015-02-03T05:00:00.000Z',
+      email: 'trenflem@gmail.com',
+      roles: 'user'
+    }
+  };
+
   // Check authentication before changing state
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
     if (toState.data && toState.data.roles && toState.data.roles.length > 0) {

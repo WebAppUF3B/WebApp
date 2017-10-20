@@ -38,6 +38,17 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['$locatio
 
 angular.module(ApplicationConfiguration.applicationModuleName).run(["$rootScope", "$state", "Authentication", function ($rootScope, $state, Authentication) {
 
+  $rootScope.mockUser = function() {
+    return {
+      firstName: 'mock',
+      lastName: 'user',
+      gender: 'male',
+      birthday: '2015-02-03T05:00:00.000Z',
+      email: 'trenflem@gmail.com',
+      roles: 'user'
+    }
+  };
+
   // Check authentication before changing state
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
     if (toState.data && toState.data.roles && toState.data.roles.length > 0) {
@@ -339,6 +350,50 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
     .state('participant-portal', {
       url: '/participant',
       templateUrl: 'modules/core/client/views/participant-portal.client.view.html'
+    })
+    .state('studies', {
+      url: '/studies',
+      templateUrl: 'modules/core/client/views/studies.client.view.html'
+    })
+    .state('studies.discover', {
+      url: '/discover',
+      templateUrl: 'modules/core/client/views/study-discovery.client.view.html'
+    })
+    .state('studies.sign-up', {
+      url: '/sign-up/:studyId',
+      templateUrl: 'modules/core/client/views/study-sign-up.client.view.html'
+    })
+    .state('studies.thank-you', {
+      url: '/thank-you',
+      templateUrl: 'modules/core/client/views/study-thank-you.client.view.html'
+    })
+    .state('researcher-portal', {
+      url: '/researcher',
+      templateUrl: 'modules/core/client/views/researcher-portal.client.view.html'
+    })
+    .state('studies.create', {
+      url: '/create',
+      templateUrl: 'modules/core/client/views/study-create.client.view.html'
+    })
+    .state('faculty-portal', {
+      url: '/faculty',
+      templateUrl: 'modules/core/client/views/faculty-portal.client.view.html'
+    })
+    .state('admin-portal', {
+      url: '/admin',
+      templateUrl: 'modules/core/client/views/admin-portal.client.view.html'
+    })
+    .state('manage-users', {
+      url: '/manage-users',
+      templateUrl: 'modules/core/client/views/manage-users.client.view.html'
+    })
+    .state('manage-studies', {
+      url: '/manage-studies',
+      templateUrl: 'modules/core/client/views/manage-studies.client.view.html'
+    })
+    .state('manage-sessions', {
+      url: '/manage-sessions',
+      templateUrl: 'modules/core/client/views/manage-sessions.client.view.html'
     })
     .state('not-found', {
       url: '/not-found',
@@ -841,6 +896,14 @@ angular.module('users').config(['$stateProvider',
       .state('authentication.signup', {
         url: '/signup',
         templateUrl: 'modules/users/client/views/authentication/signup.client.view.html'
+      })
+      .state('authentication.faculty-signup', {
+        url: '/signup/faculty',
+        templateUrl: 'modules/users/client/views/authentication/faculty-signup.client.view.html'
+      })
+      .state('authentication.researcher-signup', {
+        url: '/signup/researcher',
+        templateUrl: 'modules/users/client/views/authentication/researcher-signup.client.view.html'
       })
       .state('authentication.signin', {
         url: '/signin?err',
