@@ -77,7 +77,7 @@ exports.delete = function(req, res) {
 
   // Email any other participants involved
   for(let i=0; i < req.studySession.participants.length; i++){
-    if(req.studySession.participants[i].userID._id == cancellor._id){
+    if(req.studySession.participants[i].userID._id !== cancellor._id){
       console.log(req.studySession.participants[i]);
       emailBody = `Hello ${req.studySession.participants[i].userID.firstName} ${req.studySession.participants[i].userID.lastName},
                    \n\nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${req.studySession.studyID.title}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
@@ -102,7 +102,7 @@ exports.delete = function(req, res) {
 
   // Email any researchers involved
   for(let i=0; i < req.studySession.researchers.length; i++){
-    if(req.studySession.researchers[i].userID._id != cancellor._id){
+    if(req.studySession.researchers[i].userID._id !== cancellor._id){
       emailBody = `Hello ${req.studySession.researchers[i].userID.firstName} ${req.studySession.researchers[i].userID.lastName},
                    \n\nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${req.studySession.studyID.title}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
 

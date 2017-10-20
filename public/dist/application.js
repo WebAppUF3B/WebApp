@@ -38,14 +38,15 @@ angular.module(ApplicationConfiguration.applicationModuleName).config(['$locatio
 
 angular.module(ApplicationConfiguration.applicationModuleName).run(["$rootScope", "$state", "Authentication", function ($rootScope, $state, Authentication) {
 
-  $rootScope.mockUser = function() {
+  $rootScope.getMockUser = function() {
     return {
+      _id: '59e8f85f4fec93497c42b75e',
       firstName: 'mock',
       lastName: 'user',
       gender: 'male',
       birthday: '2015-02-03T05:00:00.000Z',
       email: 'trenflem@gmail.com',
-      roles: 'user'
+      role: 'participant'
     }
   };
 
@@ -80,7 +81,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(["$rootScope"
 
   // Store previous state
   function storePreviousState(state, params) {
-    // only store this state if it shouldn't be ignored 
+    // only store this state if it shouldn't be ignored
     if (!state.data || !state.data.ignoreState) {
       $state.previous = {
         state: state,
@@ -455,19 +456,22 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 'use strict';
 
 // TODO consider replacing $http requests with controller (sessions.client.service.js)
-angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams',
-  function($scope, $http, NgTableParams) {
+angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams', '$rootScope',
+  function($scope, $http, NgTableParams, $rootScope) {
 
     // Called after page loads
-    function init(){
+    $scope.init = function(){
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
 
+      // TODO Assign user
+      $scope.user = $rootScope.getMockUser();
+
       // TODO Get all sessions for this USER (find user details)
       // TODO Resize table columns and possibly hide column on mobile
-      $scope.sessions.getAll()
+      $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.allSessions = results.data;
@@ -514,16 +518,34 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     }
 
     // Show modal and populate it with session data
-    $scope.sessionDetails = function(session){
+    $scope.sessionDetails = function(session, currentTable, index){
       $scope.currentSession = session;
+      $scope.currentIndex = index;
+      $scope.currentTable = currentTable;
+      $scope.error = false;
       $('#detailModal').modal('show');
-
-
     }
 
-    // Remove session from DB and notify all users associated with it by email
-    $scope.cancelSession = function(session){
-      // Also remove entry from table
+    // Open cancel modal
+    $scope.cancelOpen = function(){
+      $('#detailModal').modal('hide');
+      $('#cancelModal').modal('show');
+    }
+
+    // Cancel session and remove from table
+    $scope.confirmCancel = function(){
+      let cancellor = $scope.user;
+      cancellor.date = $scope.currentSession.date;
+      cancellor.time = $scope.currentSession.time
+      $scope.sessions.cancel($scope.currentSession._id, cancellor)
+        .then(() => {
+          // Refetch sessions
+          $scope.init();
+          $('#cancelModal').modal('hide');
+        })
+        .catch((err) => {
+          $scope.error = true;
+        });
     }
 
     // Declare methods that can be used to access session data
@@ -578,8 +600,8 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           });
       },
 
-      delete: function(id) {
-        return $http.delete(window.location.origin + '/api/sessions/' + id)
+      cancel: function(id, cancellor) {
+        return $http.delete(window.location.origin + '/api/sessions/' + id, cancellor)
           .then((results) => {
             return results;
           })
@@ -590,7 +612,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     };
 
     // Run our init function
-    init();
+    $scope.init();
   }
 ]);
 
