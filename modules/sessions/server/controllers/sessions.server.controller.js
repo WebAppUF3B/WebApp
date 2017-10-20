@@ -79,24 +79,19 @@ exports.delete = function(req, res) {
 
   if (mailOptionArray.length > 0) {
     Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)))
-      .then((results) => {
-        console.log('tw emails sent!');
-        res.status(200).send(results);
+      .then(() => {
+        console.log('emails sent!');
+        return session.remove();
+      })
+      .then(() => {
+        console.log('session removed!');
+        return res.end()
       })
       .catch((errs) => {
-        console.log('tw', errs);
-        res.status(400).send(err);
+        console.log('Remove Session Errors:\n', errs);
+        return res.status(400).send(err);
       });
   }
-
-  /* Remove the session */
-  session.remove()
-    .then(() => {
-      res.end();
-    })
-    .catch((err) => {
-      res.status(400).send(err);
-    });
 };
 
 /*
