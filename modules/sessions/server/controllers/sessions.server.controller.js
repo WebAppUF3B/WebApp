@@ -94,7 +94,8 @@ exports.delete = function(req, res) {
           console.log('kw Email sent!');
         })
         .catch((err) => {
-          res.status(400).send(err);
+          console.log(err);
+          return res.status(400).send(err);
         });
     }
   }
@@ -117,7 +118,8 @@ exports.delete = function(req, res) {
           console.log('kw Email sent!');
         })
         .catch((err) => {
-          res.status(400).send(err);
+          console.log(err);
+          return res.status(400).send(err);
         });
     }
   }
