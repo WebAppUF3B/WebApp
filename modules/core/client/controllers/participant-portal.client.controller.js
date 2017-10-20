@@ -116,13 +116,13 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       },
 
       create: function(newSession) {
-        return $http.post(window.location.origin + '/api/sessions/', newSession)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/',
+          type: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(newSession)
+        });
       },
 
       get: function(id) {
@@ -136,23 +136,23 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       },
 
       update: function(id, newSession) {
-        return $http.put(window.location.origin + '/api/sessions/' + id, newSession)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/' + id, newSession,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(newSession)
+        });
       },
 
       cancel: function(id, cancellor) {
-        return $http.delete(window.location.origin + '/api/sessions/' + id, cancellor)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/' + id,
+          type: 'DELETE',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(cancellor)
+        });
       }
     };
 

@@ -64,13 +64,13 @@ exports.update = function(req, res) {
 /* Delete a session */
 exports.delete = function(req, res) {
   const session = req.studySession;
-  // Grab user object if it's placed into body for delete
+  // Grab user object that's placed into body for delete
   const cancellor = req.body;
   const participants = req.studySession.participants;
   const researchers = req.studySession.researchers;
   const studyTitle = req.studySession.studyID.title;
 
-  //established modemailer email transporter object to send email with mailOptions populating mail with link
+  // Established modemailer email transporter object to send email with mailOptions populating mail with link
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
@@ -80,7 +80,6 @@ exports.delete = function(req, res) {
   if (mailOptionArray.length > 0) {
     Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)))
       .then((results) => {
-        // console.log('tw', results);
         console.log('tw emails sent!');
         res.status(200).send(results);
       })
@@ -90,14 +89,9 @@ exports.delete = function(req, res) {
       });
   }
 
-  return;
-
   /* Remove the session */
   session.remove()
     .then(() => {
-      // Email everyone involved with the session and inform them that the session has been canceled
-
-
       res.end();
     })
     .catch((err) => {

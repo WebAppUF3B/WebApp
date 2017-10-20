@@ -16,9 +16,9 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(function ($ro
 
   $rootScope.getMockUser = function() {
     return {
-      _id: '59e8f85f4fec93497c42b75e',
-      firstName: 'mock',
-      lastName: 'user',
+      _id: '59e955038b69ba05c2bf2e6e',
+      firstName: 'Tim',
+      lastName: 'Tebow',
       gender: 'male',
       birthday: '2015-02-03T05:00:00.000Z',
       email: 'trenflem@gmail.com',
