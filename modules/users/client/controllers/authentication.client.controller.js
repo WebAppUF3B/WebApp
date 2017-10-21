@@ -34,6 +34,23 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
+    $scope.facultySignup = function (isValid) {
+      $scope.error = null;
+
+      if(!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'userForm');
+        return false;
+      }
+      delete $scope.credentials.confirm;
+      $http.post('/api/auth/signup', $scope.credentials).success((response) => {
+        $scope.authentication.user = response;
+
+        $state.go('authentication.email-sent');
+      }).error((response) => {
+        $scope.error = response.message;
+      });
+    };
+
     $scope.signin = function (isValid) {
       $scope.error = null;
 

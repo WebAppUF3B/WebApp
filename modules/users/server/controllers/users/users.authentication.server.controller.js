@@ -64,6 +64,49 @@ exports.signup = function (req, res) {
 };
 
 /**
+ * Faculty Signup
+ */
+exports.facultySignup = function(req, res) {
+  delete req.body.roles;
+
+  const faculty = new User(req.body);
+  faculty.role = 'faculty'; //set role to enum 'faculty'
+  faculty.adminApproved = false; //set adminApproved to false
+  faculty.save()
+         .then((faculty) => {
+           console.log('tw', faculty);
+           const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${faculty._id}`;
+           const verificationText = `Hello ${faculty.firstName} ${faculty.lastName},
+                                     \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
+
+           //established modemailer email transporter object to send email with mailOptions populating mail with link
+           const transporter = nodemailer.createTransport({
+             service: 'Gmail',
+             auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+           });
+           const mailOptions = {
+             from: 'no.replyhccresearch@gmail.com',
+             to: faculty.email,
+             subject: 'HCC Research Pool Account Verification',
+             text: verificationText
+           };
+           return transporter.sendMail(mailOptions);
+         })
+         .then(() => {
+           return res.status(200).send();
+         })
+         .catch((err) => {
+           console.log('Signup Error:\n', err);
+           const errJSON = err.toJSON();
+           if (errJSON.errors && errJSON.errors.email) {
+             errJSON.message = errJSON.errors.email.message;
+           }
+           console.log('SingUp User Error:\n', errJSON);
+           return res.status(400).send(errJSON);
+         })
+};
+
+/**
  * Signin after passport authentication
  */
 exports.signin = function (req, res, next) {
