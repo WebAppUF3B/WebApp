@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('core').controller('CreateStudyController', ['$scope', '$rootScope', '$http', '$state',
+angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state',
   function($scope, $rootScope, $http, $state) {
     /* Get all the listings, then bind it to the scope */
     console.log($rootScope.getMockUser());
