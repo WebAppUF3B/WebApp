@@ -501,11 +501,11 @@ hr {
 }
 
 .bootstrap-datetimepicker-widget{
-  margin-right: -38px !important;
+  margin-right: -46px !important;
 }
 
 .bootstrap-datetimepicker-widget.dropdown-menu.pull-right:after {
-  right: 50px !important;
+  right: 58px !important;
 }
 
 .bootstrap-datetimepicker-widget.dropdown-menu.pull-right:before {
