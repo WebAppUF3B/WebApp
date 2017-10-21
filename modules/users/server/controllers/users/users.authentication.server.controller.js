@@ -72,7 +72,7 @@ exports.facultySignup = function(req, res) {
   const faculty = new User(req.body);
   faculty.role = 'faculty'; //set role to enum 'faculty'
   faculty.adminApproved = false;
-  faculty.birthday = Date.now();
+  faculty.birthday = new Date(0);
   faculty.gender = 'Other';
   faculty.address = 'No Address';
   faculty.save()
@@ -107,6 +107,50 @@ exports.facultySignup = function(req, res) {
            console.log('SingUp User Error:\n', errJSON);
            return res.status(400).send(errJSON);
          })
+};
+
+/* researcher Signup */
+exports.researcherSignup = function(req, res) {
+
+
+  const researcher = new User(req.body);
+  researcher.role = 'researcher'; //set role to enum 'researcher'
+  researcher.adminApproved = false;
+  researcher.birthday = new Date(0);
+  researcher.gender = 'Other';
+  researcher.address = 'No Address';
+  researcher.save()
+    .then((researcher) => {
+      console.log('tw', researcher);
+      const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${researcher._id}`;
+      const verificationText = `Hello ${researcher.firstName} ${researcher.lastName},
+                                     \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: researcher.email,
+        subject: 'HCC Research Pool Account Verification',
+        text: verificationText
+      };
+      return transporter.sendMail(mailOptions);
+    })
+    .then(() => {
+      return res.status(200).send();
+    })
+    .catch((err) => {
+      console.log('Signup Error:\n', err);
+      const errJSON = err.toJSON();
+      if (errJSON.errors && errJSON.errors.email) {
+        errJSON.message = errJSON.errors.email.message;
+      }
+      console.log('SingUp User Error:\n', errJSON);
+      return res.status(400).send(errJSON);
+    })
 };
 
 /**
