@@ -67,11 +67,14 @@ exports.signup = function (req, res) {
  * Faculty Signup
  */
 exports.facultySignup = function(req, res) {
-  delete req.body.roles;
+
 
   const faculty = new User(req.body);
   faculty.role = 'faculty'; //set role to enum 'faculty'
-  faculty.adminApproved = false; //set adminApproved to false
+  faculty.adminApproved = false;
+  faculty.birthday = Date.now();
+  faculty.gender = 'Other';
+  faculty.address = 'No Address';
   faculty.save()
          .then((faculty) => {
            console.log('tw', faculty);
