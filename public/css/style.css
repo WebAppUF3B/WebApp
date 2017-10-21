@@ -494,3 +494,7 @@ hr {
 .error{
   color: #a94442;
 }
+
+.study-satisfied{
+  background-color: rgb(162, 214, 179) !important;
+}

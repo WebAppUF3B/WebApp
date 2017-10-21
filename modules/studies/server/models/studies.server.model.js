@@ -16,10 +16,22 @@ const studySchema = new Schema({
   location: {
     type: String
   },
+  researchers: [{
+    userID: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  }],
   maxParticipants: {
     type: Number
   },
   maxParticipantsPerSession: {
+    type: Number
+  },
+  satisfactoryNumber: {
+    type: Number
+  },
+  currentNumber: {
     type: Number
   },
   compensationType: {
