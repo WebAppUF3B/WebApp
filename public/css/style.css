@@ -19,8 +19,8 @@
     padding-top: 10px !important;
   }
   .panel-container{
-    margin-right: 15px !important;
-    margin-left: 15px !important;
+    margin-right: 0px !important;
+    margin-left: 0px !important;
   }
   .mobile-no-pad{
     padding-left: 0px !important;
@@ -493,4 +493,21 @@ hr {
 
 .error{
   color: #a94442;
+}
+
+.note{
+  font-style: italic;
+  font-size: 1em !important;
+}
+
+.bootstrap-datetimepicker-widget{
+  margin-right: -38px !important;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:after {
+  right: 50px !important;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:before {
+  display: none !important;
 }

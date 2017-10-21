@@ -6,12 +6,8 @@ angular.module('users').controller('VerificationController', ['$scope', '$state'
       const request = window.location.pathname;
       const pass = request.slice(23);
       $http.post('/api/auth/verify/'+pass, $scope.credentials).success((response) => {
-        //+$stateParams.id
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
-
-        // And redirect to the previous or home page
-        $state.go($state.previous.state.name || 'home', $state.previous.params);
       }).error((response) => {
         $scope.error = response.message;
       });
