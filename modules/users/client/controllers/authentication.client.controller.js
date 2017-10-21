@@ -42,7 +42,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return false;
       }
       delete $scope.credentials.confirm;
-      $http.post('/api/auth/signup', $scope.credentials).success((response) => {
+      $http.post('/api/auth/signup/faculty', $scope.credentials).success((response) => {
         $scope.authentication.user = response;
 
         $state.go('authentication.email-sent');
