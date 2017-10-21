@@ -45,6 +45,10 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/create',
       templateUrl: 'modules/core/client/views/study-create.client.view.html'
     })
+    .state('studies.edit', {
+      url: '/edit/:studyId',
+      templateUrl: 'modules/core/client/views/study-edit.client.view.html'
+    })
     .state('faculty-portal', {
       url: '/faculty',
       templateUrl: 'modules/core/client/views/faculty-portal.client.view.html'

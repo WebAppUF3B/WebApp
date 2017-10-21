@@ -128,6 +128,7 @@ exports.sessionsByUserId = function(req, res, next, id) {
     });
 };
 
+
 const generateMailOptions = (affectedUsers, cancellor, studyTitle) => {
   // Email any other participants involved
   const mailOptionArray = [];

@@ -110,6 +110,13 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       }
     }
 
+    $scope.studyDetails = function(study, index) {
+      $scope.currentStudy = study;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#studyModal').modal('show');
+    };
+
     // Cancel session and remove from table
     $scope.confirmCancel = function(){
       if(!alreadyClicked) {

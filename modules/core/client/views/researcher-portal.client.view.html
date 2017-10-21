@@ -53,6 +53,103 @@
     </div>
   </div>
 
+  <!-- Study Modal -->
+  <div id="studyModal" class="modal fade" role="dialog">
+    <div class="modal-dialog session-modal">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="row">
+            <div class="col-xs-8 col-xs-offset-2 text-center">
+              <h3 class="no-margin"><strong>Study Details</strong></h3>
+            </div>
+            <div class="col-xs-2">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+          </div>
+        </div>
+        <div class="pane">
+          <!-- Study Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Study</h4>
+            </div>
+          </div>
+          <div class="row small-top-pad">
+            <div class="col-sm-12">
+              <p class="mini-title">Title:</p>
+              <p>{{currentStudy.title}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Description:</p>
+              <p>{{currentStudy.description}}</p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Participant Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Participants</h4>
+            </div>
+          </div>
+          <div class="row" ng-repeat="participant in currentSession.participants">
+            <div class="col-sm-6">
+              <p class="mini-title">Name:</p>
+              <p>{{participant.userID.firstName}} {{participant.userID.lastName}}</p>
+            </div>
+            <div class="col-sm-6">
+              <p class="mini-title">Email:</p>
+              <p><a href="mailto:{{participant.userID.email}}" target="_blank">{{participant.userID.email}}</a></p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Session Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Session</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Location:</p>
+              <p>{{currentSession.studyID.location}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-6">
+              <p class="mini-title">Date:</p>
+              <p>{{currentSession.date}}</p>
+            </div>
+            <div class="col-xs-6">
+              <p class="mini-title">Time:</p>
+              <p>{{currentSession.time}}</p>
+            </div>
+          </div>
+
+          <div class="row pad-top">
+            <div class="col-sm-6">
+              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit">Edit Study</a>
+            </div>
+            <div class="col-sm-6">
+              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#cancelModal">Delete Study</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- End Study Modal -->
+
+
   <!-- Detail Modal -->
   <div id="detailModal" class="modal fade" role="dialog">
     <div class="modal-dialog session-modal">
