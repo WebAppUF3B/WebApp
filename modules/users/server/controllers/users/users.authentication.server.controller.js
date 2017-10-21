@@ -168,7 +168,7 @@ exports.signin = function (req, res, next) {
   };
 
   const notAdminApproved = {
-    message: 'Researchers and Faculty members need approval before being able to log in.',
+    message: 'Researchers and Faculty members require admin approval before log in.',
     code: 400
   };
 

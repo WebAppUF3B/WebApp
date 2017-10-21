@@ -72,7 +72,6 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
     $scope.signin = function (isValid) {
       $scope.error = null;
-
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
 
@@ -80,12 +79,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       }
 
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
-        // If successful we assign the response to the global user model
-        console.log(response);
-        $scope.authentication.user = response;
-
-        // And redirect to the previous or home page
-        $state.go('participant-portal', $state.previous.params);
+        redirect(response);
       }).error((response) => {
         $scope.error = response.message;
       });
@@ -118,6 +112,33 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return;
       }
       $scope.userForm.confirm.$setValidity('goodConfirm', true);
+    }
+    const redirect = (response) => {
+      // If successful we assign the response to the global user model
+      console.log(response);
+      $scope.authentication.user = response;
+
+      let destination;
+      switch ($scope.authentication.user.role) {
+        case 'participant':
+          destination = 'participant-portal';
+          break;
+        case 'faculty':
+          destination = 'faculty-portal';
+          break;
+        case 'researcher':
+          destination = 'researcher-portal';
+          break;
+        case 'admin':
+          destination = 'admin-portal';
+          break;
+        default:
+          $scope.error = 'Your role doesn\'t exist, what did you do?';
+          break;
+      }
+
+      // And redirect to the previous or home page
+      if(!$scope.error) $state.go(destination, $state.previous.params);
     }
   }
 ]);
