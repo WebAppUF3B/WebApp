@@ -241,7 +241,10 @@ exports.verify = function (req, res) {
       if(user.emailValidated) throw alreadyVerifiedErr;
       user.emailValidated = true;
       thisUser = user;
-      return user.save();
+      user.save()
+      .then(() => {
+        res.json(user);
+      });
     })
     .then(() => {
       return User.find({ role: 'admin' });
@@ -250,7 +253,7 @@ exports.verify = function (req, res) {
       const mailerOptions = [];
       admins.forEach((admin) => {
         const emailBody = `Hello ${admin.firstName} ${admin.lastName},
-                   \n\n${thisUser.firstName} ${thisUser.lastName} has requested a ${thisUser.role} account. \n\n Please use your admin portal to approve them.`;
+                   \n${thisUser.firstName} ${thisUser.lastName} has requested a ${thisUser.role} account. Please use your admin portal to approve them.`;
         const mailOptions = {
           from: 'no.replyhccresearch@gmail.com',
           to: admin.email,
