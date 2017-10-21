@@ -40,9 +40,9 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(["$rootScope"
 
   $rootScope.getMockUser = function() {
     return {
-      _id: '59e8f85f4fec93497c42b75e',
-      firstName: 'mock',
-      lastName: 'user',
+      _id: '59e955038b69ba05c2bf2e6e',
+      firstName: 'Tim',
+      lastName: 'Tebow',
       gender: 'male',
       birthday: '2015-02-03T05:00:00.000Z',
       email: 'trenflem@gmail.com',
@@ -459,6 +459,9 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams', '$rootScope',
   function($scope, $http, NgTableParams, $rootScope) {
 
+    // Prevent race conditions
+    let alreadyClicked = false;
+
     // Called after page loads
     $scope.init = function(){
       $scope.upcomingSessions = {};
@@ -527,25 +530,32 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     }
 
     // Open cancel modal
-    $scope.cancelOpen = function(){
-      $('#detailModal').modal('hide');
-      $('#cancelModal').modal('show');
+    $scope.cancelClose = function(){
+      if(!alreadyClicked){
+        $('#cancelModal').modal('hide');
+      }
     }
 
     // Cancel session and remove from table
     $scope.confirmCancel = function(){
-      let cancellor = $scope.user;
-      cancellor.date = $scope.currentSession.date;
-      cancellor.time = $scope.currentSession.time
-      $scope.sessions.cancel($scope.currentSession._id, cancellor)
-        .then(() => {
-          // Refetch sessions
-          $scope.init();
-          $('#cancelModal').modal('hide');
-        })
-        .catch((err) => {
-          $scope.error = true;
-        });
+      if(!alreadyClicked) {
+        alreadyClicked = true;
+        let cancellor = $scope.user;
+        cancellor.date = $scope.currentSession.date;
+        cancellor.time = $scope.currentSession.time;
+        $scope.sessions.cancel($scope.currentSession._id, cancellor)
+          .then(() => {
+            console.log("Made it!");
+            // Refetch sessions
+            $scope.init();
+            $('#cancelModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            $scope.error = true;
+            console.log(err);
+          });
+        }
     }
 
     // Declare methods that can be used to access session data
@@ -571,13 +581,13 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       },
 
       create: function(newSession) {
-        return $http.post(window.location.origin + '/api/sessions/', newSession)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/',
+          type: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(newSession)
+        });
       },
 
       get: function(id) {
@@ -591,23 +601,23 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       },
 
       update: function(id, newSession) {
-        return $http.put(window.location.origin + '/api/sessions/' + id, newSession)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/' + id, newSession,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(newSession)
+        });
       },
 
       cancel: function(id, cancellor) {
-        return $http.delete(window.location.origin + '/api/sessions/' + id, cancellor)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/' + id,
+          type: 'DELETE',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(cancellor)
+        });
       }
     };
 
@@ -1259,9 +1269,44 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
-    $scope.signin = function (isValid) {
+    $scope.facultySignup = function (isValid) {
       $scope.error = null;
 
+      if(!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'userForm');
+        return false;
+      }
+      delete $scope.credentials.confirm;
+
+      $http.post('/api/auth/signup/faculty', $scope.credentials).success((response) => {
+        $scope.authentication.user = response;
+
+        $state.go('authentication.email-sent');
+      }).error((response) => {
+        $scope.error = response.message;
+      });
+    };
+
+    $scope.researcherSignup = function (isValid) {
+      $scope.error = null;
+
+      if(!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'userForm');
+        return false;
+      }
+      delete $scope.credentials.confirm;
+
+      $http.post('/api/auth/signup/researcher', $scope.credentials).success((response) => {
+        $scope.authentication.user = response;
+
+        $state.go('authentication.email-sent');
+      }).error((response) => {
+        $scope.error = response.message;
+      });
+    };
+
+    $scope.signin = function (isValid) {
+      $scope.error = null;
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
 
@@ -1269,12 +1314,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       }
 
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
-        // If successful we assign the response to the global user model
-        console.log(response);
-        $scope.authentication.user = response;
-
-        // And redirect to the previous or home page
-        $state.go('participant-portal', $state.previous.params);
+        redirect(response);
       }).error((response) => {
         $scope.error = response.message;
       });
@@ -1307,6 +1347,33 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return;
       }
       $scope.userForm.confirm.$setValidity('goodConfirm', true);
+    }
+    const redirect = (response) => {
+      // If successful we assign the response to the global user model
+      console.log(response);
+      $scope.authentication.user = response;
+
+      let destination;
+      switch ($scope.authentication.user.role) {
+        case 'participant':
+          destination = 'participant-portal';
+          break;
+        case 'faculty':
+          destination = 'faculty-portal';
+          break;
+        case 'researcher':
+          destination = 'researcher-portal';
+          break;
+        case 'admin':
+          destination = 'admin-portal';
+          break;
+        default:
+          $scope.error = 'Your role doesn\'t exist, what did you do?';
+          break;
+      }
+
+      // And redirect to the previous or home page
+      if(!$scope.error) $state.go(destination, $state.previous.params);
     }
   }
 ]);

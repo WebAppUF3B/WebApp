@@ -8,7 +8,8 @@ const path = require('path'),
   mongoose = require('mongoose'),
   passport = require('passport'),
   User = mongoose.model('User'),
-  nodemailer = require('nodemailer');
+  nodemailer = require('nodemailer'),
+  utils = require('../../../../../utils/stringUtils');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
@@ -67,8 +68,6 @@ exports.signup = function (req, res) {
  * Faculty Signup
  */
 exports.facultySignup = function(req, res) {
-
-
   const faculty = new User(req.body);
   faculty.role = 'faculty'; //set role to enum 'faculty'
   faculty.adminApproved = false;
@@ -111,8 +110,6 @@ exports.facultySignup = function(req, res) {
 
 /* researcher Signup */
 exports.researcherSignup = function(req, res) {
-
-
   const researcher = new User(req.body);
   researcher.role = 'researcher'; //set role to enum 'researcher'
   researcher.adminApproved = false;
@@ -221,8 +218,12 @@ exports.signout = function (req, res) {
 
 //verify
 exports.verify = function (req, res) {
+  let thisUser;
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+  });
   const id = req.params.id;
-
   const noUserErr = {
     message: 'Unable to find a user with that ID. Please create another account!',
     code: 400
@@ -239,9 +240,29 @@ exports.verify = function (req, res) {
       if(user === null) throw noUserErr;
       if(user.emailValidated) throw alreadyVerifiedErr;
       user.emailValidated = true;
+      thisUser = user;
       return user.save();
     })
     .then(() => {
+      return User.find({ role: 'admin' });
+    })
+    .then((admins) => {
+      const mailerOptions = [];
+      admins.forEach((admin) => {
+        const emailBody = `Hello ${admin.firstName} ${admin.lastName},
+                   \n\n${thisUser.firstName} ${thisUser.lastName} has requested a ${thisUser.role} account. \n\n Please use your admin portal to approve them.`;
+        const mailOptions = {
+          from: 'no.replyhccresearch@gmail.com',
+          to: admin.email,
+          subject: `HCC Research Portal - New ${utils.toTitleCase(thisUser.role)} Awaiting Approval`,
+          text: emailBody
+        };
+        mailerOptions.push(mailOptions);
+      });
+      return Promise.all(mailerOptions.map((mailerOption) => transporter.sendMail(mailerOption)));
+    })
+    .then((results) => {
+      console.log('Sent emails to admin', results);
       return res.status(200).send('The account is now active and available for login!');
     })
     .catch((err) => {
