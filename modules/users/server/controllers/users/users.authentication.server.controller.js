@@ -20,7 +20,7 @@ const noReturnUrls = [
 /**
  * Signup
  */
-exports.signup = function (req, res) {
+exports.signup = function(req, res) {
   // For security measurement we remove the roles from the req.body object
   delete req.body.roles;
 
@@ -61,7 +61,7 @@ exports.signup = function (req, res) {
         }
         console.log('SingUp User Error:\n', errJSON);
         return res.status(400).send(errJSON);
-      })
+      });
 };
 
 /**
@@ -105,7 +105,7 @@ exports.facultySignup = function(req, res) {
            }
            console.log('SingUp User Error:\n', errJSON);
            return res.status(400).send(errJSON);
-         })
+         });
 };
 
 /* researcher Signup */
@@ -147,13 +147,13 @@ exports.researcherSignup = function(req, res) {
       }
       console.log('SingUp User Error:\n', errJSON);
       return res.status(400).send(errJSON);
-    })
+    });
 };
 
 /**
  * Signin after passport authentication
  */
-exports.signin = function (req, res, next) {
+exports.signin = function(req, res, next) {
   const signInErr = {
     message: 'Invalid email or password',
     code: 400
@@ -205,19 +205,19 @@ exports.signin = function (req, res, next) {
       .catch((err) => {
         console.log('Signin Error:\n', err.message);
         return res.status(err.code).send(err);
-      })
+      });
 };
 
 /**
  * Signout
  */
-exports.signout = function (req, res) {
+exports.signout = function(req, res) {
   req.logout();
   res.redirect('/');
 };
 
 //verify
-exports.verify = function (req, res) {
+exports.verify = function(req, res) {
   let thisUser;
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -242,13 +242,13 @@ exports.verify = function (req, res) {
   User.findById(id)
     .then((user) => {
       thisUser = user;
-      if(thisUser === null) throw noUserErr;
-      if(thisUser.emailValidated) throw alreadyVerifiedErr;
+      if (thisUser === null) throw noUserErr;
+      if (thisUser.emailValidated) throw alreadyVerifiedErr;
       thisUser.emailValidated = true;
       return user.save();
     })
     .then(() => {
-      if(thisUser.role === 'participant') {
+      if (thisUser.role === 'participant') {
         return res.status(200).send('The account is now active and available for login!');
       }
       User.find({ role: 'admin' })
@@ -273,7 +273,7 @@ exports.verify = function (req, res) {
         .then((results) => {
           console.log('Sent emails to admin', results);
           return res.status(200).send(`A new ${thisUser.role} account is now awaiting admin approval!`);
-        })
+        });
     })
     .catch((err) => {
       console.log('Verify email Error:\n', err);
@@ -284,8 +284,8 @@ exports.verify = function (req, res) {
 /**
  * OAuth provider call
  */
-exports.oauthCall = function (strategy, scope) {
-  return function (req, res, next) {
+exports.oauthCall = function(strategy, scope) {
+  return function(req, res, next) {
     // Set redirection path on session.
     // Do not redirect to a signin or signup page
     if (noReturnUrls.indexOf(req.query.redirectTo) === -1) {
@@ -299,8 +299,8 @@ exports.oauthCall = function (strategy, scope) {
 /**
  * OAuth callback
  */
-exports.oauthCallback = function (strategy) {
-  return function (req, res, next) {
+exports.oauthCallback = function(strategy) {
+  return function(req, res, next) {
     // Pop redirect URL from session
     const sessionRedirectURL = req.session.redirectTo;
     delete req.session.redirectTo;
@@ -326,7 +326,7 @@ exports.oauthCallback = function (strategy) {
 /**
  * Helper function to save or update a OAuth user profile
  */
-exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
+exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
   if (!req.user) {
     // Define a search query fields
     const searchMainProviderIdentifierField = 'providerData.' + providerUserProfile.providerIdentifierField;
@@ -403,7 +403,7 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
 /**
  * Remove OAuth provider
  */
-exports.removeOAuthProvider = function (req, res, next) {
+exports.removeOAuthProvider = function(req, res, next) {
   const user = req.user;
   const provider = req.query.provider;
 
