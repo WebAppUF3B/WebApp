@@ -11,18 +11,12 @@
               <div class="form-group" show-errors>
                 <label for="firstName">First Name</label>
                 <input type="text" id="firstName" name="firstName" class="form-control" ng-model="credentials.firstName" placeholder="First Name" required>
-                <div ng-messages="userForm.firstName.$error" role="alert">
-                  <p class="help-block error-text" ng-message="required">First name is required.</p>
-                </div>
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="lastName">Last Name</label>
                 <input type="text" id="lastName" name="lastName" class="form-control" ng-model="credentials.lastName" placeholder="Last Name" required>
-                <div ng-messages="userForm.lastName.$error" role="alert">
-                  <p class="help-block error-text" ng-message="required">Last name is required.</p>
-                </div>
               </div>
             </div>
           </div>
@@ -38,9 +32,6 @@
                     <option value="Post Doctorate">Post Doctorate</option>
                     <option value="Faculty">Faculty</option>
                   </select>
-                  <div ng-messages="userForm.position.$error" role="alert">
-                    <p class="help-block error-text" ng-message="required">Picking an option required.</p>
-                  </div>
                 </div>
               </div>
             </div>
@@ -51,10 +42,6 @@
               <div class="form-group" show-errors>
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" class="form-control lowercase" ng-model="credentials.email" placeholder="Email" required>
-                <div ng-messages="userForm.email.$error" role="alert">
-                  <p class="help-block error-text" ng-message="required">Email address is required.</p>
-                  <p class="help-block error-text" ng-message="email">Email address is invalid.</p>
-                </div>
               </div>
             </div>
           </div>
@@ -63,35 +50,21 @@
               <div class="form-group" show-errors>
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" class="form-control" ng-model="credentials.password" placeholder="Password" popover="{{popoverMsg}}" popover-trigger="focus" password-validator required>
-                <div ng-messages="userForm.password.$error" role="alert">
-                  <p class="help-block error-text" ng-message="required">Password is required.</p>
-                  <div ng-repeat="passwordError in passwordErrors">
-                    <p class="help-block error-text" ng-show="userForm.password.$error.requirements">{{passwordError}}</p>
-                  </div>
-                </div>
-              </div>
-              <div class="form-group" ng-show="!userForm.password.$error.required">
-                <label>Password Requirements</label>
-                <progressbar value="requirementsProgress" type="{{requirementsColor}}"><span style="color:white; white-space:nowrap;">{{requirementsProgress}}%</span></progressbar>
               </div>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-12">
-              <div class="form-group">
+              <div class="form-group" show-errors>
                 <label for="confirm">Confirm Password</label>
                 <input type="password" id="confirm" name="confirm" class="form-control" ng-model="credentials.confirm" placeholder="Confirm Password" ng-change="validateConfirmPassword(credentials.confirm)" required>
-                <div ng-messages="userForm.confirm.$error" role="alert">
-                  <p class="help-block error-text" ng-message="required">Password Confirmation is required.</p>
-                  <p class="help-block error-text" ng-message="goodConfirm">Passwords do not match.</p>
-                </div>
               </div>
             </div>
           </div>
           <div class="form-group no-margin">
-            <button type="submit" class="btn btn-primary full-width no-margin">Sign Up</button>
+            <button type="submit" class="btn btn-primary full-width no-margin small-top-margin">Sign Up</button>
           </div>
-          <div ng-show="error" class="text-center text-danger">
+          <div ng-show="error" class="text-center text-danger small-top-pad">
             <strong ng-bind="error"></strong>
           </div>
         </fieldset>

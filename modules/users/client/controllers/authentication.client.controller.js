@@ -15,9 +15,11 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
     $scope.signup = function(isValid) {
       $scope.error = null;
 
+      console.log($scope.credentials);
+
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
-
+        $scope.error = 'All fields are required.';
         return false;
       }
 
@@ -39,6 +41,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
+        $scope.error = 'All fields are required.';
         return false;
       }
       delete $scope.credentials.confirm;
@@ -57,6 +60,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
+        $scope.error = 'All fields are required.';
         return false;
       }
       delete $scope.credentials.confirm;
