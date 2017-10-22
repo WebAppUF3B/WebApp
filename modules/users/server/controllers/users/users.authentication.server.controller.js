@@ -8,7 +8,8 @@ const path = require('path'),
   mongoose = require('mongoose'),
   passport = require('passport'),
   User = mongoose.model('User'),
-  nodemailer = require('nodemailer');
+  nodemailer = require('nodemailer'),
+  utils = require('../../../../../utils/stringUtils');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
@@ -19,7 +20,7 @@ const noReturnUrls = [
 /**
  * Signup
  */
-exports.signup = function (req, res) {
+exports.signup = function(req, res) {
   // For security measurement we remove the roles from the req.body object
   delete req.body.roles;
 
@@ -60,13 +61,99 @@ exports.signup = function (req, res) {
         }
         console.log('SingUp User Error:\n', errJSON);
         return res.status(400).send(errJSON);
-      })
+      });
+};
+
+/**
+ * Faculty Signup
+ */
+exports.facultySignup = function(req, res) {
+  const faculty = new User(req.body);
+  faculty.role = 'faculty'; //set role to enum 'faculty'
+  faculty.adminApproved = false;
+  faculty.birthday = new Date(0);
+  faculty.gender = 'Other';
+  faculty.address = 'No Address';
+  faculty.save()
+         .then((faculty) => {
+           console.log('tw', faculty);
+           const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${faculty._id}`;
+           const verificationText = `Hello ${faculty.firstName} ${faculty.lastName},
+                                     \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
+
+           //established modemailer email transporter object to send email with mailOptions populating mail with link
+           const transporter = nodemailer.createTransport({
+             service: 'Gmail',
+             auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+           });
+           const mailOptions = {
+             from: 'no.replyhccresearch@gmail.com',
+             to: faculty.email,
+             subject: 'HCC Research Pool Account Verification',
+             text: verificationText
+           };
+           return transporter.sendMail(mailOptions);
+         })
+         .then(() => {
+           return res.status(200).send();
+         })
+         .catch((err) => {
+           console.log('Signup Error:\n', err);
+           const errJSON = err.toJSON();
+           if (errJSON.errors && errJSON.errors.email) {
+             errJSON.message = errJSON.errors.email.message;
+           }
+           console.log('SingUp User Error:\n', errJSON);
+           return res.status(400).send(errJSON);
+         });
+};
+
+/* researcher Signup */
+exports.researcherSignup = function(req, res) {
+  const researcher = new User(req.body);
+  researcher.role = 'researcher'; //set role to enum 'researcher'
+  researcher.adminApproved = false;
+  researcher.birthday = new Date(0);
+  researcher.gender = 'Other';
+  researcher.address = 'No Address';
+  researcher.save()
+    .then((researcher) => {
+      console.log('tw', researcher);
+      const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${researcher._id}`;
+      const verificationText = `Hello ${researcher.firstName} ${researcher.lastName},
+                                     \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: researcher.email,
+        subject: 'HCC Research Pool Account Verification',
+        text: verificationText
+      };
+      return transporter.sendMail(mailOptions);
+    })
+    .then(() => {
+      return res.status(200).send();
+    })
+    .catch((err) => {
+      console.log('Signup Error:\n', err);
+      const errJSON = err.toJSON();
+      if (errJSON.errors && errJSON.errors.email) {
+        errJSON.message = errJSON.errors.email.message;
+      }
+      console.log('SingUp User Error:\n', errJSON);
+      return res.status(400).send(errJSON);
+    });
 };
 
 /**
  * Signin after passport authentication
  */
-exports.signin = function (req, res, next) {
+exports.signin = function(req, res, next) {
   const signInErr = {
     message: 'Invalid email or password',
     code: 400
@@ -78,7 +165,7 @@ exports.signin = function (req, res, next) {
   };
 
   const notAdminApproved = {
-    message: 'Researchers and Faculty members need approval before being able to log in.',
+    message: 'Researchers and Faculty members require admin approval before log in.',
     code: 400
   };
 
@@ -118,23 +205,31 @@ exports.signin = function (req, res, next) {
       .catch((err) => {
         console.log('Signin Error:\n', err.message);
         return res.status(err.code).send(err);
-      })
+      });
 };
 
 /**
  * Signout
  */
-exports.signout = function (req, res) {
+exports.signout = function(req, res) {
   req.logout();
   res.redirect('/');
 };
 
 //verify
-exports.verify = function (req, res) {
+exports.verify = function(req, res) {
+  let thisUser;
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+  });
   const id = req.params.id;
-
   const noUserErr = {
     message: 'Unable to find a user with that ID. Please create another account!',
+    code: 400
+  };
+  const noAdminsErr = {
+    message: 'Unable to find any admins to email.',
     code: 400
   };
 
@@ -146,16 +241,42 @@ exports.verify = function (req, res) {
 
   User.findById(id)
     .then((user) => {
-      if(user === null) throw noUserErr;
-      if(user.emailValidated) throw alreadyVerifiedErr;
-      user.emailValidated = true;
+      thisUser = user;
+      if (thisUser === null) throw noUserErr;
+      if (thisUser.emailValidated) throw alreadyVerifiedErr;
+      thisUser.emailValidated = true;
       return user.save();
     })
     .then(() => {
-      return res.status(200).send('The account is now active and available for login!');
+      if (thisUser.role === 'participant') {
+        return res.status(200).send('The account is now active and available for login!');
+      }
+      User.find({ role: 'admin' })
+        .then((admins) => {
+          if (admins.length === 0) {
+            throw noAdminsErr;
+          }
+          const mailerOptions = [];
+          admins.forEach((admin) => {
+            const emailBody = `Hello ${admin.firstName} ${admin.lastName},
+                   \n\n${thisUser.firstName} ${thisUser.lastName} has requested a ${thisUser.role} account. \n\n Please use your admin portal to approve them.`;
+            const mailOptions = {
+              from: 'no.replyhccresearch@gmail.com',
+              to: admin.email,
+              subject: `HCC Research Portal - New ${utils.toTitleCase(thisUser.role)} Awaiting Approval`,
+              text: emailBody
+            };
+            mailerOptions.push(mailOptions);
+          });
+          return Promise.all(mailerOptions.map((mailerOption) => transporter.sendMail(mailerOption)));
+        })
+        .then((results) => {
+          console.log('Sent emails to admin', results);
+          return res.status(200).send(`A new ${thisUser.role} account is now awaiting admin approval!`);
+        });
     })
     .catch((err) => {
-      console.log(err);
+      console.log('Verify email Error:\n', err);
       return res.status(err.code).send(err);
     });
 };
@@ -163,8 +284,8 @@ exports.verify = function (req, res) {
 /**
  * OAuth provider call
  */
-exports.oauthCall = function (strategy, scope) {
-  return function (req, res, next) {
+exports.oauthCall = function(strategy, scope) {
+  return function(req, res, next) {
     // Set redirection path on session.
     // Do not redirect to a signin or signup page
     if (noReturnUrls.indexOf(req.query.redirectTo) === -1) {
@@ -178,8 +299,8 @@ exports.oauthCall = function (strategy, scope) {
 /**
  * OAuth callback
  */
-exports.oauthCallback = function (strategy) {
-  return function (req, res, next) {
+exports.oauthCallback = function(strategy) {
+  return function(req, res, next) {
     // Pop redirect URL from session
     const sessionRedirectURL = req.session.redirectTo;
     delete req.session.redirectTo;
@@ -205,7 +326,7 @@ exports.oauthCallback = function (strategy) {
 /**
  * Helper function to save or update a OAuth user profile
  */
-exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
+exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
   if (!req.user) {
     // Define a search query fields
     const searchMainProviderIdentifierField = 'providerData.' + providerUserProfile.providerIdentifierField;
@@ -282,7 +403,7 @@ exports.saveOAuthUserProfile = function (req, providerUserProfile, done) {
 /**
  * Remove OAuth provider
  */
-exports.removeOAuthProvider = function (req, res, next) {
+exports.removeOAuthProvider = function(req, res, next) {
   const user = req.user;
   const provider = req.query.provider;
 
