@@ -15,6 +15,8 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
+      $scope.compensation = {};
+      $scope.compensation.data = [];
 
       // TODO Assign user
       $scope.user = $rootScope.getMockUser();
@@ -24,7 +26,6 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
           // Update satisfied value of each study
           results.data.forEach((study) => {
-            console.log(study);
             if(!study.removed){
               if(study.currentNumber > study.satisfactoryNumber){
                 study.satisfied = true;
@@ -68,6 +69,16 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             } else{
               $scope.pastSessions.data.push(session);
             }
+
+            // Populate table with users awaiting compensationType
+            session.participants.forEach((participant) => {
+              if(participant.attended && participant.compensationType == 'monetary' && !participant.compensationGiven){
+                const temp = participant;
+                temp.studyID = session.studyID;
+                temp.session = session._id;
+                $scope.compensation.data.push(temp);
+              }
+            });
           });
 
           $scope.upcomingSessions = new NgTableParams({
@@ -90,6 +101,16 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             dataset: $scope.pastSessions.data // select data
           });
 
+          $scope.compensation = new NgTableParams({
+            count: 10,
+            sorting: {
+              'userID.lastName': 'desc'
+            }
+          }, {
+            counts: [], // hides page sizes
+            dataset: $scope.compensation.data // select data
+          });
+
         })
         .catch((err) => {
           console.log(err);
@@ -102,6 +123,14 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.currentIndex = index;
       $scope.error = false;
       $('#studyModal').modal('show');
+    }
+
+    // Show modal and populate it with compensation data
+    $scope.compensationDetails = function(participant, index){
+      $scope.currentParticipant = participant;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#compensationModal').modal('show');
     }
 
     // Show modal and populate it with session data
@@ -203,6 +232,41 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       }
     }
 
+    // Change attendance value of participant
+    $scope.changeAttendance = function(participant) {
+      const change = { 'userID': participant.userID._id, 'attended': participant.attended };
+      $scope.sessions.attend($scope.currentSession._id, change)
+        .then(() => {
+          // Refetch sessions
+          alreadyClicked = false;
+        })
+        .catch((err) => {
+          $scope.error = true;
+          console.log(err);
+          alreadyClicked = false;
+        });
+    }
+
+    // Mark participant as compensated
+    $scope.markCompensated = function() {
+      if(!alreadyClicked) {
+        alreadyClicked = true;
+        const user = { 'userID': $scope.currentParticipant.userID._id };
+        $scope.sessions.compensate($scope.currentParticipant.session, user)
+          .then((response) => {
+            // Refetch sessions
+            $scope.init();
+            $('#compensationModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            $scope.error = true;
+            console.log(err);
+            alreadyClicked = false;
+          });
+      }
+    }
+
     // Declare methods that can be used to access session data
     $scope.sessions = {
       getAll: function() {
@@ -262,6 +326,26 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           contentType: 'application/json',
           dataType: 'json',
           data: JSON.stringify(cancellor)
+        });
+      },
+
+      attend: function(id, change) {
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/attend/' + id,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(change)
+        });
+      },
+
+      compensate: function(id, user) {
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/compensate/' + id,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(user)
         });
       }
     };

@@ -94,6 +94,50 @@ exports.delete = function(req, res) {
   }
 };
 
+// Change the attendance value for a participant
+exports.changeAttendance = function(req, res) {
+  const session = req.studySession;
+  const change = req.body;
+
+  session.participants.forEach((participant) => {
+    if(participant.userID._id == change.userID){
+      participant.attended = change.attended;
+    }
+  });
+
+  /* Update the session */
+  session.save()
+    .then(() => {
+      res.json(session);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send(err);
+    });
+};
+
+// Change the attendance value for a participant
+exports.markCompensated = function(req, res) {
+  const session = req.studySession;
+  const compensated = req.body;
+
+  session.participants.forEach((participant) => {
+    if(participant.userID._id == compensated.userID){
+      participant.compensationGiven = true;
+    }
+  });
+
+  /* Update the session */
+  session.save()
+    .then(() => {
+      res.json(session);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send(err);
+    });
+};
+
 /*
   Middleware: find a session by its ID, then pass it to the next request handler.
  */

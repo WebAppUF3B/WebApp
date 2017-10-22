@@ -39,6 +39,9 @@ const studySchema = new Schema({
     enum: ['extraCredit', 'monetary'],
     required: true
   }],
+  compensationAmount: {
+    type: Number
+  },
   availability: [{
     slot: Date,
   }],
