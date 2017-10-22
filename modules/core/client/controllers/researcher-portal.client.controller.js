@@ -1,6 +1,6 @@
 'use strict';
 
-// TODO consider replacing $http requests with factory (sessions.client.service.js)
+// TODO consider replacing $http requests with factory
 angular.module('core').controller('ResearcherPortalController', ['$scope','$http','NgTableParams', '$rootScope',
   function($scope, $http, NgTableParams, $rootScope) {
 
@@ -161,14 +161,6 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       if(!alreadyClicked){
         $('#removeStudyModal').modal('hide');
       }
-    }
-
-    // Show details of study in modal
-    $scope.studyDetails = function(study, index) {
-      $scope.currentStudy = study;
-      $scope.currentIndex = index;
-      $scope.error = false;
-      $('#studyModal').modal('show');
     }
 
     // Close study in backend
