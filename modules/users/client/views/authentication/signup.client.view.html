@@ -122,10 +122,12 @@
 </div>
 
 <script type="text/javascript">
+    const today = Date.now();
     $(function () {
         $('#datepicker').datetimepicker({
           format: 'MM/DD/YYYY',
-          viewMode: 'years'
-        });
+          viewMode: 'years',
+          maxDate: today,
+        })
     });
 </script>

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('users').controller('AuthenticationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator',
-  function ($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
+  function($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
       // Get an eventual error defined in the URL query string:
@@ -12,7 +12,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       $location.path('/');
     }
 
-    $scope.signup = function (isValid) {
+    $scope.signup = function(isValid) {
       $scope.error = null;
 
       if (!isValid) {
@@ -34,10 +34,10 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
-    $scope.facultySignup = function (isValid) {
+    $scope.facultySignup = function(isValid) {
       $scope.error = null;
 
-      if(!isValid) {
+      if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         return false;
       }
@@ -52,10 +52,10 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
-    $scope.researcherSignup = function (isValid) {
+    $scope.researcherSignup = function(isValid) {
       $scope.error = null;
 
-      if(!isValid) {
+      if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         return false;
       }
@@ -70,7 +70,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
-    $scope.signin = function (isValid) {
+    $scope.signin = function(isValid) {
       $scope.error = null;
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
@@ -86,7 +86,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
     };
 
     // OAuth provider request
-    $scope.callOauthProvider = function (url) {
+    $scope.callOauthProvider = function(url) {
       if ($state.previous && $state.previous.href) {
         url += '?redirectTo=' + encodeURIComponent($state.previous.href);
       }
@@ -94,17 +94,6 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       // Effectively call OAuth authentication route:
       $window.location.href = url;
     };
-    const myDate = new Date();
-    $scope.maxDate = new Date(
-        myDate.getFullYear(),
-        myDate.getMonth(),
-        myDate.getDate()
-      );
-    $scope.minDate = new Date(
-        myDate.getFullYear() - 127,
-        myDate.getMonth(),
-        myDate.getDate()
-    );
     $scope.validateConfirmPassword = (confirmation) => {
       const password = $scope.userForm.password.$viewValue;
       if (confirmation && password && confirmation !== password) {
@@ -112,7 +101,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return;
       }
       $scope.userForm.confirm.$setValidity('goodConfirm', true);
-    }
+    };
     const redirect = (response) => {
       // If successful we assign the response to the global user model
       console.log(response);
@@ -138,7 +127,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       }
 
       // And redirect to the previous or home page
-      if(!$scope.error) $state.go(destination, $state.previous.params);
-    }
+      if (!$scope.error) $state.go(destination, $state.previous.params);
+    };
   }
 ]);
