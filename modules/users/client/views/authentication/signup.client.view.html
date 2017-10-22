@@ -28,11 +28,14 @@
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="birthday">Birthday</label>
-                <div id="birthday" class="date">
-                  <md-datepicker name="birthday" ng-model="credentials.birthday" md-current-view="year" md-placeholder="Enter date" md-open-on-focus="" required md-min-date="minDate" md-max-date="maxDate" onkeydown="return false"></md-datepicker>
-                  <div ng-messages="userForm.birthday.$error" role="alert">
-                    <p class="help-block error-text" ng-message="required">Birthday is required.</p>
-                  </div>
+                <div class='input-group date' id='datepicker'>
+                    <input type='text' id="birthday" name="birthday" ng-model="credentials.birthday" class="form-control" />
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+                <div ng-messages="userForm.birthday.$error" role="alert">
+                  <p class="help-block error-text" ng-message="required">Birthday is required.</p>
                 </div>
               </div>
             </div>
@@ -47,7 +50,7 @@
                     <option value="none">Prefer Not to Disclose</option>
                   </select>
                   <div ng-messages="userForm.gender.$error" role="alert">
-                    <p class="help-block error-text" ng-message="required">picking an option required.</p>
+                    <p class="help-block error-text" ng-message="required">Picking an option required.</p>
                   </div>
                 </div>
               </div>
@@ -109,7 +112,7 @@
           <div class="form-group no-margin">
             <button type="submit" class="btn btn-primary full-width no-margin">Sign Up</button>
           </div>
-          <div ng-show="error" class="text-center text-danger">
+          <div ng-show="error" class="text-center text-danger top-pad">
             <strong ng-bind="error"></strong>
           </div>
         </fieldset>
@@ -117,3 +120,14 @@
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+    const today = Date.now();
+    $(function () {
+        $('#datepicker').datetimepicker({
+          format: 'MM/DD/YYYY',
+          viewMode: 'years',
+          maxDate: today,
+        })
+    });
+</script>

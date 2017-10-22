@@ -4,7 +4,7 @@
   <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 moile-no-pad">
     <!-- TODO replace the form fields below with what we have in balsamiq -->
     <div class="form-panel">
-      <form name="userForm" ng-submit="signup(userForm.$valid)" class="signin" novalidate autocomplete="off">
+      <form name="userForm" ng-submit="facultySignup(userForm.$valid)" class="signin" novalidate autocomplete="off">
         <fieldset>
           <div class="row">
             <div class="col-sm-6">
@@ -27,53 +27,13 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-6">
-              <div class="form-group" show-errors>
-                <label for="birthday">Birthday</label>
-                <div id="birthday" class="date">
-                  <md-datepicker name="birthday" ng-model="credentials.birthday" md-current-view="year" md-placeholder="Enter date" md-open-on-focus="" required md-min-date="minDate" md-max-date="maxDate"></md-datepicker>
-                  <div ng-messages="userForm.birthday.$error" role="alert">
-                    <p class="help-block error-text" ng-message="required">Birthday is required.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-sm-6">
-              <div class="form-group" show-errors>
-                <div id="gender" class="form-group">
-                  <label>Gender</label>
-                  <select name="gender" class="form-control" ng-model="credentials.gender" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                    <option value="none">Prefer Not to Disclose</option>
-                  </select>
-                  <div ng-messages="userForm.gender.$error" role="alert">
-                    <p class="help-block error-text" ng-message="required">picking an option required.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
             <div class="col-sm-12">
               <div class="form-group" show-errors>
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" class="form-control lowercase" ng-model="credentials.email" placeholder="Email" popover="If you are participating for extra credit, you must use your UFL email." popover-trigger="focus" required>
+                <input type="email" id="email" name="email" class="form-control lowercase" ng-model="credentials.email" placeholder="Email" required>
                 <div ng-messages="userForm.email.$error" role="alert">
                   <p class="help-block error-text" ng-message="required">Email address is required.</p>
                   <p class="help-block error-text" ng-message="email">Email address is invalid.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="form-group" show-errors>
-                <label for="address">Address</label>
-                <input type="address" id="address" name="address" class="form-control" ng-model="credentials.address" placeholder="Address, City, State, Zipcode" required>
-                <div ng-messages="userForm.address.$error" role="alert">
-                  <p class="help-block error-text" ng-message="required">Address is required.</p>
                 </div>
               </div>
             </div>
