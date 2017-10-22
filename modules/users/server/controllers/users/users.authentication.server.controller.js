@@ -228,6 +228,10 @@ exports.verify = function (req, res) {
     message: 'Unable to find a user with that ID. Please create another account!',
     code: 400
   };
+  const noAdminsErr = {
+    message: 'Unable to find any admins to email.',
+    code: 400
+  };
 
   const alreadyVerifiedErr = {
     message: 'Unable to find a user with that ID. Please create another account!',
@@ -237,36 +241,42 @@ exports.verify = function (req, res) {
 
   User.findById(id)
     .then((user) => {
-      if(user === null) throw noUserErr;
-      if(user.emailValidated) throw alreadyVerifiedErr;
-      user.emailValidated = true;
       thisUser = user;
+      if(thisUser === null) throw noUserErr;
+      if(thisUser.emailValidated) throw alreadyVerifiedErr;
+      thisUser.emailValidated = true;
       return user.save();
     })
     .then(() => {
-      return User.find({ role: 'admin' });
-    })
-    .then((admins) => {
-      const mailerOptions = [];
-      admins.forEach((admin) => {
-        const emailBody = `Hello ${admin.firstName} ${admin.lastName},
+      if(thisUser.role === 'participant') {
+        return res.status(200).send('The account is now active and available for login!');
+      }
+      User.find({ role: 'admin' })
+        .then((admins) => {
+          if (admins.length === 0) {
+            throw noAdminsErr;
+          }
+          const mailerOptions = [];
+          admins.forEach((admin) => {
+            const emailBody = `Hello ${admin.firstName} ${admin.lastName},
                    \n\n${thisUser.firstName} ${thisUser.lastName} has requested a ${thisUser.role} account. \n\n Please use your admin portal to approve them.`;
-        const mailOptions = {
-          from: 'no.replyhccresearch@gmail.com',
-          to: admin.email,
-          subject: `HCC Research Portal - New ${utils.toTitleCase(thisUser.role)} Awaiting Approval`,
-          text: emailBody
-        };
-        mailerOptions.push(mailOptions);
-      });
-      return Promise.all(mailerOptions.map((mailerOption) => transporter.sendMail(mailerOption)));
-    })
-    .then((results) => {
-      console.log('Sent emails to admin', results);
-      return res.status(200).send('The account is now active and available for login!');
+            const mailOptions = {
+              from: 'no.replyhccresearch@gmail.com',
+              to: admin.email,
+              subject: `HCC Research Portal - New ${utils.toTitleCase(thisUser.role)} Awaiting Approval`,
+              text: emailBody
+            };
+            mailerOptions.push(mailOptions);
+          });
+          return Promise.all(mailerOptions.map((mailerOption) => transporter.sendMail(mailerOption)));
+        })
+        .then((results) => {
+          console.log('Sent emails to admin', results);
+          return res.status(200).send(`A new ${thisUser.role} account is now awaiting admin approval!`);
+        })
     })
     .catch((err) => {
-      console.log(err);
+      console.log('Verify email Error:\n', err);
       return res.status(err.code).send(err);
     });
 };
