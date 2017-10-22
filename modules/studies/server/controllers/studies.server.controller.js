@@ -74,6 +74,41 @@ exports.delete = function(req, res) {
   })
 };
 
+// Close a study (no longer accept sign ups, cancel all sessions, and gray out in researcher table)
+exports.closeStudy = function(req, res) {
+  const study = req.study;
+  study.closed = true;
+  const cancellor = req.body;
+
+  /* Update the study */
+  study.save()
+    .then(() => {
+      // TODO Cancel all sessions associated with this study
+      res.json(study);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send(err);
+    });
+};
+
+// Remove study (no longer appear in researcher table)
+exports.removeStudy = function(req, res) {
+  const study = req.study;
+  study.removed = true;
+
+  /* Update the study */
+  study.save()
+    .then(() => {
+      // Return
+      res.json(study);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send(err);
+    });
+};
+
 /*
   Middleware: find a study by its ID, then pass it to the next request handler.
  */

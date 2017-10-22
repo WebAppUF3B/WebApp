@@ -73,7 +73,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $('#detailModal').modal('show');
     }
 
-    // Open cancel modal
+    // Close cancel modal
     $scope.cancelClose = function(){
       if(!alreadyClicked){
         $('#cancelModal').modal('hide');
@@ -89,7 +89,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
         cancellor.time = $scope.currentSession.time;
         $scope.sessions.cancel($scope.currentSession._id, cancellor)
           .then(() => {
-            console.log("Made it!");
             // Refetch sessions
             $scope.init();
             $('#cancelModal').modal('hide');

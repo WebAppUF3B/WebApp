@@ -21,14 +21,16 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
       $scope.studies.getUserStudies($scope.user._id)
         .then((results) => {
-          // Assign results to myStudies.data
-          $scope.myStudies.data = results.data;
 
           // Update satisfied value of each study
-          $scope.myStudies.data.forEach((study) => {
+          results.data.forEach((study) => {
             console.log(study);
-            if(study.currentNumber > study.satisfactoryNumber){
-              study.satisfied = true;
+            if(!study.removed){
+              if(study.currentNumber > study.satisfactoryNumber){
+                study.satisfied = true;
+              }
+              // Store in array
+              $scope.myStudies.data.push(study);
             }
           });
 
@@ -94,6 +96,14 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         });
     }
 
+    // Show modal and populate it with study details
+    $scope.studyDetails = function(study, index) {
+      $scope.currentStudy = study;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#studyModal').modal('show');
+    }
+
     // Show modal and populate it with session data
     $scope.sessionDetails = function(session, currentTable, index){
       $scope.currentSession = session;
@@ -103,19 +113,73 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $('#detailModal').modal('show');
     }
 
-    // Open cancel modal
+    // Close cancel modal
     $scope.cancelClose = function(){
       if(!alreadyClicked){
         $('#cancelModal').modal('hide');
       }
     }
 
+    // Close closeStudy modal
+    $scope.closeStudyClose = function(){
+      if(!alreadyClicked){
+        $('#closeStudyModal').modal('hide');
+      }
+    }
+
+    // Close closeStudy modal
+    $scope.removeStudyClose = function(){
+      if(!alreadyClicked){
+        $('#removeStudyModal').modal('hide');
+      }
+    }
+
+    // Show details of study in modal
     $scope.studyDetails = function(study, index) {
       $scope.currentStudy = study;
       $scope.currentIndex = index;
       $scope.error = false;
       $('#studyModal').modal('show');
-    };
+    }
+
+    // Close study in backend
+    $scope.confirmCloseStudy = function(){
+      if(!alreadyClicked) {
+        alreadyClicked = true;
+        const cancellor = $scope.user;
+        $scope.studies.close($scope.currentStudy._id, cancellor)
+          .then(() => {
+            // Refetch sessions
+            $scope.init();
+            $('#closeStudyModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            $scope.error = true;
+            console.log(err);
+            alreadyClicked = false;
+          });
+      }
+    }
+
+    // Remove study in backend
+    $scope.confirmRemoveStudy = function(){
+      if(!alreadyClicked) {
+        alreadyClicked = true;
+        $scope.studies.remove($scope.currentStudy._id)
+          .then(() => {
+            // Refetch sessions
+            $scope.init();
+            $('#removeStudyModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            $scope.error = true;
+            console.log(err);
+            alreadyClicked = false;
+          });
+      }
+    }
 
     // Cancel session and remove from table
     $scope.confirmCancel = function(){
@@ -126,7 +190,6 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         cancellor.time = $scope.currentSession.time;
         $scope.sessions.cancel($scope.currentSession._id, cancellor)
           .then(() => {
-            console.log("Made it!");
             // Refetch sessions
             $scope.init();
             $('#cancelModal').modal('hide');
@@ -255,13 +318,20 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         });
       },
 
-      delete: function(id, cancellor) {
+      close: function(id, cancellor) {
         return $.ajax({
-          url: window.location.origin + '/api/studies/' + id,
-          type: 'DELETE',
+          url: window.location.origin + '/api/studies/close/' + id,
+          type: 'PUT',
           contentType: 'application/json',
           dataType: 'json',
           data: JSON.stringify(cancellor)
+        });
+      },
+
+      remove: function(id) {
+        return $.ajax({
+          url: window.location.origin + '/api/studies/remove/' + id,
+          type: 'PUT'
         });
       }
     };

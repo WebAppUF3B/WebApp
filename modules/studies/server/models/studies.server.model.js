@@ -34,14 +34,22 @@ const studySchema = new Schema({
   currentNumber: {
     type: Number
   },
-  compensationType: {
+  compensationType: [{
     type: String,
     enum: ['extraCredit', 'monetary'],
     required: true
-  },
+  }],
   availability: [{
     slot: Date,
   }],
+  closed: {
+    type: Boolean,
+    default: false
+  },
+  removed: {
+    type: Boolean,
+    default: false
+  },
   createdOn: Date,
   updated: Date
 });

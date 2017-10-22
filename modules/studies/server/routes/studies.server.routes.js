@@ -13,6 +13,8 @@ module.exports = function (app) {
     .put(studies.update)
     .delete(studies.delete);
   app.route('/api/studies/user/:userId').get(studies.get);
+  app.route('/api/studies/close/:studyId').put(studies.closeStudy);
+  app.route('/api/studies/remove/:studyId').put(studies.removeStudy);
 
   /*
     The 'router.param' method allows us to specify middleware we would like to use to handle

@@ -35,6 +35,12 @@
   .hide-col-1-phone th:nth-child(1), .hide-col-1-phone td:nth-child(1){
     display: none !important;
   }
+  .hide-col-2-phone th:nth-child(2), .hide-col-2-phone td:nth-child(2){
+    display: none !important;
+  }
+  .hide-col-3-phone th:nth-child(3), .hide-col-3-phone td:nth-child(3){
+    display: none !important;
+  }
   .phone-top-margin{
     margin-top: 10px;
   }
@@ -496,5 +502,9 @@ hr {
 }
 
 .study-satisfied{
-  background-color: rgb(162, 214, 179) !important;
+  background-color: #a2d6b3 !important;
+}
+
+.study-closed, .study-satisfied .study-closed{
+  background-color: #e0a9a9 !important;
 }

@@ -40,7 +40,7 @@ angular.module(ApplicationConfiguration.applicationModuleName).run(["$rootScope"
 
   $rootScope.getMockUser = function() {
     return {
-      _id: '59e955038b69ba05c2bf2e6e',
+      _id: '59e8f85f4fec93497c42b75e',
       firstName: 'Tim',
       lastName: 'Tebow',
       gender: 'male',
@@ -376,6 +376,10 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/create',
       templateUrl: 'modules/core/client/views/study-create.client.view.html'
     })
+    .state('studies.edit', {
+      url: '/edit/:studyId',
+      templateUrl: 'modules/core/client/views/study-edit.client.view.html'
+    })
     .state('faculty-portal', {
       url: '/faculty',
       templateUrl: 'modules/core/client/views/faculty-portal.client.view.html'
@@ -528,7 +532,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $('#detailModal').modal('show');
     }
 
-    // Open cancel modal
+    // Close cancel modal
     $scope.cancelClose = function(){
       if(!alreadyClicked){
         $('#cancelModal').modal('hide');
@@ -544,7 +548,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
         cancellor.time = $scope.currentSession.time;
         $scope.sessions.cancel($scope.currentSession._id, cancellor)
           .then(() => {
-            console.log("Made it!");
             // Refetch sessions
             $scope.init();
             $('#cancelModal').modal('hide');
@@ -654,7 +657,6 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
           // Update satisfied value of each study
           $scope.myStudies.data.forEach((study) => {
-            console.log(study);
             if(study.currentNumber > study.satisfactoryNumber){
               study.satisfied = true;
             }
@@ -722,6 +724,14 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         });
     }
 
+    // Show modal and populate it with study details
+    $scope.studyDetails = function(study, index) {
+      $scope.currentStudy = study;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#studyModal').modal('show');
+    }
+
     // Show modal and populate it with session data
     $scope.sessionDetails = function(session, currentTable, index){
       $scope.currentSession = session;
@@ -731,10 +741,43 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $('#detailModal').modal('show');
     }
 
-    // Open cancel modal
+    // Close cancel modal
     $scope.cancelClose = function(){
       if(!alreadyClicked){
         $('#cancelModal').modal('hide');
+      }
+    }
+
+    // Close closeStudy modal
+    $scope.closeStudyClose = function(){
+      if(!alreadyClicked){
+        $('#closeStudyModal').modal('hide');
+      }
+    }
+
+    $scope.studyDetails = function(study, index) {
+      $scope.currentStudy = study;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#studyModal').modal('show');
+    }
+
+    $scope.confirmCloseStudy = function(){
+      if(!alreadyClicked) {
+        alreadyClicked = true;
+        const cancellor = $scope.user;
+        $scope.studies.close($scope.currentStudy._id, cancellor)
+          .then(() => {
+            // Refetch sessions
+            $scope.init();
+            $('#closeStudyModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            $scope.error = true;
+            console.log(err);
+            alreadyClicked = false;
+          });
       }
     }
 
@@ -747,7 +790,6 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         cancellor.time = $scope.currentSession.time;
         $scope.sessions.cancel($scope.currentSession._id, cancellor)
           .then(() => {
-            console.log("Made it!");
             // Refetch sessions
             $scope.init();
             $('#cancelModal').modal('hide');
@@ -876,10 +918,10 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         });
       },
 
-      delete: function(id, cancellor) {
+      close: function(id, cancellor) {
         return $.ajax({
-          url: window.location.origin + '/api/studies/' + id,
-          type: 'DELETE',
+          url: window.location.origin + '/api/studies/close/' + id,
+          type: 'PUT',
           contentType: 'application/json',
           dataType: 'json',
           data: JSON.stringify(cancellor)
