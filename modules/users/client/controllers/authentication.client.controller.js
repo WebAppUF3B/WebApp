@@ -14,6 +14,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
     $scope.signup = function(isValid) {
       $scope.error = null;
+      $scope.credentials.birthday = $('#birthday').val();
 
       console.log($scope.credentials);
 
