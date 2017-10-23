@@ -19,8 +19,8 @@
     padding-top: 10px !important;
   }
   .panel-container{
-    margin-right: 15px !important;
-    margin-left: 15px !important;
+    margin-right: 0px !important;
+    margin-left: 0px !important;
   }
   .mobile-no-pad{
     padding-left: 0px !important;
@@ -150,6 +150,10 @@ h2, h3, h4, h5, h6 {
 
 .top-margin {
   margin-top: 30px;
+}
+
+.no-margin .small-top-margin {
+  margin-top: 10px !important;
 }
 
 .small-top-margin {
@@ -507,4 +511,21 @@ hr {
 
 .not-bold{
   font-weight: normal;
+}
+
+.note{
+  font-style: italic;
+  font-size: 1em !important;
+}
+
+.bootstrap-datetimepicker-widget{
+  margin-right: -46px !important;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:after {
+  right: 58px !important;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:before {
+  display: none !important;
 }

@@ -591,6 +591,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           dataType: 'json',
           data: JSON.stringify(newSession)
         });
+
       },
 
       get: function(id) {
@@ -1577,9 +1578,44 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
-    $scope.signin = function (isValid) {
+    $scope.facultySignup = function (isValid) {
       $scope.error = null;
 
+      if(!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'userForm');
+        return false;
+      }
+      delete $scope.credentials.confirm;
+
+      $http.post('/api/auth/signup/faculty', $scope.credentials).success((response) => {
+        $scope.authentication.user = response;
+
+        $state.go('authentication.email-sent');
+      }).error((response) => {
+        $scope.error = response.message;
+      });
+    };
+
+    $scope.researcherSignup = function (isValid) {
+      $scope.error = null;
+
+      if(!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'userForm');
+        return false;
+      }
+      delete $scope.credentials.confirm;
+
+      $http.post('/api/auth/signup/researcher', $scope.credentials).success((response) => {
+        $scope.authentication.user = response;
+
+        $state.go('authentication.email-sent');
+      }).error((response) => {
+        $scope.error = response.message;
+      });
+    };
+
+    $scope.signin = function (isValid) {
+      $scope.error = null;
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
 
@@ -1587,12 +1623,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       }
 
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
-        // If successful we assign the response to the global user model
-        console.log(response);
-        $scope.authentication.user = response;
-
-        // And redirect to the previous or home page
-        $state.go('participant-portal', $state.previous.params);
+        redirect(response);
       }).error((response) => {
         $scope.error = response.message;
       });
@@ -1625,6 +1656,33 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return;
       }
       $scope.userForm.confirm.$setValidity('goodConfirm', true);
+    }
+    const redirect = (response) => {
+      // If successful we assign the response to the global user model
+      console.log(response);
+      $scope.authentication.user = response;
+
+      let destination;
+      switch ($scope.authentication.user.role) {
+        case 'participant':
+          destination = 'participant-portal';
+          break;
+        case 'faculty':
+          destination = 'faculty-portal';
+          break;
+        case 'researcher':
+          destination = 'researcher-portal';
+          break;
+        case 'admin':
+          destination = 'admin-portal';
+          break;
+        default:
+          $scope.error = 'Your role doesn\'t exist, what did you do?';
+          break;
+      }
+
+      // And redirect to the previous or home page
+      if(!$scope.error) $state.go(destination, $state.previous.params);
     }
   }
 ]);
@@ -1760,18 +1818,15 @@ angular.module('users').controller('SettingsController', ['$scope', 'Authenticat
 angular.module('users').controller('VerificationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication',
   function ($scope, $state, $http, $location, $window, Authentication) {
     const verify = function () {
+      $scope.error = false;
       // mark verify field for this user as True (don't know if you need all the vars included above, just copied them from authentication controller)
       const request = window.location.pathname;
       const pass = request.slice(23);
       $http.post('/api/auth/verify/'+pass, $scope.credentials).success((response) => {
-        //+$stateParams.id
         // If successful we assign the response to the global user model
-        $scope.authentication.user = response;
-
-        // And redirect to the previous or home page
-        $state.go($state.previous.state.name || 'home', $state.previous.params);
+        $scope.user = response;
       }).error((response) => {
-        $scope.error = response.message;
+        $scope.error = true;
       });
       //alert(request);
     };
