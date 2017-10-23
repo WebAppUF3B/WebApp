@@ -10,13 +10,15 @@ const mongoose = require('mongoose'),
 
 /* Retreive all the studies */
 exports.getAll = function(req, res) {
-  Study.find().exec((err, studies) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.json(studies);
-    }
-  });
+  Study.find()
+    .populate('researchers.userID')
+    .exec((err, studies) => {
+      if (err) {
+        res.status(400).send(err);
+      } else {
+        res.json(studies);
+      }
+    });
 };
 
 /* Create a study */
@@ -39,6 +41,7 @@ exports.create = function(req, res) {
 /* Show the current study */
 exports.get = function(req, res) {
   /* send back the study as json from the request */
+  console.log(req.study);
   res.json(req.study);
 };
 
@@ -73,15 +76,39 @@ exports.delete = function(req, res) {
   })
 };
 
-/* TODO Make sure this function actually has access to ID without using middleware, also make sure that "find" gets all studies where 1 user id matches*/
-exports.getUserStudies = function(req, res, id) {
-  Session.find({ 'researchers.researcherID': id }).exec((err, studies) => {
-    if (err) {
+// Close a study (no longer accept sign ups, cancel all sessions, and gray out in researcher table)
+exports.closeStudy = function(req, res) {
+  const study = req.study;
+  study.closed = true;
+  const cancellor = req.body;
+
+  /* Update the study */
+  study.save()
+    .then(() => {
+      // TODO Cancel all sessions associated with this study
+      res.json(study);
+    })
+    .catch((err) => {
+      console.log(err);
       res.status(400).send(err);
-    } else {
-      res.json(studies);
-    }
-  });
+    });
+};
+
+// Remove study (no longer appear in researcher table)
+exports.removeStudy = function(req, res) {
+  const study = req.study;
+  study.removed = true;
+
+  /* Update the study */
+  study.save()
+    .then(() => {
+      // Return
+      res.json(study);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send(err);
+    });
 };
 
 /*
@@ -96,4 +123,18 @@ exports.studyById = function(req, res, next, id) {
       next();
     }
   });
+};
+
+exports.studyByUserId = function(req, res, next, id) {
+  Study.find({ 'researchers.userID': id })
+    .populate('researchers.userID')
+    .exec()
+    .then((studies) => {
+      req.study = studies;
+      next();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send(err);
+    });
 };
