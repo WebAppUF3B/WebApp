@@ -13,6 +13,8 @@ module.exports = function (app) {
     .put(sessions.update)
     .delete(sessions.delete);
   app.route('/api/sessions/user/:userId').get(sessions.get);
+  app.route('/api/sessions/attend/:sessionId').put(sessions.changeAttendance);
+  app.route('/api/sessions/compensate/:sessionId').put(sessions.markCompensated);
 
   /*
     The 'router.param' method allows us to specify middleware we would like to use to handle

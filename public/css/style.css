@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
-/* For Phone */
 
+/* For Phone */
 @media (max-width: 767px) {
   .phone-center {
     text-align: center;
@@ -35,6 +35,12 @@
   .hide-col-1-phone th:nth-child(1), .hide-col-1-phone td:nth-child(1){
     display: none !important;
   }
+  .hide-col-2-phone th:nth-child(2), .hide-col-2-phone td:nth-child(2){
+    display: none !important;
+  }
+  .hide-col-3-phone th:nth-child(3), .hide-col-3-phone td:nth-child(3){
+    display: none !important;
+  }
   .phone-top-margin{
     margin-top: 10px;
   }
@@ -44,7 +50,6 @@
 }
 
 /* For Tablet/Phone */
-
 @media (max-width: 991px) {
   .tablet-center {
     text-align: center;
@@ -58,7 +63,6 @@
 }
 
 /* For Tablet/Desktop */
-
 @media (min-width: 768px) {
   .landing-page-container {
     margin-top: 50px !important;
@@ -69,13 +73,11 @@
 }
 
 /* For Desktop Only */
-
 @media (min-width: 992px) {
 
 }
 
 html {
-  overflow-x: hidden;
   height: 100%;
   background-color: white;
 }
@@ -497,6 +499,18 @@ hr {
 
 .error{
   color: #a94442;
+}
+
+.study-satisfied{
+  background-color: #a2d6b3 !important;
+}
+
+.study-closed, .study-satisfied .study-closed{
+  background-color: #e0a9a9 !important;
+}
+
+.not-bold{
+  font-weight: normal;
 }
 
 .note{
