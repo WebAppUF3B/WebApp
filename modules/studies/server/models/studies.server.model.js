@@ -32,7 +32,8 @@ const studySchema = new Schema({
     type: Number
   },
   currentNumber: {
-    type: Number
+    type: Number,
+    default: 0
   },
   compensationType: [{
     type: String,
