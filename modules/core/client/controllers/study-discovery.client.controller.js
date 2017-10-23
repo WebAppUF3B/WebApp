@@ -9,8 +9,11 @@ angular.module('core').controller('StudyDiscoveryController', ['$scope','$http',
 
     // Called after page loads
     $scope.init = function() {
-      $scope.allStudies = {};
-      $scope.allStudies.data = [];
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
+
+      $scope.allStudies = [];
+      $scope.filters = {};
 
       // TODO Assign user
       $scope.user = $rootScope.getMockUser();
@@ -23,24 +26,71 @@ angular.module('core').controller('StudyDiscoveryController', ['$scope','$http',
           results.data.forEach((study) => {
             if (!study.removed) {
               // Store in array
-              $scope.allStudies.data.push(study);
+              $scope.allStudies.push(study);
             }
           });
 
-          $scope.allStudies = new NgTableParams({
-            count: 20,
+          $scope.studyTable = new NgTableParams({
+            count: 10,
             sorting: {
               title: 'asc'
             }
           }, {
             counts: [], // hides page sizes
-            dataset: $scope.allStudies.data // select data
+            dataset: $scope.allStudies // select data
           });
 
         })
         .catch((err) => {
           console.log(err);
         });
+    };
+
+    // Toggle filter area open or closed
+    $scope.expandFilters = function() {
+      $('.filter-area').slideToggle();
+    };
+
+    // Check and see if any filters are applied
+    $scope.checkFilters = function() {
+      if ($scope.filters.compensationType) {
+        $('.clear-filters-btn').show();
+      } else {
+        $('.clear-filters-btn').hide();
+      }
+      $scope.reloadTable();
+    };
+
+    // Remove table filters
+    $scope.clearFilters = function() {
+      $scope.filters = '';
+      $('.clear-filters-btn').hide();
+      $scope.reloadTable();
+    };
+
+    // Search table
+    $scope.search = function() {
+      $scope.searchQuery = $scope.searchText;
+    };
+
+    // Search on 'enter' press
+    $("#search").keypress((e) => {
+      if (e.keyCode === 13) {
+        $('#search-btn').click();
+      }
+    });
+
+    $scope.reloadTable = function() {
+      $scope.studyTable = new NgTableParams({
+        count: 10,
+        sorting: {
+          title: 'asc'
+        },
+        filter: $scope.filters
+      }, {
+        counts: [], // hides page sizes
+        dataset: $scope.allStudies // select data
+      });
     };
 
     // Show details of study in modal

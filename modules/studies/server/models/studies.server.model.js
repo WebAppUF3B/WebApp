@@ -16,20 +16,43 @@ const studySchema = new Schema({
   location: {
     type: String
   },
+  researchers: [{
+    userID: {
+      type: Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  }],
   maxParticipants: {
     type: Number
   },
   maxParticipantsPerSession: {
     type: Number
   },
-  compensationType: {
+  satisfactoryNumber: {
+    type: Number
+  },
+  currentNumber: {
+    type: Number
+  },
+  compensationType: [{
     type: String,
     enum: ['extraCredit', 'monetary'],
     required: true
+  }],
+  compensationAmount: {
+    type: Number
   },
   availability: [{
     slot: Date,
   }],
+  closed: {
+    type: Boolean,
+    default: false
+  },
+  removed: {
+    type: Boolean,
+    default: false
+  },
   createdOn: Date,
   updated: Date
 });

@@ -16,10 +16,10 @@
       <h2 class="text-center">My Upcoming Sessions</h2>
       <table ng-table="upcomingSessions" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
         <tr ng-click="sessionDetails(session, 'upcoming', $index)" ng-repeat="session in upcomingSessions.data">
-          <td title="'Title'" filter="{ title: 'text'}" sortable="'Title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
-          <td title="'Location'" filter="{ location: 'text'}" sortable="'Location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
-          <td title="'Date'" filter="{ Date: 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
-          <td title="'Time'" filter="{ Time: 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
+          <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
+          <td title="'Location'" filter="{ 'studyID.location': 'text'}" sortable="'studyID.location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
         </tr>
       </table>
     </div>
@@ -30,17 +30,17 @@
       <h2 class="text-center">My Past Sessions</h2>
       <table ng-table="pastSessions" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
         <tr ng-click="sessionDetails(session, 'past', $index)" ng-repeat="session in pastSessions.data">
-          <td title="'Title'" filter="{ title: 'text'}" sortable="'Title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
-          <td title="'Location'" filter="{ location: 'text'}" sortable="'Location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
-          <td title="'Date'" filter="{ Date: 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
-          <td title="'Time'" filter="{ Time: 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
+          <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
+          <td title="'Location'" filter="{ 'studyID.location': 'text'}" sortable="'studyID.location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
         </tr>
       </table>
     </div>
   </div>
 
   <!-- Detail Modal -->
-  <div id="detailModal" class="modal fade" role="dialog">
+  <div id="detailModal" class="modal" role="dialog">
     <div class="modal-dialog session-modal">
 
       <!-- Modal content-->
