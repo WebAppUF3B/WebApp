@@ -9,17 +9,17 @@
 
   <div class="row">
     <div class="col-sm-4 col-sm-offset-4">
-      <a class="btn btn-primary full-width" ui-sref="admin-portal.manage-users">Manage Users</a>
+      <a class="btn btn-primary full-width" ui-sref="admin-portal.manage-users" href="admin-portal.manage-users">Manage Users</a>
     </div>
   </div>
   <div class="row">
     <div class="col-sm-4 col-sm-offset-4">
-      <a class="btn btn-primary full-width" ui-sref="admin-portal.manage-studies">Manage Studies</a>
+      <a class="btn btn-primary full-width" ui-sref="admin-portal.manage-studies" href="admin-portal.manage-studies">Manage Studies</a>
     </div>
   </div>
   <div class="row">
     <div class="col-sm-4 col-sm-offset-4">
-      <a class="btn btn-primary full-width" ui-sref="admin-portal.manage-sessions">Manage Sessions</a>
+      <a class="btn btn-primary full-width" ui-sref="admin-portal.manage-sessions" href="admin-portal.manage-sessions">Manage Sessions</a>
     </div>
   </div>
 
@@ -36,7 +36,7 @@
             <td>Approved</td>
           </tr>
         </thead>
-        <tr ng-repeat="">
+        <tr ng-repeat="user in allUsers">
           <td title="'Name'" sortable="'Name'"> <!--filter="{ name: 'text'}"  sortable="'Title'">-->
             {{user.firstName}} {{user.lastName}}</td>
           <td title="'Email'" filter="{ email: 'text'}" sortable="'Email'">

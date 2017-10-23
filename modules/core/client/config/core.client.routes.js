@@ -58,15 +58,15 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       templateUrl: 'modules/core/client/views/admin-portal.client.view.html'
     })
     .state('manage-users', {
-      url: '/manage-users',
+      url: '/admin-portal.manage-users',
       templateUrl: 'modules/core/client/views/manage-users.client.view.html'
     })
     .state('manage-studies', {
-      url: '/manage-studies',
+      url: '/admin-portal.manage-studies',
       templateUrl: 'modules/core/client/views/manage-studies.client.view.html'
     })
     .state('manage-sessions', {
-      url: '/manage-sessions',
+      url: '/admin-portal.manage-sessions',
       templateUrl: 'modules/core/client/views/manage-sessions.client.view.html'
     })
     .state('not-found', {
