@@ -3,7 +3,8 @@
 /* Dependencies */
 const mongoose = require('mongoose'),
   Session = mongoose.model('studySession'),
-  nodemailer = require('nodemailer');
+  nodemailer = require('nodemailer'),
+  studies = require('../../../studies/server/controllers/studies.server.controller.js');
 
 /**
  * Backend functions for CRUD operations on session collection
@@ -102,6 +103,7 @@ exports.changeAttendance = function(req, res) {
   session.participants.forEach((participant) => {
     if(participant.userID._id == change.userID){
       participant.attended = change.attended;
+      studies.modifyCount(session.studyID._id, change.attended);
     }
   });
 

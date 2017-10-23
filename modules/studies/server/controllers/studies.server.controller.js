@@ -111,6 +111,32 @@ exports.removeStudy = function(req, res) {
     });
 };
 
+// Change count for the study
+exports.modifyCount = function(id, attended) {
+  Study.findById(id).exec((err, study) => {
+    if (err) {
+      return err;
+    } else {
+      if (attended) {
+        study.currentNumber ++;
+      } else {
+        study.currentNumber --;
+      }
+
+      // Update study
+      study.save()
+        .then(() => {
+          // Return
+          return;
+        })
+        .catch((err) => {
+          console.log(err);
+          return err;
+        });
+    }
+  });
+};
+
 /*
   Middleware: find a study by its ID, then pass it to the next request handler.
  */
