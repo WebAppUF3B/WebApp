@@ -591,7 +591,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           dataType: 'json',
           data: JSON.stringify(newSession)
         });
-
       },
 
       get: function(id) {
@@ -632,7 +631,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
 
 'use strict';
 
-// TODO consider replacing $http requests with factory (sessions.client.service.js)
+// TODO consider replacing $http requests with factory
 angular.module('core').controller('ResearcherPortalController', ['$scope','$http','NgTableParams', '$rootScope',
   function($scope, $http, NgTableParams, $rootScope) {
 
@@ -647,19 +646,23 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
+      $scope.compensation = {};
+      $scope.compensation.data = [];
 
       // TODO Assign user
       $scope.user = $rootScope.getMockUser();
 
       $scope.studies.getUserStudies($scope.user._id)
         .then((results) => {
-          // Assign results to myStudies.data
-          $scope.myStudies.data = results.data;
 
           // Update satisfied value of each study
-          $scope.myStudies.data.forEach((study) => {
-            if(study.currentNumber > study.satisfactoryNumber){
-              study.satisfied = true;
+          results.data.forEach((study) => {
+            if(!study.removed){
+              if(study.currentNumber > study.satisfactoryNumber){
+                study.satisfied = true;
+              }
+              // Store in array
+              $scope.myStudies.data.push(study);
             }
           });
 
@@ -697,6 +700,16 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             } else{
               $scope.pastSessions.data.push(session);
             }
+
+            // Populate table with users awaiting compensationType
+            session.participants.forEach((participant) => {
+              if(participant.attended && participant.compensationType == 'monetary' && !participant.compensationGiven){
+                const temp = participant;
+                temp.studyID = session.studyID;
+                temp.session = session._id;
+                $scope.compensation.data.push(temp);
+              }
+            });
           });
 
           $scope.upcomingSessions = new NgTableParams({
@@ -719,6 +732,16 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             dataset: $scope.pastSessions.data // select data
           });
 
+          $scope.compensation = new NgTableParams({
+            count: 10,
+            sorting: {
+              'userID.lastName': 'desc'
+            }
+          }, {
+            counts: [], // hides page sizes
+            dataset: $scope.compensation.data // select data
+          });
+
         })
         .catch((err) => {
           console.log(err);
@@ -731,6 +754,14 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.currentIndex = index;
       $scope.error = false;
       $('#studyModal').modal('show');
+    }
+
+    // Show modal and populate it with compensation data
+    $scope.compensationDetails = function(participant, index){
+      $scope.currentParticipant = participant;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#compensationModal').modal('show');
     }
 
     // Show modal and populate it with session data
@@ -756,13 +787,14 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       }
     }
 
-    $scope.studyDetails = function(study, index) {
-      $scope.currentStudy = study;
-      $scope.currentIndex = index;
-      $scope.error = false;
-      $('#studyModal').modal('show');
+    // Close closeStudy modal
+    $scope.removeStudyClose = function(){
+      if(!alreadyClicked){
+        $('#removeStudyModal').modal('hide');
+      }
     }
 
+    // Close study in backend
     $scope.confirmCloseStudy = function(){
       if(!alreadyClicked) {
         alreadyClicked = true;
@@ -772,6 +804,25 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             // Refetch sessions
             $scope.init();
             $('#closeStudyModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            $scope.error = true;
+            console.log(err);
+            alreadyClicked = false;
+          });
+      }
+    }
+
+    // Remove study in backend
+    $scope.confirmRemoveStudy = function(){
+      if(!alreadyClicked) {
+        alreadyClicked = true;
+        $scope.studies.remove($scope.currentStudy._id)
+          .then(() => {
+            // Refetch sessions
+            $scope.init();
+            $('#removeStudyModal').modal('hide');
             alreadyClicked = false;
           })
           .catch((err) => {
@@ -794,6 +845,41 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             // Refetch sessions
             $scope.init();
             $('#cancelModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            $scope.error = true;
+            console.log(err);
+            alreadyClicked = false;
+          });
+      }
+    }
+
+    // Change attendance value of participant
+    $scope.changeAttendance = function(participant) {
+      const change = { 'userID': participant.userID._id, 'attended': participant.attended };
+      $scope.sessions.attend($scope.currentSession._id, change)
+        .then(() => {
+          // Refetch sessions
+          alreadyClicked = false;
+        })
+        .catch((err) => {
+          $scope.error = true;
+          console.log(err);
+          alreadyClicked = false;
+        });
+    }
+
+    // Mark participant as compensated
+    $scope.markCompensated = function() {
+      if(!alreadyClicked) {
+        alreadyClicked = true;
+        const user = { 'userID': $scope.currentParticipant.userID._id };
+        $scope.sessions.compensate($scope.currentParticipant.session, user)
+          .then((response) => {
+            // Refetch sessions
+            $scope.init();
+            $('#compensationModal').modal('hide');
             alreadyClicked = false;
           })
           .catch((err) => {
@@ -864,6 +950,26 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           dataType: 'json',
           data: JSON.stringify(cancellor)
         });
+      },
+
+      attend: function(id, change) {
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/attend/' + id,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(change)
+        });
+      },
+
+      compensate: function(id, user) {
+        return $.ajax({
+          url: window.location.origin + '/api/sessions/compensate/' + id,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(user)
+        });
       }
     };
 
@@ -926,6 +1032,191 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           contentType: 'application/json',
           dataType: 'json',
           data: JSON.stringify(cancellor)
+        });
+      },
+
+      remove: function(id) {
+        return $.ajax({
+          url: window.location.origin + '/api/studies/remove/' + id,
+          type: 'PUT'
+        });
+      }
+    };
+
+    // Run our init function
+    $scope.init();
+  }
+]);
+
+'use strict';
+
+// TODO consider replacing $http requests with factory
+angular.module('core').controller('StudyDiscoveryController', ['$scope','$http','NgTableParams', '$rootScope',
+  function($scope, $http, NgTableParams, $rootScope) {
+
+    // Prevent race conditions
+    const alreadyClicked = false;
+
+    // Called after page loads
+    $scope.init = function() {
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
+
+      $scope.allStudies = [];
+      $scope.filters = {};
+
+      // TODO Assign user
+      $scope.user = $rootScope.getMockUser();
+
+      // TODO filter these based on study criteria and use profile
+      $scope.studies.getAll()
+        .then((results) => {
+
+          // Update satisfied value of each study
+          results.data.forEach((study) => {
+            if (!study.removed) {
+              // Store in array
+              $scope.allStudies.push(study);
+            }
+          });
+
+          $scope.studyTable = new NgTableParams({
+            count: 10,
+            sorting: {
+              title: 'asc'
+            }
+          }, {
+            counts: [], // hides page sizes
+            dataset: $scope.allStudies // select data
+          });
+
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
+    // Toggle filter area open or closed
+    $scope.expandFilters = function() {
+      $('.filter-area').slideToggle();
+    };
+
+    // Check and see if any filters are applied
+    $scope.checkFilters = function() {
+      if ($scope.filters.compensationType) {
+        $('.clear-filters-btn').show();
+      } else {
+        $('.clear-filters-btn').hide();
+      }
+      $scope.reloadTable();
+    };
+
+    // Remove table filters
+    $scope.clearFilters = function() {
+      $scope.filters = '';
+      $('.clear-filters-btn').hide();
+      $scope.reloadTable();
+    };
+
+    // Search table
+    $scope.search = function() {
+      $scope.searchQuery = $scope.searchText;
+    };
+
+    // Search on 'enter' press
+    $("#search").keypress((e) => {
+      if (e.keyCode === 13) {
+        $('#search-btn').click();
+      }
+    });
+
+    $scope.reloadTable = function() {
+      $scope.studyTable = new NgTableParams({
+        count: 10,
+        sorting: {
+          title: 'asc'
+        },
+        filter: $scope.filters
+      }, {
+        counts: [], // hides page sizes
+        dataset: $scope.allStudies // select data
+      });
+    };
+
+    // Show details of study in modal
+    $scope.studyDetails = function(study, index) {
+      $scope.currentStudy = study;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#studyModal').modal('show');
+    };
+
+    // Declare methods that can be used to access study data
+    $scope.studies = {
+      getAll: function() {
+        return $http.get(window.location.origin + '/api/studies/')
+          .then((results) => {
+            return results;
+          })
+          .catch((err) => {
+            return err;
+          });
+      },
+
+      getUserStudies: function(userId) {
+        return $http.get(window.location.origin + '/api/studies/user/' + userId)
+          .then((results) => {
+            return results;
+          })
+          .catch((err) => {
+            return err;
+          });
+      },
+
+      create: function(newStudy) {
+        return $.ajax({
+          url: window.location.origin + '/api/studies/',
+          type: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(newStudy)
+        });
+      },
+
+      get: function(id) {
+        return $http.get(window.location.origin + '/api/studies/' + id)
+          .then((results) => {
+            return results;
+          })
+          .catch((err) => {
+            return err;
+          });
+      },
+
+      update: function(id, newStudy) {
+        return $.ajax({
+          url: window.location.origin + '/api/studies/' + id, newStudy,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(newStudy)
+        });
+      },
+
+      close: function(id, cancellor) {
+        return $.ajax({
+          url: window.location.origin + '/api/studies/close/' + id,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(cancellor)
+        });
+      },
+
+      remove: function(id) {
+        return $.ajax({
+          url: window.location.origin + '/api/studies/remove/' + id,
+          type: 'PUT'
         });
       }
     };
@@ -1545,7 +1836,7 @@ angular.module('users.admin').controller('UserController', ['$scope', '$state', 
 'use strict';
 
 angular.module('users').controller('AuthenticationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator',
-  function ($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
+  function($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
       // Get an eventual error defined in the URL query string:
@@ -1556,12 +1847,14 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       $location.path('/');
     }
 
-    $scope.signup = function (isValid) {
+    $scope.signup = function(isValid) {
       $scope.error = null;
+
+      console.log($scope.credentials);
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
-
+        $scope.error = 'All fields are required.';
         return false;
       }
 
@@ -1578,11 +1871,12 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
-    $scope.facultySignup = function (isValid) {
+    $scope.facultySignup = function(isValid) {
       $scope.error = null;
 
-      if(!isValid) {
+      if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
+        $scope.error = 'All fields are required.';
         return false;
       }
       delete $scope.credentials.confirm;
@@ -1596,11 +1890,12 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
-    $scope.researcherSignup = function (isValid) {
+    $scope.researcherSignup = function(isValid) {
       $scope.error = null;
 
-      if(!isValid) {
+      if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
+        $scope.error = 'All fields are required.';
         return false;
       }
       delete $scope.credentials.confirm;
@@ -1614,7 +1909,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
-    $scope.signin = function (isValid) {
+    $scope.signin = function(isValid) {
       $scope.error = null;
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
@@ -1630,7 +1925,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
     };
 
     // OAuth provider request
-    $scope.callOauthProvider = function (url) {
+    $scope.callOauthProvider = function(url) {
       if ($state.previous && $state.previous.href) {
         url += '?redirectTo=' + encodeURIComponent($state.previous.href);
       }
@@ -1638,17 +1933,6 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       // Effectively call OAuth authentication route:
       $window.location.href = url;
     };
-    const myDate = new Date();
-    $scope.maxDate = new Date(
-        myDate.getFullYear(),
-        myDate.getMonth(),
-        myDate.getDate()
-      );
-    $scope.minDate = new Date(
-        myDate.getFullYear() - 127,
-        myDate.getMonth(),
-        myDate.getDate()
-    );
     $scope.validateConfirmPassword = (confirmation) => {
       const password = $scope.userForm.password.$viewValue;
       if (confirmation && password && confirmation !== password) {
@@ -1656,7 +1940,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
         return;
       }
       $scope.userForm.confirm.$setValidity('goodConfirm', true);
-    }
+    };
     const redirect = (response) => {
       // If successful we assign the response to the global user model
       console.log(response);
@@ -1682,8 +1966,8 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       }
 
       // And redirect to the previous or home page
-      if(!$scope.error) $state.go(destination, $state.previous.params);
-    }
+      if (!$scope.error) $state.go(destination, $state.previous.params);
+    };
   }
 ]);
 

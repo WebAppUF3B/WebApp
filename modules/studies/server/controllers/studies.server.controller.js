@@ -10,13 +10,15 @@ const mongoose = require('mongoose'),
 
 /* Retreive all the studies */
 exports.getAll = function(req, res) {
-  Study.find().exec((err, studies) => {
-    if (err) {
-      res.status(400).send(err);
-    } else {
-      res.json(studies);
-    }
-  });
+  Study.find()
+    .populate('researchers.userID')
+    .exec((err, studies) => {
+      if (err) {
+        res.status(400).send(err);
+      } else {
+        res.json(studies);
+      }
+    });
 };
 
 /* Create a study */
