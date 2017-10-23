@@ -22,7 +22,7 @@
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="birthday">Birthday</label>
-                <div class='input-group date' id='datepicker'>
+                <div class='input-group date'>
                     <input type='text' id="birthday" name="birthday" ng-model="credentials.birthday" onkeydown="return false" class="form-control" />
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
@@ -91,7 +91,7 @@
 <script type="text/javascript">
     const today = Date.now();
     $(function () {
-        $('#datepicker').datetimepicker({
+        $('#birthday').datetimepicker({
           format: 'MM/DD/YYYY',
           viewMode: 'years',
           maxDate: today,
