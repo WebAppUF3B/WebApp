@@ -1,42 +1,455 @@
-<!-- TODO create the controller for the researcher page -->
 <div class="container inner-container" ng-controller="ResearcherPortalController">
   <div class="row">
-    <div class="col-sm-6">
-      <h1 class="phone-center">Researcher Portal</h1>
-    </div>
-    <div class="col-sm-6">
-      <a class="btn btn-primary margin-top mobile-full-width float-right" ui-sref="studies.create" href="/studies/create">Create a New Study</a>
+    <div class="col-sm-12">
+      <h1 class="phone-center"><strong>Researcher Portal</strong></h1>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-10 col-sm-offset-1">
+      <a class="btn btn-orange mobile-full-width float-right no-margin-bottom phone-top-margin" ui-sref="studies.create">Create a New Study</a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
       <h2 class="text-center">My Studies</h2>
-      <!-- TODO look at how I populate the table in participant-portal and then display info from backend -->
-      <table class="table table-hover">
-
+      <table ng-table="myStudies" class="table table-hover entries-selectable hide-col-2-phone hide-col-3-phone" show-filter="false">
+        <tr ng-class="{'study-satisfied' : study.satisfied, 'study-closed' : study.closed}" ng-click="studyDetails(study, $index)" ng-repeat="study in myStudies.data">
+          <td title="'Title'" filter="{ 'title': 'text'}" sortable="'title'" ng-attr-title="{{null}}">{{study.title}}</td>
+          <td title="'IRB'" filter="{ 'irb': 'text'}" sortable="'irb'" ng-attr-title="{{null}}">{{study.irb}}</td>
+          <td title="'Location'" filter="{ 'location': 'text'}" sortable="'location'" ng-attr-title="{{null}}">{{study.location}}</td>
+          <td title="'Desired #'" sortable="'satisfied'" width=115px ng-attr-title="{{null}}">{{study.currentNumber}}/{{study.satisfactoryNumber}}</td>
+        </tr>
       </table>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-10 col-sm-offset-1">
       <h2 class="text-center">My Upcoming Sessions</h2>
-      <!-- TODO look at how I populate the table in participant-portal and then display info from backend (consider approval process for participants) -->
-      <table class="table table-hover">
-
+      <table ng-table="upcomingSessions" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
+        <tr ng-click="sessionDetails(session, 'upcoming', $index)" ng-repeat="session in upcomingSessions.data">
+          <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
+          <td title="'Location'" filter="{ 'studyID.location': 'text'}" sortable="'studyID.location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
+        </tr>
       </table>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-sm-12">
+    <div class="col-sm-10 col-sm-offset-1">
       <h2 class="text-center">My Past Sessions</h2>
-      <!-- TODO look at how I populate the table in participant-portal and then display info from backend (consider approval process for participants) -->
-      <table class="table table-hover">
-
+      <table ng-table="pastSessions" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
+        <tr ng-click="sessionDetails(session, 'past', $index)" ng-repeat="session in pastSessions.data">
+          <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
+          <td title="'Location'" filter="{ 'studyID.location': 'text'}" sortable="'studyID.location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
+        </tr>
       </table>
     </div>
   </div>
+
+  <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
+      <h2 class="text-center">Participants Awaiting Compensation</h2>
+      <table ng-table="compensation" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
+        <tr ng-click="compensationDetails(user, $index)" ng-repeat="user in compensation.data">
+          <td title="'Name'" filter="{ 'userID.lastName': 'text'}" sortable="'userID.lastName'" ng-attr-title="{{null}}">{{user.userID.firstName}} {{user.userID.lastName}}</td>
+          <td title="'Email'" filter="{ 'userID.email': 'text'}" sortable="'userID.email'" ng-attr-title="{{null}}">{{user.userID.email}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Study Modal -->
+  <div id="studyModal" class="modal" role="dialog">
+    <div class="modal-dialog session-modal">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="row">
+            <div class="col-xs-8 col-xs-offset-2 text-center">
+              <h3 class="no-margin"><strong>Study Details</strong></h3>
+            </div>
+            <div class="col-xs-2">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+          </div>
+        </div>
+        <div class="pane">
+          <!-- Study Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Study</h4>
+            </div>
+          </div>
+          <div class="row small-top-pad">
+            <div class="col-sm-12">
+              <p class="mini-title">Title:</p>
+              <p>{{currentStudy.title}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Description:</p>
+              <p>{{currentStudy.description}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">IRB #:</p>
+              <p>{{currentStudy.irb}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Location:</p>
+              <p>{{currentStudy.location}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Compensation Types Offered:</p>
+              <p ng-if="currentStudy.compensationType.length == 1 && currentStudy.compensationType[0] == 'extraCredit'">
+                Extra Credit
+              </p>
+              <p ng-if="currentStudy.compensationType.length == 1 && currentStudy.compensationType[0] == 'monetary'">
+                Monetary
+              </p>
+              <p ng-if="currentStudy.compensationType.length == 2">
+                Extra Credit, Monetary
+              </p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Researcher Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Researchers</h4>
+            </div>
+          </div>
+          <div class="row" ng-repeat="researcher in currentStudy.researchers">
+            <div class="col-sm-6">
+              <p class="mini-title">Name:</p>
+              <p>{{researcher.userID.firstName}} {{researcher.userID.lastName}}</p>
+            </div>
+            <div class="col-sm-6">
+              <p class="mini-title">Email:</p>
+              <p><a href="mailto:{{researcher.userID.email}}" target="_blank">{{researcher.userID.email}}</a></p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Statistics Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Statistics</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Participants Completed: <span class="not-bold"> 	&nbsp;{{currentStudy.currentNumber}}</span></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Participants Desired: <span class="not-bold"> 	&nbsp;{{currentStudy.satisfactoryNumber}}</span></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Max Participants in Study: <span class="not-bold"> 	&nbsp;{{currentStudy.maxParticipants}}</span></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Max Participants per Session: <span class="not-bold"> 	&nbsp;{{currentStudy.maxParticipantsPerSession}}</span></p>
+            </div>
+          </div>
+
+
+          <div class="row pad-top" ng-if="!currentStudy.closed">
+            <div class="col-sm-6">
+              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit({ studyId: currentStudy._id })">Edit Study</a>
+            </div>
+            <div class="col-sm-6">
+              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#closeStudyModal">Close Study</a>
+            </div>
+          </div>
+          <div class="row pad-top" ng-if="currentStudy.closed">
+            <div class="col-sm-6 col-sm-offset-3">
+              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#removeStudyModal">Remove Study</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Study Modal -->
+
+  <!-- Close Study Modal -->
+  <div id="closeStudyModal" class="modal" role="dialog">
+    <div class="small-modal">
+        <!-- Modal content-->
+        <div class="modal-content">
+        <div class="row">
+          <div class="col-xs-12 text-center">
+            <p>Are you sure you want to close this study?</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4 col-sm-offset-1">
+            <button class="btn small-modal-btn full-width" ng-click="confirmCloseStudy()">Yes</button>
+          </div>
+          <div class="col-sm-4 col-sm-offset-1">
+            <button class="btn small-modal-btn full-width" ng-click="closeStudyClose()">No</button>
+          </div>
+        </div>
+        <div class="row" ng-if="error">
+          <div class="col-sm-12">
+            <p class="error text-center">There was a problem closing your study, please contact the admin!</button>
+          </div>
+        </div>
+        </div>
+    </div>
+
+  </div>
+  <!-- End Close Study Modal -->
+
+  <!-- Remove Study Modal -->
+  <div id="removeStudyModal" class="modal" role="dialog">
+    <div class="small-modal">
+        <!-- Modal content-->
+        <div class="modal-content">
+        <div class="row">
+          <div class="col-xs-12 text-center">
+            <p>Are you sure you want to remove this study from your view?</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4 col-sm-offset-1">
+            <button class="btn small-modal-btn full-width" ng-click="confirmRemoveStudy()">Yes</button>
+          </div>
+          <div class="col-sm-4 col-sm-offset-1">
+            <button class="btn small-modal-btn full-width" ng-click="removeStudyClose()">No</button>
+          </div>
+        </div>
+        <div class="row" ng-if="error">
+          <div class="col-sm-12">
+            <p class="error text-center">There was a problem removing your study, please contact the admin!</button>
+          </div>
+        </div>
+        </div>
+    </div>
+
+  </div>
+  <!-- End Remove Study Modal -->
+
+  <!-- Compensation Modal -->
+  <div id="compensationModal" class="modal" role="dialog">
+    <div class="modal-dialog session-modal">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="row">
+            <div class="col-xs-8 col-xs-offset-2 text-center">
+              <h3 class="no-margin"><strong>Participant Details</strong></h3>
+            </div>
+            <div class="col-xs-2">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+          </div>
+        </div>
+        <div class="pane">
+          <!-- Participant Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Participant</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+              <p class="mini-title">Name:</p>
+              <p>{{currentParticipant.userID.firstName}} {{currentParticipant.userID.lastName}}</p>
+            </div>
+            <div class="col-sm-6">
+              <p class="mini-title">Email:</p>
+              <p><a href="mailto:{{currentParticipant.userID.email}}" target="_blank">{{currentParticipant.userID.email}}</a></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Address:</p>
+              <p>{{currentParticipant.userID.address}}</p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Study Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Study</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Title:</p>
+              <p>{{currentParticipant.studyID.title}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Compensation Amount:</p>
+              <p>${{currentParticipant.studyID.compensationAmount}}</p>
+            </div>
+          </div>
+
+          <div class="row pad-top">
+            <div class="col-sm-8 col-sm-offset-2">
+              <a class="btn btn-primary full-width" ng-click="markCompensated()">Mark as Compensated</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Compensation Modal -->
+
+  <!-- Detail Modal -->
+  <div id="detailModal" class="modal" role="dialog">
+    <div class="modal-dialog session-modal">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="row">
+            <div class="col-xs-8 col-xs-offset-2 text-center">
+              <h3 class="no-margin"><strong>Session Details</strong></h3>
+            </div>
+            <div class="col-xs-2">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+          </div>
+        </div>
+        <div class="pane">
+          <!-- Study Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Study</h4>
+            </div>
+          </div>
+          <div class="row small-top-pad">
+            <div class="col-sm-12">
+              <p class="mini-title">Title:</p>
+              <p>{{currentSession.studyID.title}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Description:</p>
+              <p>{{currentSession.studyID.description}}</p>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Participant Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Participants</h4>
+            </div>
+          </div>
+          <div class="row" ng-repeat="participant in currentSession.participants">
+            <div class="col-sm-4">
+              <p class="mini-title">Name:</p>
+              <p>{{participant.userID.firstName}} {{participant.userID.lastName}}</p>
+            </div>
+            <div class="col-sm-5">
+              <p class="mini-title">Email:</p>
+              <p><a href="mailto:{{participant.userID.email}}" target="_blank">{{participant.userID.email}}</a></p>
+            </div>
+            <div class="col-sm-3">
+              <p class="mini-title">Attended:</p>
+              <input ng-model="participant.attended" type="checkbox" ng-change='changeAttendance(participant)'>
+            </div>
+          </div>
+
+          <hr>
+
+          <!-- Session Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Session</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Location:</p>
+              <p>{{currentSession.studyID.location}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-xs-6">
+              <p class="mini-title">Date:</p>
+              <p>{{currentSession.date}}</p>
+            </div>
+            <div class="col-xs-6">
+              <p class="mini-title">Time:</p>
+              <p>{{currentSession.time}}</p>
+            </div>
+          </div>
+
+          <div class="row pad-top" ng-if="currentTable=='upcoming'">
+            <div class="col-sm-6 col-sm-offset-3">
+              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#cancelModal">Cancel Your Session</a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Detail Modal -->
+
+  <!-- Cancel Modal -->
+  <div id="cancelModal" class="modal" role="dialog">
+    <div class="small-modal">
+        <!-- Modal content-->
+        <div class="modal-content">
+        <div class="row">
+          <div class="col-xs-12 text-center">
+            <p>Are you sure you want to cancel your session?</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-4 col-sm-offset-1">
+            <button class="btn small-modal-btn full-width" ng-click="confirmCancel()">Yes</button>
+          </div>
+          <div class="col-sm-4 col-sm-offset-1">
+            <button class="btn small-modal-btn full-width" ng-click="cancelClose()">No</button>
+          </div>
+        </div>
+        <div class="row" ng-if="error">
+          <div class="col-sm-12">
+            <p class="error text-center">There was a problem canceling your session, please contact the researcher running your session!</button>
+          </div>
+        </div>
+        </div>
+    </div>
+
+  </div>
+  <!-- End Cancel Modal -->
 
 </div>
