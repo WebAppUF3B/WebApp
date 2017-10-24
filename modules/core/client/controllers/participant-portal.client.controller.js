@@ -1,21 +1,26 @@
 'use strict';
 
 // TODO consider replacing $http requests with factory (sessions.client.service.js)
-angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams', '$rootScope',
-  function($scope, $http, NgTableParams, $rootScope) {
+angular.module('core').controller('ParticipantPortalController', ['$scope','$http','$state', 'Authentication', 'NgTableParams',
+  function($scope, $http, $state, Authentication, NgTableParams) {
 
     // Prevent race conditions
     let alreadyClicked = false;
 
     // Called after page loads
-    $scope.init = function(){
+    $scope.init = function() {
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
 
       // TODO Assign user
-      $scope.user = $rootScope.getMockUser();
+      $scope.user = Authentication.user;
+      console.log($scope.user);
+
+      if (!$scope.user) {
+        $state.go('authentication.signin');
+      }
 
       $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
@@ -28,12 +33,12 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           $scope.allSessions.forEach((session) => {
             date = new Date(session.sessionTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? "PM" : "AM"}`
+            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             // Place session in correct array
-            if(date >= today){
+            if (date >= today) {
               $scope.upcomingSessions.data.push(session);
-            } else{
+            } else {
               $scope.pastSessions.data.push(session);
             }
           });
@@ -62,27 +67,27 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
         .catch((err) => {
           console.log(err);
         });
-    }
+    };
 
     // Show modal and populate it with session data
-    $scope.sessionDetails = function(session, currentTable, index){
+    $scope.sessionDetails = function(session, currentTable, index) {
       $scope.currentSession = session;
       $scope.currentIndex = index;
       $scope.currentTable = currentTable;
       $scope.error = false;
       $('#detailModal').modal('show');
-    }
+    };
 
     // Close cancel modal
-    $scope.cancelClose = function(){
-      if(!alreadyClicked){
+    $scope.cancelClose = function() {
+      if (!alreadyClicked) {
         $('#cancelModal').modal('hide');
       }
-    }
+    };
 
     // Cancel session and remove from table
-    $scope.confirmCancel = function(){
-      if(!alreadyClicked) {
+    $scope.confirmCancel = function() {
+      if (!alreadyClicked) {
         alreadyClicked = true;
         const cancellor = $scope.user;
         cancellor.date = $scope.currentSession.date;
@@ -100,7 +105,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
             alreadyClicked = false;
           });
       }
-    }
+    };
 
     // Declare methods that can be used to access session data
     $scope.sessions = {

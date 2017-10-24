@@ -1,12 +1,13 @@
 'use strict';
 
 // Authentication service for user variables
-angular.module('users').factory('Authentication', ['$window',
-  function ($window) {
-    const auth = {
-      user: $window.user
-    };
+angular.module('users').factory('Authentication', ['$window', '$injector',
+  function($window) {
 
-    return auth;
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    return {
+      user: user
+    };
   }
 ]);
