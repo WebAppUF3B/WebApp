@@ -16,6 +16,8 @@ module.exports = function (app) {
   app.route('/api/studies/close/:studyId').put(studies.closeStudy);
   app.route('/api/studies/remove/:studyId').put(studies.removeStudy);
 
+  app.route('/api/studies/create').post(studies.create);
+
   /*
     The 'router.param' method allows us to specify middleware we would like to use to handle
     requests with a parameter.

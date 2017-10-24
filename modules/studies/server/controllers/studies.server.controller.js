@@ -23,10 +23,9 @@ exports.getAll = function(req, res) {
 
 /* Create a study */
 exports.create = function(req, res) {
-
   /* Instantiate a study */
   const study = new Study(req.body);
-
+  console.log('PV', study);
   /* Then save the study */
   study.save((err) => {
     if (err) {
