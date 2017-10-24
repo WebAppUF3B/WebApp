@@ -14,8 +14,11 @@ module.exports = function (app) {
   app.route('/api/users')
     .get(adminPolicy.isAllowed, admin.list);
 
-  app.route('/api/admin/manage-users')
-    .get(admin.getAll);
+  app.route('/api/admin/approval')
+    .get(admin.getWaitingUsers);
+//  app.route('/api/admin/approval/:userId')
+//    .put(admin.approveUser)
+//    .delete(admin.denyUser);
 
   // Single user routes
   app.route('/api/users/:userId')

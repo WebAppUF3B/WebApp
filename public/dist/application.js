@@ -426,6 +426,77 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 
 'use strict';
 
+angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams',
+  function($scope, $http, NgTableParams) {
+    const init = () => {
+      $scope.admin.getWaitingUsers()
+        .then((results) => {
+          // Assign results to upcomingSessions.data
+          $scope.allUsers = results.data;
+
+          $scope.approvalTable = new NgTableParams({
+            count: 10,
+            sorting: {
+              lastName: 'asc'
+            }
+          }, {
+            counts: [], // hides page sizes
+            dataset: $scope.allUsers // select data
+          });
+
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
+    $scope.approveUser = function() {
+      console.log("Approved!");
+      init();
+    };
+
+    $scope.denyUser = function() {
+      console.log("Approved!");
+      init();
+    };
+
+    // Declare methods that can be used to access session data
+    $scope.admin = {
+      getWaitingUsers: function() {
+        return $http.get(window.location.origin + '/api/admin/approval')
+          .then((results) => {
+            return results;
+          })
+          .catch((err) => {
+            return err;
+          });
+      },
+
+      approve: function(id) {
+        return $.ajax({
+          url: window.location.origin + '/api/admin/approval/' + id,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json'
+        });
+      },
+
+      deny: function(id) {
+        return $.ajax({
+          url: window.location.origin + '/api/admin/approval/' + id,
+          type: 'DELETE',
+          contentType: 'application/json',
+          dataType: 'json',
+        });
+      }
+    };
+
+    init();
+  }
+]);
+
+'use strict';
+
 angular.module('core').controller('HeaderController', ['$scope', '$state', 'Authentication', 'Menus',
   function ($scope, $state, Authentication, Menus) {
     // Expose view variables

@@ -70,6 +70,22 @@ exports.list = function (req, res) {
   });
 };
 
+exports.getWaitingUsers = function(req, res) {
+  User.find({ emailValidated: true, adminApproved: false }, '-salt -password')
+    .exec()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((err) => {
+      res.status(400).send();
+    });
+};
+/*
+exports.approveUser = function(req, res) {
+
+};
+*/
+
 /**
  * User middleware
  */
@@ -97,7 +113,7 @@ exports.getAll = function(req, res) {
   User.find()
   .then((results) => {
     console.log(results);
-    return res.status(400).send({
+    return res.status(200).send({
       users: results
     });
   })
