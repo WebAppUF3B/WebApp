@@ -23,10 +23,9 @@ exports.getAll = function(req, res) {
 
 /* Create a study */
 exports.create = function(req, res) {
-
   /* Instantiate a study */
   const study = new Study(req.body);
-
+  console.log('PV', study);
   /* Then save the study */
   study.save((err) => {
     if (err) {
@@ -109,6 +108,32 @@ exports.removeStudy = function(req, res) {
       console.log(err);
       res.status(400).send(err);
     });
+};
+
+// Change count for the study
+exports.modifyCount = function(id, attended) {
+  Study.findById(id).exec((err, study) => {
+    if (err) {
+      return err;
+    } else {
+      if (attended) {
+        study.currentNumber ++;
+      } else {
+        study.currentNumber --;
+      }
+
+      // Update study
+      study.save()
+        .then(() => {
+          // Return
+          return;
+        })
+        .catch((err) => {
+          console.log(err);
+          return err;
+        });
+    }
+  });
 };
 
 /*
