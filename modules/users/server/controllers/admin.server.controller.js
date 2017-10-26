@@ -70,6 +70,7 @@ exports.list = function (req, res) {
   });
 };
 
+//*//
 exports.getWaitingUsers = function(req, res) {
   User.find({ emailValidated: true, adminApproved: false }, '-salt -password')
     .exec()
@@ -80,23 +81,31 @@ exports.getWaitingUsers = function(req, res) {
       res.status(400).send();
     });
 };
-/*
+//*//
 exports.approveUser = function(req, res) {
+  const thisUser = req.model;
+
+  User.findById(thisUser.id)
+    .then((thisUser) => {
+      //if (thisUser.adminApproved = false) {
+      thisUser.adminApproved = true;
+      thisUser.save();
+    });
+
 
 };
-*/
 
 /**
  * User middleware
  */
-exports.userByID = function (req, res, next, id) {
+exports.userByID = function(req, res, next, id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({
       message: 'User  invalid'
     });
   }
 
-  User.findById(id, '-salt -password').exec(function (err, user) {
+  User.findById(id, '-salt -password').exec(function(err, user) {
     if (err) {
       return next(err);
     } else if (!user) {

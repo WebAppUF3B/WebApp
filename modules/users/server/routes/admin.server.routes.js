@@ -16,14 +16,15 @@ module.exports = function (app) {
 
   app.route('/api/admin/approval')
     .get(admin.getWaitingUsers);
-//  app.route('/api/admin/approval/:userId')
-//    .put(admin.approveUser)
+  app.route('/api/admin/approval/:userId')
+    .put(admin.approveUser);
 //    .delete(admin.denyUser);
 
   // Single user routes
   app.route('/api/users/:userId')
     .get(adminPolicy.isAllowed, admin.read)
-    .put(adminPolicy.isAllowed, admin.update)
+    .put(admin.update)
+    //.put(adminPolicy.isAllowed, admin.update)
     .delete(adminPolicy.isAllowed, admin.delete);
 
   // Finish by binding the user middleware
