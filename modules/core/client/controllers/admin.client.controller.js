@@ -5,7 +5,6 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     const init = () => {
       $scope.admin.getWaitingUsers()
         .then((results) => {
-          // Assign results to upcomingSessions.data
           $scope.allUsers = results.data;
           console.log(results.data);
           $scope.approvalTable = new NgTableParams({
@@ -24,17 +23,26 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
         });
     };
 
+    $scope.approvalDetails = function(user, index) {
+      $scope.currentUser = user;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#approvalModal').modal('show');
+    };
+
     $scope.approveUser = function() {
-      console.log("Approved!");
-      init();
+      console.log('Approved!');
+      console.log($scope.currentUser._id);
+      return $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id);
+      //init();
     };
 
     $scope.denyUser = function() {
-      console.log("Approved!");
+      console.log('DENIED!');
       init();
     };
 
-    // Declare methods that can be used to access session data
+    // Declare methods that can be used to access administrative data
     $scope.admin = {
       getWaitingUsers: function() {
         return $http.get(window.location.origin + '/api/admin/approval')
@@ -47,6 +55,7 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
       },
 
       approve: function(id) {
+        console.log('eyyyyyyyy');
         return $.ajax({
           url: window.location.origin + '/api/admin/approval/' + id,
           type: 'PUT',
