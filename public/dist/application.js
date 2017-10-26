@@ -389,15 +389,15 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       templateUrl: 'modules/core/client/views/admin-portal.client.view.html'
     })
     .state('manage-users', {
-      url: '/manage-users',
+      url: '/admin-portal.manage-users',
       templateUrl: 'modules/core/client/views/manage-users.client.view.html'
     })
     .state('manage-studies', {
-      url: '/manage-studies',
+      url: '/admin-portal.manage-studies',
       templateUrl: 'modules/core/client/views/manage-studies.client.view.html'
     })
     .state('manage-sessions', {
-      url: '/manage-sessions',
+      url: '/admin-portal.manage-sessions',
       templateUrl: 'modules/core/client/views/manage-sessions.client.view.html'
     })
     .state('not-found', {
@@ -425,6 +425,7 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 ]);
 
 'use strict';
+
 
 angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state',
   function($scope, $rootScope, $http, $state) {
@@ -454,6 +455,72 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       });
     };
 
+angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams',
+  function($scope, $http, NgTableParams) {
+    const init = () => {
+      $scope.admin.getWaitingUsers()
+        .then((results) => {
+          // Assign results to upcomingSessions.data
+          $scope.allUsers = results.data;
+
+          $scope.approvalTable = new NgTableParams({
+            count: 10,
+            sorting: {
+              lastName: 'asc'
+            }
+          }, {
+            counts: [], // hides page sizes
+            dataset: $scope.allUsers // select data
+          });
+
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+
+    $scope.approveUser = function() {
+      console.log("Approved!");
+      init();
+    };
+
+    $scope.denyUser = function() {
+      console.log("Approved!");
+      init();
+    };
+
+    // Declare methods that can be used to access session data
+    $scope.admin = {
+      getWaitingUsers: function() {
+        return $http.get(window.location.origin + '/api/admin/approval')
+          .then((results) => {
+            return results;
+          })
+          .catch((err) => {
+            return err;
+          });
+      },
+
+      approve: function(id) {
+        return $.ajax({
+          url: window.location.origin + '/api/admin/approval/' + id,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json'
+        });
+      },
+
+      deny: function(id) {
+        return $.ajax({
+          url: window.location.origin + '/api/admin/approval/' + id,
+          type: 'DELETE',
+          contentType: 'application/json',
+          dataType: 'json',
+        });
+      }
+    };
+
+    init();
   }
 ]);
 
