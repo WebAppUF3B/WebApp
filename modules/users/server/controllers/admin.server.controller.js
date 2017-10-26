@@ -95,6 +95,19 @@ exports.approveUser = function(req, res) {
 
 };
 
+//*//
+exports.denyUser = function(req, res) {
+  const thisUser = req.model;
+
+  User.findById(thisUser.id)
+    .then((thisUser) => {
+      //if (thisUser.adminApproved = false) {
+      thisUser.remove();
+    });
+
+
+};
+
 /**
  * User middleware
  */

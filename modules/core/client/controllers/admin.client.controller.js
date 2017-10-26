@@ -39,7 +39,8 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
 
     $scope.denyUser = function() {
       console.log('DENIED!');
-      init();
+      console.log($scope.currentUser._id);
+      return $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id);
     };
 
     // Declare methods that can be used to access administrative data

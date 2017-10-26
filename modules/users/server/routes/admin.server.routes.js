@@ -3,12 +3,12 @@
 /**
  * Module dependencies.
  */
-var adminPolicy = require('../policies/admin.server.policy'),
+const adminPolicy = require('../policies/admin.server.policy'),
   admin = require('../controllers/admin.server.controller');
 
-module.exports = function (app) {
+module.exports = function(app) {
   // User route registration first. Ref: #713
-  require('./users.server.routes.js')(app);
+  //require('./users.server.routes.js')(app);
 
   // Users collection routes
   app.route('/api/users')
@@ -17,8 +17,8 @@ module.exports = function (app) {
   app.route('/api/admin/approval')
     .get(admin.getWaitingUsers);
   app.route('/api/admin/approval/:userId')
-    .put(admin.approveUser);
-//    .delete(admin.denyUser);
+    .put(admin.approveUser)
+    .delete(admin.denyUser);
 
   // Single user routes
   app.route('/api/users/:userId')
