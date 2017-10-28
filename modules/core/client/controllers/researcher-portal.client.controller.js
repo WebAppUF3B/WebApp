@@ -1,8 +1,8 @@
 'use strict';
 
 // TODO consider replacing $http requests with factory
-angular.module('core').controller('ResearcherPortalController', ['$scope','$http','NgTableParams', '$rootScope',
-  function($scope, $http, NgTableParams, $rootScope) {
+angular.module('core').controller('ResearcherPortalController', ['$scope','$http','NgTableParams', '$rootScope', "Authentication",
+  function($scope, $http, NgTableParams, $rootScope, Authentication) {
 
     // Prevent race conditions
     let alreadyClicked = false;
@@ -18,8 +18,8 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.compensation = {};
       $scope.compensation.data = [];
 
-      // TODO Assign user
-      $scope.user = $rootScope.getMockUser();
+      $scope.user = Authentication.user;
+      console.log($scope.user);
 
       $scope.studies.getUserStudies($scope.user._id)
         .then((results) => {
@@ -59,7 +59,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           const today = new Date();
           let date;
           $scope.allSessions.forEach((session) => {
-            date = new Date(session.sessionTime);
+            date = new Date(session.startTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
             session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
@@ -84,7 +84,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           $scope.upcomingSessions = new NgTableParams({
             count: 10,
             sorting: {
-              sessionTime: 'asc'
+              startTime: 'asc'
             }
           }, {
             counts: [], // hides page sizes
@@ -94,7 +94,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           $scope.pastSessions = new NgTableParams({
             count: 10,
             sorting: {
-              sessionTime: 'desc'
+              startTime: 'desc'
             }
           }, {
             counts: [], // hides page sizes
