@@ -24,6 +24,12 @@ exports.getAll = function(req, res) {
     });
 };
 
+exports.allSessionsFromStudy = function(req, res) {
+  const sessions = req.allSessionsByStudyId;
+  console.log('tw all sessions: \n', sessions);
+  res.status(200).send(sessions);
+};
+
 /* Create a session */
 exports.create = function(req, res) {
 
@@ -101,7 +107,7 @@ exports.changeAttendance = function(req, res) {
   const change = req.body;
 
   session.participants.forEach((participant) => {
-    if(participant.userID._id == change.userID){
+    if (participant.userID._id === change.userID) {
       participant.attended = change.attended;
       studies.modifyCount(session.studyID._id, change.attended);
     }
@@ -124,7 +130,7 @@ exports.markCompensated = function(req, res) {
   const compensated = req.body;
 
   session.participants.forEach((participant) => {
-    if(participant.userID._id == compensated.userID){
+    if (participant.userID._id === compensated.userID) {
       participant.compensationGiven = true;
     }
   });
@@ -160,7 +166,7 @@ exports.sessionById = function(req, res, next, id) {
 
 exports.sessionsByUserId = function(req, res, next, id) {
   console.log(id);
-  Session.find({ $or:[ { 'participants.userID': id }, { 'researchers.userID': id } ] })
+  Session.find({ $or: [ { 'participants.userID': id }, { 'researchers.userID': id } ] })
     .populate('studyID')
     .populate('researchers.userID')
     .populate('participants.userID')
@@ -174,12 +180,32 @@ exports.sessionsByUserId = function(req, res, next, id) {
     });
 };
 
+exports.sessionsByStudyId = function(req, res, next, id) {
+  console.log('tw id: ', id);
+  const _id = mongoose.Types.ObjectId(id);
+
+  const noSessionsAvailableErr = {
+    code: 404,
+    message: 'There are no sessions available for this study'
+  };
+
+  Session.find({ studyID: _id })
+    .then((sessions) => {
+      if (!sessions || sessions.length === 0) throw noSessionsAvailableErr;
+      req.allSessionsByStudyId = sessions;
+      next();
+    })
+    .catch((err) => {
+      console.log('Get all sessions from a study Error:\n', err);
+      res.status(err.code).send(err);
+    });
+};
 
 const generateMailOptions = (affectedUsers, cancellor, studyTitle) => {
   // Email any other participants involved
   const mailOptionArray = [];
   affectedUsers.forEach((affectedUser) => {
-    if(affectedUser.userID._id !== cancellor._id) {
+    if (affectedUser.userID._id !== cancellor._id) {
       const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
                    \n\nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${studyTitle}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
 
@@ -192,5 +218,5 @@ const generateMailOptions = (affectedUsers, cancellor, studyTitle) => {
       mailOptionArray.push(mailOptions);
     }
   });
-  return mailOptionArray
+  return mailOptionArray;
 };

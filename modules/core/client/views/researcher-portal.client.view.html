@@ -177,14 +177,14 @@
 
 
           <div class="row pad-top" ng-if="!currentStudy.closed">
-            <div class="col-sm-6">
-              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit({ studyId: currentStudy._id })">Edit Study</a>
+            <div class="col-sm-4">
+              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit({ studyId: currentStudy._id })">Edit</a>
             </div>
-            <div class="col-sm-6">
-              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#closeStudyModal">Close Study</a>
+            <div class="col-sm-4">
+              <a class="btn btn-orange full-width" data-dismiss="modal" ui-sref="sessions({ studyId: currentStudy._id })">Sessions</a>
             </div>
-            <div>
-              <!-- TODO add session button -->
+            <div class="col-sm-4">
+              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#closeStudyModal">Close</a>
             </div>
           </div>
           <div class="row pad-top" ng-if="currentStudy.closed">
@@ -219,7 +219,7 @@
         </div>
         <div class="row" ng-if="error">
           <div class="col-sm-12">
-            <p class="error text-center">There was a problem closing your study, please contact the admin!</button>
+            <p class="error text-center">There was a problem closing your study, please contact the admin!</p>
           </div>
         </div>
         </div>
@@ -248,7 +248,7 @@
         </div>
         <div class="row" ng-if="error">
           <div class="col-sm-12">
-            <p class="error text-center">There was a problem removing your study, please contact the admin!</button>
+            <p class="error text-center">There was a problem removing your study, please contact the admin!</p>
           </div>
         </div>
         </div>
@@ -446,7 +446,7 @@
         </div>
         <div class="row" ng-if="error">
           <div class="col-sm-12">
-            <p class="error text-center">There was a problem canceling your session, please contact the researcher running your session!</button>
+            <p class="error text-center">There was a problem canceling your session, please contact the researcher running your session!</p>
           </div>
         </div>
         </div>

@@ -49,8 +49,8 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/edit/:studyId',
       templateUrl: 'modules/core/client/views/study-edit.client.view.html'
     })
-    .state('sessions.manage', {
-      url: '/session/:studyId',
+    .state('sessions', {
+      url: '/sessions/:studyId',
       templateUrl: 'modules/core/client/views/session-handle.client.view.html'
     })
     .state('faculty-portal', {
