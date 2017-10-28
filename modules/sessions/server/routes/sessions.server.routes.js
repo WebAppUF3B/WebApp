@@ -16,10 +16,14 @@ module.exports = function (app) {
   app.route('/api/sessions/attend/:sessionId').put(sessions.changeAttendance);
   app.route('/api/sessions/compensate/:sessionId').put(sessions.markCompensated);
 
+  app.route('/api/studySessions/:studyId')
+    .get(sessions.allSessionsFromStudy);
+
   /*
     The 'router.param' method allows us to specify middleware we would like to use to handle
     requests with a parameter.
    */
   app.param('sessionId', sessions.sessionById);
   app.param('userId', sessions.sessionsByUserId);
+  app.param('studyId', sessions.sessionsByStudyId);
 };

@@ -380,6 +380,10 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/edit/:studyId',
       templateUrl: 'modules/core/client/views/study-edit.client.view.html'
     })
+    .state('sessions', {
+      url: '/sessions/:studyId',
+      templateUrl: 'modules/core/client/views/session-handle.client.view.html'
+    })
     .state('faculty-portal', {
       url: '/faculty',
       templateUrl: 'modules/core/client/views/faculty-portal.client.view.html'
@@ -426,43 +430,13 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 
 'use strict';
 
-
-angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state',
-  function($scope, $rootScope, $http, $state) {
-    /* Get all the listings, then bind it to the scope */
-    console.log($rootScope.getMockUser());
-
-    $scope.create = function (isValid) {
-      //alert('Hello World');
-      $scope.error = null;
-
-
-      if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'userForm');
-        alert('Invalid JSON');
-        return false;
-      }
-
-      $http.post('/api/studies/create', $scope.study).success((response) => {
-        alert(response);
-        // If successful we assign the response to the global user model
-        console.log('PV', 'Study Created!');
-        // And redirect to the previous or home page
-        $state.go('researcher-portal');
-      }).error((response) => {
-        $scope.error = response.message;
-        alert(response.message);
-      });
-    };
-
 angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams',
   function($scope, $http, NgTableParams) {
     const init = () => {
       $scope.admin.getWaitingUsers()
         .then((results) => {
-          // Assign results to upcomingSessions.data
           $scope.allUsers = results.data;
-
+          console.log(results.data);
           $scope.approvalTable = new NgTableParams({
             count: 10,
             sorting: {
@@ -479,17 +453,27 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
         });
     };
 
+    $scope.approvalDetails = function(user, index) {
+      $scope.currentUser = user;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#approvalModal').modal('show');
+    };
+
     $scope.approveUser = function() {
-      console.log("Approved!");
-      init();
+      console.log('Approved!');
+      console.log($scope.currentUser._id);
+      return $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id);
+      //init();
     };
 
     $scope.denyUser = function() {
-      console.log("Approved!");
-      init();
+      console.log('DENIED!');
+      console.log($scope.currentUser._id);
+      return $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id);
     };
 
-    // Declare methods that can be used to access session data
+    // Declare methods that can be used to access administrative data
     $scope.admin = {
       getWaitingUsers: function() {
         return $http.get(window.location.origin + '/api/admin/approval')
@@ -502,6 +486,7 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
       },
 
       approve: function(id) {
+        console.log('eyyyyyyyy');
         return $.ajax({
           url: window.location.origin + '/api/admin/approval/' + id,
           type: 'PUT',
@@ -521,6 +506,111 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     };
 
     init();
+  }
+]);
+
+'use strict';
+
+angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$document',
+  function($scope, $rootScope, $http, $state, $document) {
+    /* Get all the listings, then bind it to the scope */
+    console.log($rootScope.getMockUser());
+
+    $document.ready(() => {
+      $scope.request = window.location.pathname;
+      $scope.pass = $scope.request.slice(14);
+      //alert('document fire');
+      if (window.location.pathname.includes('edit')) {
+        $scope.init();
+      }
+    });
+
+
+    $scope.init = function() {
+      //alert('init called');
+
+      $scope.getStudy($scope.pass)
+      .then((results) => {
+        $scope.study = results;
+        console.log($scope.study);
+        $scope.study.title = $scope.study.data.title;
+        $scope.study.location = $scope.study.data.location;
+        $scope.study.irb = $scope.study.data.irb;
+        $scope.study.compensationType = $scope.study.data.compensationType;
+        $scope.study.maxParticipants = $scope.study.data.maxParticipants;
+        $scope.study.maxParticipantsPerSession = $scope.study.data.maxParticipantsPerSession;
+        $scope.study.description = $scope.study.data.description;
+        //TODO Add researchers (and compensationAmount?)
+
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
+    };
+
+    $scope.getStudy = function(studyId) {
+      return $http.get(window.location.origin + '/api/studies/' + studyId)
+        .then((results) => {
+          return results;
+        })
+        .catch((err) => {
+          return err;
+        });
+    };
+
+    $scope.create = function(isValid) {
+      //alert('Hello World');
+      $scope.error = null;
+
+
+      if (!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'userForm');
+        alert('Invalid JSON');
+        return false;
+      }
+
+      $http.post('/api/studies/create', $scope.study).success((response) => {
+        //alert(response);
+        // If successful we assign the response to the global user model
+        console.log('PV', 'Study Created!');
+        // And redirect to the previous or home page
+        $state.go('researcher-portal');
+      }).error((response) => {
+        $scope.error = response.message;
+        alert(response.message);
+      });
+    };
+
+    $scope.update = function(isValid) {
+
+      //alert($scope.study.title);
+
+      if (!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'userForm');
+        alert('Invalid JSON');
+        return false;
+      }
+
+      $http.put('/api/studies/'+pass, $scope.study).success((response) => {
+        //alert($scope.study.title+' meow');
+        console.log('PV', 'Study Updated!');
+        //$state.go('researcher-portal');
+      }).error((response) => {
+        $scope.error = response.message;
+        alert(response.message);
+      });
+    };
+
+    /*
+    $document.ready(() => {
+      alert('document fire');
+      alert(window.location.pathname);
+      if (window.location.pathname.includes('edit')) {
+        $scope.init();
+      }
+    });
+    */
   }
 ]);
 
@@ -560,21 +650,26 @@ angular.module('core').controller('HomeController', ['$scope', 'Authentication',
 'use strict';
 
 // TODO consider replacing $http requests with factory (sessions.client.service.js)
-angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams', '$rootScope',
-  function($scope, $http, NgTableParams, $rootScope) {
+angular.module('core').controller('ParticipantPortalController', ['$scope','$http','$state', 'Authentication', 'NgTableParams',
+  function($scope, $http, $state, Authentication, NgTableParams) {
 
     // Prevent race conditions
     let alreadyClicked = false;
 
     // Called after page loads
-    $scope.init = function(){
+    $scope.init = function() {
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
 
       // TODO Assign user
-      $scope.user = $rootScope.getMockUser();
+      $scope.user = Authentication.user;
+      console.log($scope.user);
+
+      if (!$scope.user) {
+        $state.go('authentication.signin');
+      }
 
       $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
@@ -587,12 +682,12 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           $scope.allSessions.forEach((session) => {
             date = new Date(session.sessionTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? "PM" : "AM"}`
+            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             // Place session in correct array
-            if(date >= today){
+            if (date >= today) {
               $scope.upcomingSessions.data.push(session);
-            } else{
+            } else {
               $scope.pastSessions.data.push(session);
             }
           });
@@ -621,27 +716,27 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
         .catch((err) => {
           console.log(err);
         });
-    }
+    };
 
     // Show modal and populate it with session data
-    $scope.sessionDetails = function(session, currentTable, index){
+    $scope.sessionDetails = function(session, currentTable, index) {
       $scope.currentSession = session;
       $scope.currentIndex = index;
       $scope.currentTable = currentTable;
       $scope.error = false;
       $('#detailModal').modal('show');
-    }
+    };
 
     // Close cancel modal
-    $scope.cancelClose = function(){
-      if(!alreadyClicked){
+    $scope.cancelClose = function() {
+      if (!alreadyClicked) {
         $('#cancelModal').modal('hide');
       }
-    }
+    };
 
     // Cancel session and remove from table
-    $scope.confirmCancel = function(){
-      if(!alreadyClicked) {
+    $scope.confirmCancel = function() {
+      if (!alreadyClicked) {
         alreadyClicked = true;
         const cancellor = $scope.user;
         cancellor.date = $scope.currentSession.date;
@@ -659,7 +754,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
             alreadyClicked = false;
           });
       }
-    }
+    };
 
     // Declare methods that can be used to access session data
     $scope.sessions = {
@@ -739,7 +834,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
     let alreadyClicked = false;
 
     // Called after page loads
-    $scope.init = function(){
+    $scope.init = function() {
       $scope.myStudies = {};
       $scope.myStudies.data = [];
       $scope.upcomingSessions = {};
@@ -757,8 +852,8 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
           // Update satisfied value of each study
           results.data.forEach((study) => {
-            if(!study.removed){
-              if(study.currentNumber > study.satisfactoryNumber){
+            if (!study.removed) {
+              if (study.currentNumber > study.satisfactoryNumber) {
                 study.satisfied = true;
               }
               // Store in array
@@ -792,18 +887,18 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           $scope.allSessions.forEach((session) => {
             date = new Date(session.sessionTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? "PM" : "AM"}`
+            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             // Place session in correct array
-            if(date >= today){
+            if (date >= today) {
               $scope.upcomingSessions.data.push(session);
-            } else{
+            } else {
               $scope.pastSessions.data.push(session);
             }
 
             // Populate table with users awaiting compensationType
             session.participants.forEach((participant) => {
-              if(participant.attended && participant.compensationType == 'monetary' && !participant.compensationGiven){
+              if (participant.attended && participant.compensationType === 'monetary' && !participant.compensationGiven) {
                 const temp = participant;
                 temp.studyID = session.studyID;
                 temp.session = session._id;
@@ -846,7 +941,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         .catch((err) => {
           console.log(err);
         });
-    }
+    };
 
     // Show modal and populate it with study details
     $scope.studyDetails = function(study, index) {
@@ -854,49 +949,49 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.currentIndex = index;
       $scope.error = false;
       $('#studyModal').modal('show');
-    }
+    };
 
     // Show modal and populate it with compensation data
-    $scope.compensationDetails = function(participant, index){
+    $scope.compensationDetails = function(participant, index) {
       $scope.currentParticipant = participant;
       $scope.currentIndex = index;
       $scope.error = false;
       $('#compensationModal').modal('show');
-    }
+    };
 
     // Show modal and populate it with session data
-    $scope.sessionDetails = function(session, currentTable, index){
+    $scope.sessionDetails = function(session, currentTable, index) {
       $scope.currentSession = session;
       $scope.currentIndex = index;
       $scope.currentTable = currentTable;
       $scope.error = false;
       $('#detailModal').modal('show');
-    }
+    };
 
     // Close cancel modal
-    $scope.cancelClose = function(){
-      if(!alreadyClicked){
+    $scope.cancelClose = function() {
+      if (!alreadyClicked) {
         $('#cancelModal').modal('hide');
       }
-    }
+    };
 
     // Close closeStudy modal
-    $scope.closeStudyClose = function(){
-      if(!alreadyClicked){
+    $scope.closeStudyClose = function() {
+      if (!alreadyClicked) {
         $('#closeStudyModal').modal('hide');
       }
-    }
+    };
 
     // Close closeStudy modal
-    $scope.removeStudyClose = function(){
-      if(!alreadyClicked){
+    $scope.removeStudyClose = function() {
+      if (!alreadyClicked) {
         $('#removeStudyModal').modal('hide');
       }
-    }
+    };
 
     // Close study in backend
-    $scope.confirmCloseStudy = function(){
-      if(!alreadyClicked) {
+    $scope.confirmCloseStudy = function() {
+      if (!alreadyClicked) {
         alreadyClicked = true;
         const cancellor = $scope.user;
         $scope.studies.close($scope.currentStudy._id, cancellor)
@@ -912,11 +1007,11 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             alreadyClicked = false;
           });
       }
-    }
+    };
 
     // Remove study in backend
-    $scope.confirmRemoveStudy = function(){
-      if(!alreadyClicked) {
+    $scope.confirmRemoveStudy = function() {
+      if (!alreadyClicked) {
         alreadyClicked = true;
         $scope.studies.remove($scope.currentStudy._id)
           .then(() => {
@@ -931,11 +1026,11 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             alreadyClicked = false;
           });
       }
-    }
+    };
 
     // Cancel session and remove from table
-    $scope.confirmCancel = function(){
-      if(!alreadyClicked) {
+    $scope.confirmCancel = function() {
+      if (!alreadyClicked) {
         alreadyClicked = true;
         const cancellor = $scope.user;
         cancellor.date = $scope.currentSession.date;
@@ -953,7 +1048,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             alreadyClicked = false;
           });
       }
-    }
+    };
 
     // Change attendance value of participant
     $scope.changeAttendance = function(participant) {
@@ -968,11 +1063,11 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           console.log(err);
           alreadyClicked = false;
         });
-    }
+    };
 
     // Mark participant as compensated
     $scope.markCompensated = function() {
-      if(!alreadyClicked) {
+      if (!alreadyClicked) {
         alreadyClicked = true;
         const user = { 'userID': $scope.currentParticipant.userID._id };
         $scope.sessions.compensate($scope.currentParticipant.session, user)
@@ -988,7 +1083,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             alreadyClicked = false;
           });
       }
-    }
+    };
 
     // Declare methods that can be used to access session data
     $scope.sessions = {
@@ -1147,6 +1242,40 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
     $scope.init();
   }
 ]);
+
+angular.module('core').controller('SessionController', ['$scope','$http','NgTableParams', '$location',
+  function($scope, $http, NgTableParams, $location) {
+    const init = function() {
+
+      const url = $location.absUrl().split('/');
+      $scope.studyId = url[url.length -1];
+      $scope.studySessions = null;
+      $scope.error = null;
+
+      $scope.getAllSessionsByStudyId();
+      $scope.myStudySessions = new NgTableParams({
+        count: 10,
+        sorting: {
+          title: 'asc'
+        }
+      }, {
+        counts: [], // hides page sizes
+        dataset: $scope.studySessions // select data
+      });
+    };
+    $scope.getAllSessionsByStudyId = function() {
+      $http.get(window.location.origin + '/api/studySessions/' + $scope.studyId)
+        .then((results) => {
+          $scope.studySessions = results.data;
+          console.log('tw session data', $scope.studySessions);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    };
+    init();
+  }]);
+
 
 'use strict';
 
@@ -2019,6 +2148,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       }
 
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
+        localStorage.setItem('user', JSON.stringify(response));
         redirect(response);
       }).error((response) => {
         $scope.error = response.message;
@@ -2201,8 +2331,8 @@ angular.module('users').controller('SettingsController', ['$scope', 'Authenticat
 
 'use strict';
 angular.module('users').controller('VerificationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication',
-  function ($scope, $state, $http, $location, $window, Authentication) {
-    const verify = function () {
+  function($scope, $state, $http, $location, $window, Authentication) {
+    const verify = function() {
       $scope.error = false;
       // mark verify field for this user as True (don't know if you need all the vars included above, just copied them from authentication controller)
       const request = window.location.pathname;
@@ -2312,13 +2442,14 @@ angular.module('users').directive('lowercase', () => {
 'use strict';
 
 // Authentication service for user variables
-angular.module('users').factory('Authentication', ['$window',
-  function ($window) {
-    const auth = {
-      user: $window.user
-    };
+angular.module('users').factory('Authentication', ['$window', '$injector',
+  function($window) {
 
-    return auth;
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    return {
+      user: user
+    };
   }
 ]);
 

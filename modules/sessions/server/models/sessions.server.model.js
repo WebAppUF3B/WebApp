@@ -21,7 +21,11 @@ const sessionSchema = new Schema({
       ref: 'User'
     }
   }],
-  sessionTime: {
+  startTime: {
+    type: Date,
+    required: true
+  },
+  endTime: {
     type: Date,
     required: true
   },
