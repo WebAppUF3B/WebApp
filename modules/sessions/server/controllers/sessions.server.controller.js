@@ -194,7 +194,6 @@ exports.sessionsByUserId = function(req, res, next, id) {
     });
 };
 
-<<<<<<< HEAD
 /* Get the students who recieved extra */
 exports.getExtraCredit = function(req, res) {
   const sessions = req.studySession;
@@ -227,7 +226,9 @@ exports.extraCreditByCourse = function(req, res, next, name) {
     })
     .catch((err) => {
       res.status(400).send(err);
-=======
+    });
+};
+
 exports.sessionsByStudyId = function(req, res, next, id) {
   console.log('tw id: ', id);
   const _id = mongoose.Types.ObjectId(id);
@@ -246,7 +247,6 @@ exports.sessionsByStudyId = function(req, res, next, id) {
     .catch((err) => {
       console.log('Get all sessions from a study Error:\n', err);
       res.status(err.code).send(err);
->>>>>>> 1f547cfafe28ce2fd0aba918b2c816e44dbc4dd7
     });
 };
 
