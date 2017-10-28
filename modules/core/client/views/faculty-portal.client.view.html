@@ -2,72 +2,75 @@
 <div class="container inner-container" ng-controller="FacultyPortalController">
   <div class="row">
     <div class="col-sm-12">
-      <h1 class="phone-center">Faculty Portal</h1>
+      <h1 class="phone-center"><strong>Faculty Portal</strong></h1>
     </div>
   </div>
 
   <div class="row">
-
-    <!-- Add Ng-change-->
-    <div class="col-md-3 col-md-offset-3">
-      <select class="form-control" ng-model="selectedCLass" ng-options="course as course.name for course in allCourses track by course.name">
-        <option value="" disabled selected>Select a Class</option>
+    <div class="col-md-3 col-md-offset-3 col-sm-4 col-sm-offset-2">
+      <select class="form-control top-margin" ng-model="selectedCourse" ng-options="course as course.name for course in allCourses track by course.name" ng-change="populateCourse()">
+        <option value="" disabled selected>Select a Course</option>
       </select>
     </div>
-    <div class="col-md-3">
-      <a class="btn btn-primary full-width" data-target="#addClassModal" data-toggle="modal">Add a New Class</a>
-
- <!-- Ng-click wasn't working-->
-      <div ng-controller="FacultyPortalController">
-      <label>Name:<input type="text" ng-model="newCourse"></input></label>
-      <button type="button" ng-click="addCourse()">Add class</button>
-      </div>
-
-      {{newCourse}}
-
-      
+    <div class="col-md-3 col-sm-4">
+      <a class="btn btn-primary full-width top-margin" data-target="#addCourseModal" data-toggle="modal">Add a New Course</a>
     </div>
   </div>
-
-
-
 
   <div class="row">
     <div class="col-sm-10 col-sm-offset-1">
-      <h2 class="text-center">{{selectedCLass.name}} </h2>
-      <table ng-table="pastSessions" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
-        <tr ng-repeat="">
-          <td title="'Name'" filter="{ Name: 'text'}" sortable="'Name'" ng-attr-title="{{null}}">{{}}</td>
-          <td title="'Email'" filter="{Email: 'text'}" sortable="'Email'" ng-attr-title="{{null}}">{{}}</td>
+      <table ng-table="extraCredit" class="table table-hover small-top-margin" show-filter="false">
+        <tr ng-repeat="participant in extraCredit.data">
+          <td title="'Name'" filter="{'lastName': 'text'}" sortable="'lastName'" ng-attr-title="{{null}}">{{participant.firstName}} {{participant.lastName}}</td>
+          <td title="'Email'" filter="{'email': 'text'}" sortable="'email'" ng-attr-title="{{null}}">{{participant.email}}</td>
         </tr>
       </table>
     </div>
   </div>
 
-
-
-
-
-</div>
-
-
-
-<!-- addClassModal -->
-  <div id="addClassModal" class="modal" role="dialog">
-    <div class="small-modal">
-        <!-- Modal content-->
-        <div class="modal-content">
-        <div class="row">
-          <div class="col-xs-12 text-center">
-            <p>Type the class you want to add.</p>
-            <label>Name: <input type="text" ng-model="newCourse" /></label>
-          </div>       
-        </div>
-          <div class="modal-footer">
-            <button ng-click="addCourse()" class="btn=btn-primary">Add class</button>
-            <button class="btn=btn-primary" data-dismiss="modal">Cancel</button>
-        </div>
+  <div class="row" ng-show="extraCredit.data.length">
+    <div class="col-sm-2 col-sm-offset-5">
+      <a class="btn btn-orange full-width small-top-margin" ng-click="exportCSV()">Export</a>
     </div>
   </div>
-  <!-- End addClassModal -->
 
+  <!-- Add Course Modal -->
+  <div id="addCourseModal" class="modal fade" role="dialog">
+    <div class="modal-dialog course-modal">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="row">
+            <div class="col-xs-8 col-xs-offset-2 text-center">
+              <h3 class="no-margin"><strong>Add New Course</strong></h3>
+            </div>
+            <div class="col-xs-2">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+          </div>
+        </div>
+        <div class="pane">
+          <div class="row">
+            <div class="col-sm-12">
+              <label for="course">Course Code</label>
+              <input type="text" id="course" name="course" class="form-control small-top-margin" ng-model="newCourse.name" placeholder="Enter a course code">
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <a class="btn btn-primary full-width top-margin" ng-click="addCourse()">Add Course</a>
+            </div>
+          </div>
+          <div class="row" ng-show='error'>
+            <div class="col-sm-12">
+              <p class="error text-center">{{error}}</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Add Course Modal -->
+
+</div>
