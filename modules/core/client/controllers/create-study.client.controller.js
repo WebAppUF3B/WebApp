@@ -1,18 +1,27 @@
 'use strict';
 
-angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state',
-  function($scope, $rootScope, $http, $state) {
+angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$document',
+  function($scope, $rootScope, $http, $state, $document) {
     /* Get all the listings, then bind it to the scope */
     console.log($rootScope.getMockUser());
-    const request = window.location.pathname;
-    const pass = request.slice(14);
+
+    $document.ready(() => {
+      $scope.request = window.location.pathname;
+      $scope.pass = $scope.request.slice(14);
+      //alert('document fire');
+      if (window.location.pathname.includes('edit')) {
+        $scope.init();
+      }
+    });
+
 
     $scope.init = function() {
+      //alert('init called');
 
-      $scope.getStudy(pass)
+      $scope.getStudy($scope.pass)
       .then((results) => {
         $scope.study = results;
-
+        console.log($scope.study);
         $scope.study.title = $scope.study.data.title;
         $scope.study.location = $scope.study.data.location;
         $scope.study.irb = $scope.study.data.irb;
@@ -51,7 +60,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       }
 
       $http.post('/api/studies/create', $scope.study).success((response) => {
-        alert(response);
+        //alert(response);
         // If successful we assign the response to the global user model
         console.log('PV', 'Study Created!');
         // And redirect to the previous or home page
@@ -82,8 +91,14 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       });
     };
 
-    if (request.indexOf('edit') !== -1) {
-      $scope.init();
-    }
+    /*
+    $document.ready(() => {
+      alert('document fire');
+      alert(window.location.pathname);
+      if (window.location.pathname.includes('edit')) {
+        $scope.init();
+      }
+    });
+    */
   }
 ]);
