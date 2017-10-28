@@ -7,25 +7,67 @@
   </div>
 
   <div class="row">
-    <!-- TODO Populate me with the classes from the backend (look into "ng-options")! -->
+
+    <!-- Add Ng-change-->
     <div class="col-md-3 col-md-offset-3">
-      <select class="form-control">
-        <option value="Class">Class</option>
+      <select class="form-control" ng-model="selectedCLass" ng-options="course as course.name for course in allCourses track by course.name">
+        <option value="" disabled selected>Select a Class</option>
       </select>
     </div>
     <div class="col-md-3">
-      <!-- TODO This bad boy needs to pop open a modal that lets them add a class string to the backend (if it doesn't already exist) -->
-      <a class="btn btn-primary full-width">Add a New Class</a>
+      <a class="btn btn-primary full-width" data-target="#addClassModal" data-toggle="modal">Add a New Class</a>
+
+ <!-- Ng-click wasn't working-->
+      <div ng-controller="FacultyPortalController">
+      <label>Name:<input type="text" ng-model="newCourse"></input></label>
+      <button type="button" ng-click="addCourse()">Add class</button>
+      </div>
+
+      {{newCourse}}
+
+      
     </div>
   </div>
 
-  <div class="row">
-    <div class="col-sm-12">
-      <!-- TODO look at how I populate the table in participant-portal and then display "name, and email of students that completed as study for the class this semester" -->
-      <table class="table table-hover">
 
+
+
+  <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
+      <h2 class="text-center">{{selectedCLass.name}} </h2>
+      <table ng-table="pastSessions" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
+        <tr ng-repeat="">
+          <td title="'Name'" filter="{ Name: 'text'}" sortable="'Name'" ng-attr-title="{{null}}">{{}}</td>
+          <td title="'Email'" filter="{Email: 'text'}" sortable="'Email'" ng-attr-title="{{null}}">{{}}</td>
+        </tr>
       </table>
     </div>
   </div>
 
+
+
+
+
 </div>
+
+
+
+<!-- addClassModal -->
+  <div id="addClassModal" class="modal" role="dialog">
+    <div class="small-modal">
+        <!-- Modal content-->
+        <div class="modal-content">
+        <div class="row">
+          <div class="col-xs-12 text-center">
+            <p>Type the class you want to add.</p>
+            <label>Name: <input type="text" ng-model="newCourse" /></label>
+          </div>       
+        </div>
+          <div class="modal-footer">
+            <button ng-click="addCourse()" class="btn=btn-primary">Add class</button>
+            <button class="btn=btn-primary" data-dismiss="modal">Cancel</button>
+        </div>
+    </div>
+  </div>
+  <!-- End addClassModal -->
+
