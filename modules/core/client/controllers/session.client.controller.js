@@ -28,6 +28,19 @@ angular.module('core').controller('SessionController', ['$scope','$http','NgTabl
           console.log(err);
         });
     };
+    $scope.hoursAndMinutes = function(minutes) {
+      const hours = Math.floor(minutes / 60);
+      const remainderMins = Math.floor(minutes % 60);
+      const hoursUnits = hours === 1 ? 'hour' : 'hours';
+      const hoursStr = hours > 0 ? `${hours} ${hoursUnits}` : '';
+
+      const minutesUnits = remainderMins === 1 ? 'minute' : 'minutes';
+      const minutesStr = remainderMins > 0 ? `${remainderMins} ${minutesUnits}` : '';
+
+      const conjunctionFunction = hoursStr && minutesStr ? ' and ' : '';
+
+      return `${hoursStr}${conjunctionFunction}${minutesStr}`;
+    };
     init();
   }]);
 

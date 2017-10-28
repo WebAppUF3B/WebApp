@@ -4,6 +4,7 @@
 const mongoose = require('mongoose'),
   Session = mongoose.model('studySession'),
   nodemailer = require('nodemailer'),
+  dateUtils = require('../../../../utils/dateUtilities'),
   studies = require('../../../studies/server/controllers/studies.server.controller.js');
 
 /**
@@ -25,9 +26,22 @@ exports.getAll = function(req, res) {
 };
 
 exports.allSessionsFromStudy = function(req, res) {
-  const sessions = req.allSessionsByStudyId;
-  console.log('tw all sessions: \n', sessions);
-  res.status(200).send(sessions);
+  const originalSessions = req.allSessionsByStudyId;
+  const minimalSessions = [];
+
+  originalSessions.forEach((session) => {
+    const startTime = new Date(session.startTime);
+    const endTime = new Date(session.endTime);
+    const duration = dateUtils.differenceInSeconds(startTime, endTime);
+    const minimalSession = {
+      id: session._id,
+      date: dateUtils.formatMMDDYYYY(startTime),
+      dow: dateUtils.DOWMap(startTime.getDay()),
+      duration: duration
+    };
+    minimalSessions.push(minimalSession);
+  });
+  res.status(200).send(minimalSessions);
 };
 
 /* Create a session */

@@ -15,8 +15,8 @@
             <table ng-table="myStudySessions" class="table table-hover entries-selectable hide-col-2-phone hide-col-3-phone" show-filter="false">
                 <tr ng-click="sessionDetails(session, 'upcoming', $index)" ng-repeat="session in studySessions">
                     <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
-                    <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
-                    <td title="'Duration'" filter="{ 'duration': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.sessionTime}}</td>
+                    <td title="'Day of the Week'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.dow}}</td>
+                    <td title="'Duration'" filter="{ 'duration': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{hoursAndMinutes(session.duration)}}</td>
                 </tr>
             </table>
         </div>
