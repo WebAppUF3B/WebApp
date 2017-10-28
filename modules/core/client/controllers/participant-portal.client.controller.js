@@ -1,24 +1,27 @@
 'use strict';
 
-// TODO consider replacing $http requests with controller (sessions.client.service.js)
-angular.module('core').controller('ParticipantPortalController', ['$scope','$http','NgTableParams', '$rootScope',
-  function($scope, $http, NgTableParams, $rootScope) {
+// TODO consider replacing $http requests with factory (sessions.client.service.js)
+angular.module('core').controller('ParticipantPortalController', ['$scope','$http','$state', 'Authentication', 'NgTableParams',
+  function($scope, $http, $state, Authentication, NgTableParams) {
 
     // Prevent race conditions
     let alreadyClicked = false;
 
     // Called after page loads
-    $scope.init = function(){
+    $scope.init = function() {
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
 
       // TODO Assign user
-      $scope.user = $rootScope.getMockUser();
+      $scope.user = Authentication.user;
+      console.log($scope.user);
 
-      // TODO Get all sessions for this USER (find user details)
-      // TODO Resize table columns and possibly hide column on mobile
+      if (!$scope.user) {
+        $state.go('authentication.signin');
+      }
+
       $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
           // Assign results to upcomingSessions.data
@@ -26,15 +29,16 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
 
           // Populate date and time fields for each sessions
           const today = new Date();
+          let date;
           $scope.allSessions.forEach((session) => {
-            let date = new Date(session.sessionTime);
+            date = new Date(session.sessionTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? "PM" : "AM"}`
+            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             // Place session in correct array
-            if(date >= today){
+            if (date >= today) {
               $scope.upcomingSessions.data.push(session);
-            } else{
+            } else {
               $scope.pastSessions.data.push(session);
             }
           });
@@ -63,34 +67,33 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
         .catch((err) => {
           console.log(err);
         });
-    }
+    };
 
     // Show modal and populate it with session data
-    $scope.sessionDetails = function(session, currentTable, index){
+    $scope.sessionDetails = function(session, currentTable, index) {
       $scope.currentSession = session;
       $scope.currentIndex = index;
       $scope.currentTable = currentTable;
       $scope.error = false;
       $('#detailModal').modal('show');
-    }
+    };
 
-    // Open cancel modal
-    $scope.cancelClose = function(){
-      if(!alreadyClicked){
+    // Close cancel modal
+    $scope.cancelClose = function() {
+      if (!alreadyClicked) {
         $('#cancelModal').modal('hide');
       }
-    }
+    };
 
     // Cancel session and remove from table
-    $scope.confirmCancel = function(){
-      if(!alreadyClicked) {
+    $scope.confirmCancel = function() {
+      if (!alreadyClicked) {
         alreadyClicked = true;
-        let cancellor = $scope.user;
+        const cancellor = $scope.user;
         cancellor.date = $scope.currentSession.date;
         cancellor.time = $scope.currentSession.time;
         $scope.sessions.cancel($scope.currentSession._id, cancellor)
           .then(() => {
-            console.log("Made it!");
             // Refetch sessions
             $scope.init();
             $('#cancelModal').modal('hide');
@@ -99,9 +102,10 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           .catch((err) => {
             $scope.error = true;
             console.log(err);
+            alreadyClicked = false;
           });
-        }
-    }
+      }
+    };
 
     // Declare methods that can be used to access session data
     $scope.sessions = {

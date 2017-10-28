@@ -25,7 +25,7 @@ exports.update = function (req, res) {
   user.firstName = req.body.firstName;
   user.lastName = req.body.lastName;
   user.displayName = user.firstName + ' ' + user.lastName;
-  user.roles = req.body.roles;
+  user.role = req.body.role;
 
   user.save(function (err) {
     if (err) {
@@ -70,17 +70,55 @@ exports.list = function (req, res) {
   });
 };
 
+//*//
+exports.getWaitingUsers = function(req, res) {
+  User.find({ emailValidated: true, adminApproved: false }, '-salt -password')
+    .exec()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((err) => {
+      res.status(400).send();
+    });
+};
+//*//
+exports.approveUser = function(req, res) {
+  const thisUser = req.model;
+
+  User.findById(thisUser.id)
+    .then((thisUser) => {
+      //if (thisUser.adminApproved = false) {
+      thisUser.adminApproved = true;
+      thisUser.save();
+    });
+
+
+};
+
+//*//
+exports.denyUser = function(req, res) {
+  const thisUser = req.model;
+
+  User.findById(thisUser.id)
+    .then((thisUser) => {
+      //if (thisUser.adminApproved = false) {
+      thisUser.remove();
+    });
+
+
+};
+
 /**
  * User middleware
  */
-exports.userByID = function (req, res, next, id) {
+exports.userByID = function(req, res, next, id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({
-      message: 'User is invalid'
+      message: 'User  invalid'
     });
   }
 
-  User.findById(id, '-salt -password').exec(function (err, user) {
+  User.findById(id, '-salt -password').exec(function(err, user) {
     if (err) {
       return next(err);
     } else if (!user) {
@@ -89,5 +127,20 @@ exports.userByID = function (req, res, next, id) {
 
     req.model = user;
     next();
+  });
+};
+
+/* Retreive all the Users */
+exports.getAll = function(req, res) {
+  User.find()
+  .then((results) => {
+    console.log(results);
+    return res.status(200).send({
+      users: results
+    });
+  })
+  .catch((err) => {
+    console.log('get all users error:\n', err);
+    return res.status(err.code).send(err);
   });
 };

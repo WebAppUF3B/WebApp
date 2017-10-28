@@ -45,6 +45,14 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/create',
       templateUrl: 'modules/core/client/views/study-create.client.view.html'
     })
+    .state('studies.edit', {
+      url: '/edit/:studyId',
+      templateUrl: 'modules/core/client/views/study-edit.client.view.html'
+    })
+    .state('sessions', {
+      url: '/sessions/:studyId',
+      templateUrl: 'modules/core/client/views/session-handle.client.view.html'
+    })
     .state('faculty-portal', {
       url: '/faculty',
       templateUrl: 'modules/core/client/views/faculty-portal.client.view.html'
@@ -54,15 +62,15 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       templateUrl: 'modules/core/client/views/admin-portal.client.view.html'
     })
     .state('manage-users', {
-      url: '/manage-users',
+      url: '/admin-portal.manage-users',
       templateUrl: 'modules/core/client/views/manage-users.client.view.html'
     })
     .state('manage-studies', {
-      url: '/manage-studies',
+      url: '/admin-portal.manage-studies',
       templateUrl: 'modules/core/client/views/manage-studies.client.view.html'
     })
     .state('manage-sessions', {
-      url: '/manage-sessions',
+      url: '/admin-portal.manage-sessions',
       templateUrl: 'modules/core/client/views/manage-sessions.client.view.html'
     })
     .state('not-found', {

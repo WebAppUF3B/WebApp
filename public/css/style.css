@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
-/* For Phone */
 
+/* For Phone */
 @media (max-width: 767px) {
   .phone-center {
     text-align: center;
@@ -19,8 +19,8 @@
     padding-top: 10px !important;
   }
   .panel-container{
-    margin-right: 15px !important;
-    margin-left: 15px !important;
+    margin-right: 0px !important;
+    margin-left: 0px !important;
   }
   .mobile-no-pad{
     padding-left: 0px !important;
@@ -35,16 +35,28 @@
   .hide-col-1-phone th:nth-child(1), .hide-col-1-phone td:nth-child(1){
     display: none !important;
   }
+  .hide-col-2-phone th:nth-child(2), .hide-col-2-phone td:nth-child(2){
+    display: none !important;
+  }
+  .hide-col-3-phone th:nth-child(3), .hide-col-3-phone td:nth-child(3){
+    display: none !important;
+  }
   .phone-top-margin{
     margin-top: 10px;
   }
   .pane{
   	padding: 0px 15px 15px !important;
   }
+  .filter-btn{
+    margin-top: 15px;
+  }
+  .clear-filters-btn{
+    top: 5px !important;
+    right: 5px !important;
+  }
 }
 
 /* For Tablet/Phone */
-
 @media (max-width: 991px) {
   .tablet-center {
     text-align: center;
@@ -58,7 +70,6 @@
 }
 
 /* For Tablet/Desktop */
-
 @media (min-width: 768px) {
   .landing-page-container {
     margin-top: 50px !important;
@@ -69,13 +80,11 @@
 }
 
 /* For Desktop Only */
-
 @media (min-width: 992px) {
 
 }
 
 html {
-  overflow-x: hidden;
   height: 100%;
   background-color: white;
 }
@@ -115,8 +124,8 @@ h2, h3, h4, h5, h6 {
   background: #f1f1f1;
   color: #243778;
   text-transform: uppercase;
-  border-top: 1px solid #9da3bd;
-  border-bottom: 3px solid #9da3bd;
+  border-top: 1px solid #9da3bd !important;
+  border-bottom: 3px solid #9da3bd !important;
   margin-bottom: 0px !important;
 }
 
@@ -148,6 +157,10 @@ h2, h3, h4, h5, h6 {
 
 .top-margin {
   margin-top: 30px;
+}
+
+.no-margin .small-top-margin {
+  margin-top: 10px !important;
 }
 
 .small-top-margin {
@@ -246,11 +259,11 @@ footer .uf-monogram {
 }
 
 .btn-primary {
-  background: #007ec6 !important;
+  background: #316cb9 !important;
 }
 
 .btn-primary:hover{
-  background: #006ba8 !important;
+  background: #2e66af !important;
 }
 
 .btn-orange{
@@ -498,4 +511,129 @@ hr {
 
 .error{
   color: #a94442;
+}
+
+.note{
+  font-style: italic;
+  font-size: 1em !important;
+}
+
+.bootstrap-datetimepicker-widget{
+  margin-right: -46px !important;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:after {
+  right: 58px !important;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu.pull-right:before {
+  display: none !important;
+}
+
+.study-satisfied{
+  background-color: #a2d6b3 !important;
+}
+
+.study-closed, .study-satisfied .study-closed{
+  background-color: #e0a9a9 !important;
+}
+
+.not-bold{
+  font-weight: normal;
+}
+
+.search-container{
+	width: 100%;
+	background-color: #f1f1f1;
+}
+
+.search-pad{
+  padding: 15px 0px;
+}
+
+.search-box{
+  overflow: hidden;
+  width: 100%;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.search-box input#search{
+  width: 100%;
+  height: 40px;
+  background: #ffffff;
+  border: 1px solid #c6cde8;
+  font-size: 10pt;
+  float: left;
+  color: #fff;
+  padding-left: 15px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+}
+
+.search-box input#search {
+   color: #65737e;
+   padding-right: 50px;
+}
+
+.search-box input:focus, .search-box:hover button.icon, .search-box:active button.icon, .search-box:focus button.icon{
+  outline: none;
+}
+
+.search-box button.icon{
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  border: none;
+  height: 40px;
+  width: 50px;
+  color: white;
+  font-size: 12pt;
+  margin-left: -50px;
+}
+
+.filter-btn{
+  margin-bottom: 0px !important;
+  position: relative;
+}
+
+.clear-filters-btn{
+  position: absolute;
+  padding-top: 1px;
+  text-align: center;
+  top: -10px;
+  right: 3px;
+  width: 25px;
+  height: 25px;
+  font-size: 16px;
+  border-radius: 20px;
+  color: white !important;
+  text-decoration: none !important;
+  display: none;
+}
+
+.clear-filters-btn:hover{
+  cursor: pointer;
+}
+
+.filter-area{
+  border-top: 1px solid #c6cde8;
+  background-color: #f9f9f9;
+	display: none;
+  padding-bottom: 15px;
+}
+
+.select-options{
+	height: 40px;
+	font-size: 20px;
+	width: 100%;
+}
+
+.filter-date{
+	font-size: 20px;
+	width: 40%;
+}
+
+.shrink-col-3 th:nth-child(3){
+  width: 200px;
 }
