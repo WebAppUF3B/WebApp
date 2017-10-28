@@ -1,7 +1,7 @@
 'use strict';
 angular.module('users').controller('VerificationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication',
-  function ($scope, $state, $http, $location, $window, Authentication) {
-    const verify = function () {
+  function($scope, $state, $http, $location, $window, Authentication) {
+    const verify = function() {
       $scope.error = false;
       // mark verify field for this user as True (don't know if you need all the vars included above, just copied them from authentication controller)
       const request = window.location.pathname;
