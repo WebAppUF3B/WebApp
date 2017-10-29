@@ -1,7 +1,19 @@
-<!-- TODO create study sign up controller -->
-<div class="container inner-container" ng-controller="StudySignUpController">
-
-  <!-- TODO Copy html from one of the other forms to match style -->
-  <!-- TODO Good luck making the calendar modal! -->
-
+<div class="container inner-container" ng-controller="StudySignupController">
+  <div class="row">
+    <div class="col-sm-12">
+      <h1 class="phone-center"><strong>Study Signup for </strong></h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
+      <h2 class="text-center">Available Sessions</h2>
+      <table ng-table="myStudySessions" class="table table-hover entries-selectable hide-col-2-phone hide-col-3-phone" show-filter="false">
+        <tr ng-click="sessionDetails(session, 'upcoming', $index)" ng-repeat="session in studySessions">
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Day of the Week'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.dow}}</td>
+          <td title="'Duration'" filter="{ 'duration': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{hoursAndMinutes(session.duration)}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
 </div>
