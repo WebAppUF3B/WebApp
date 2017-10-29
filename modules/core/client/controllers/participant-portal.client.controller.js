@@ -9,6 +9,9 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
 
     // Called after page loads
     $scope.init = function() {
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
+      
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};

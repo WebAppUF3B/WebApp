@@ -31,7 +31,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
           $scope.extraCredit = new NgTableParams({
             count: 10,
             sorting: {
-              lastName: 'desc'
+              lastName: 'asc'
             }
           }, {
             counts: [], // hides page sizes

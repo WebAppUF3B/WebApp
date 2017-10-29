@@ -80,13 +80,17 @@
 
           <div class="row pad-top">
             <div class="col-sm-6">
-              <a class="btn btn-primary full-width" ng-click="approveUser()"data-dismiss="modal" data-toggle="modal">Approve User</a>
+              <a class="btn btn-primary full-width" ng-click="approveUser()">Approve User</a>
             </div>
             <div class="col-sm-6">
-              <a class="btn btn-red full-width" ng-click="denyUser()" data-dismiss="modal" data-toggle="modal">Deny User</a>
+              <a class="btn btn-red full-width" ng-click="denyUser()">Deny User</a>
             </div>
           </div>
-
+          <div class="row" ng-show='error'>
+            <div class="col-sm-12">
+              <p class="error text-center">{{error}}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>

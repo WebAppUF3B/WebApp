@@ -90,6 +90,7 @@ exports.approveUser = function(req, res) {
       //if (thisUser.adminApproved = false) {
       thisUser.adminApproved = true;
       thisUser.save();
+      res.json(thisUser);
     });
 
 
@@ -101,8 +102,8 @@ exports.denyUser = function(req, res) {
 
   User.findById(thisUser.id)
     .then((thisUser) => {
-      //if (thisUser.adminApproved = false) {
       thisUser.remove();
+      res.json(thisUser);
     });
 
 
