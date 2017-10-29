@@ -32,8 +32,8 @@
         <tr ng-click="sessionDetails(session, 'upcoming', $index)" ng-repeat="session in upcomingSessions.data">
           <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
           <td title="'Location'" filter="{ 'studyID.location': 'text'}" sortable="'studyID.location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
-          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
-          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'startTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'startTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
         </tr>
       </table>
     </div>
@@ -46,8 +46,8 @@
         <tr ng-click="sessionDetails(session, 'past', $index)" ng-repeat="session in pastSessions.data">
           <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
           <td title="'Location'" filter="{ 'studyID.location': 'text'}" sortable="'studyID.location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
-          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
-          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'startTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'startTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
         </tr>
       </table>
     </div>
