@@ -1,5 +1,5 @@
-angular.module('core').controller('StudySignupController', ['$scope','$http','NgTableParams', '$location',
-  function($scope, $http, NgTableParams, $location) {
+angular.module('core').controller('StudySignupController', ['$scope','$http','NgTableParams', '$location', '$state', 'Authentication',
+  function($scope, $http, NgTableParams, $location, $state, Authentication) {
     const init = function() {
 
       const url = $location.absUrl().split('/');
@@ -7,6 +7,12 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       $scope.studySessions = null;
       $scope.study = null;
       $scope.error = null;
+      $scope.currentSession = null;
+      $scope.hasMonetary = false;
+      $scope.hasExtraCredit = false;
+      $scope.credentails = null;
+      $scope.user = Authentication.user;
+      console.log($scope.user);
 
       $scope.getAllSessionsByStudyId();
       $scope.myStudySessions = new NgTableParams({
@@ -24,6 +30,16 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
         .then((results) => {
           $scope.studySessions = results.data.sessions;
           $scope.study = results.data.study;
+          $scope.study.compensationType.forEach((type) => {
+            switch (type) {
+              case 'monetary':
+                $scope.hasMonetary = true;
+                break;
+              case 'extraCredit':
+                $scope.hasExtraCredit = true;
+                break;
+            }
+          });
           console.log('tw get data');
           console.log('tw study\n', $scope.study);
           console.log('tw sessions\n', $scope.studySessions);
@@ -45,5 +61,40 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
 
       return `${hoursStr}${conjunctionFunction}${minutesStr}`;
     };
+
+
+    $scope.studySignupModal = function(session, index) {
+      $scope.currentSession = session;
+      $scope.currentIndex = index;
+      $scope.error = false;
+      $('#studySignupModal').modal('show');
+    };
+
+    $scope.studySignup = function(valid) {
+      $scope.error = null;
+      if (!valid) {
+        $scope.error = 'Please select a compensation type';
+        return;
+      }
+      if ($scope.credentials.compensation === 'extraCredit' && !$scope.credentials.classCode) {
+        $scope.error = 'Please select a class code';
+        return;
+      }
+
+      $scope.credentials.sessionId = $scope.currentSession.id;
+      $scope.credentials.userId = $scope.user.id;
+
+      $http.post(window.location.origin + '/api/studySession/signup', $scope.credentials)
+        .then(() => {
+          alert(`You are successfully signed up for ${$scope.study.title}!`);
+          $state.go('participant-portal');
+        })
+        .catch((err) => {
+          $scope.error = err;
+        });
+    };
+
+    $scope.hardCodedClasses = ['CEN3031', 'COP4600', 'EEL3701', 'CIS4930'];
+
     init();
   }]);

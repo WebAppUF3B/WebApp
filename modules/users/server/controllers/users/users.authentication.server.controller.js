@@ -196,7 +196,7 @@ exports.signin = function(req, res, next) {
           birthday: user.birthday,
           email: user.email,
           role: user.role,
-          _id: user._id
+          id: user._id
         };
 
         console.log('minimal user info:\n', minimalUser);

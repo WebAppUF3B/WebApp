@@ -154,6 +154,40 @@ exports.markCompensated = function(req, res) {
     });
 };
 
+exports.sessionSignup = function(req, res) {
+  const sessionId = mongoose.Types.ObjectId(req.body.sessionId);
+  const userId = mongoose.Types.ObjectId(req.body.userId);
+  const compensationType = req.body.compensation;
+  const classCode = req.body.classCode;
+
+  const invalidSessionErr = {
+    message: 'There is a problem with this session, please contact an admin.',
+    code: 400
+  };
+
+  Session.findById(sessionId)
+    .then((session) => {
+      if (!session) throw invalidSessionErr;
+      const newParticipant = {
+        userID: userId,
+        attended: false,
+        compensationType: compensationType,
+        extraCreditCourse: classCode,
+        compensationGiven: false
+      };
+      session.participants.push(newParticipant);
+      return session.save();
+    })
+    .then((result) => {
+      console.log('tw signed up study', result);
+      res.status(200).send();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(err.code).send(err);
+    });
+};
+
 /*
   Middleware: find a session by its ID, then pass it to the next request handler.
  */
