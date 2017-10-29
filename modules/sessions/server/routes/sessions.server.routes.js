@@ -3,7 +3,7 @@
 // Session Routes
 const sessions = require('../controllers/sessions.server.controller.js');
 
-module.exports = function (app) {
+module.exports = function(app) {
   // Setting up the session api
   app.route('/api/sessions/')
     .get(sessions.getAll)
@@ -15,9 +15,9 @@ module.exports = function (app) {
   app.route('/api/sessions/user/:userId').get(sessions.get);
   app.route('/api/sessions/attend/:sessionId').put(sessions.changeAttendance);
   app.route('/api/sessions/compensate/:sessionId').put(sessions.markCompensated);
-
   app.route('/api/studySessions/:studyId')
     .get(sessions.allSessionsFromStudy);
+  app.route('/api/sessions/course/:courseName').get(sessions.getExtraCredit);
 
   app.route('/api/studySessions/signup/:studyId')
     .get(sessions.allSessionsForSignup);
@@ -31,5 +31,6 @@ module.exports = function (app) {
    */
   app.param('sessionId', sessions.sessionById);
   app.param('userId', sessions.sessionsByUserId);
+  app.param('courseName', sessions.extraCreditByCourse);
   app.param('studyId', sessions.sessionsByStudyId);
 };

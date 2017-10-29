@@ -5,7 +5,7 @@ const mongoose = require('mongoose'),
   Study = mongoose.model('Study');
 
 /**
- * Backend functions for CRUD operations on study collection
+ * Backend functions for CRUD operations on course collection
  */
 
 /* Retreive all the studies */

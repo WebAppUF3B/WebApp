@@ -29,10 +29,10 @@ exports.signup = function(req, res) {
 
   // Init Variables
   const user = new User(req.body);
+  user.adminApproved = true;
   // Then save the user
   user.save()
       .then((user) => {
-        console.log('tw', user);
         const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${user._id}`;
         const verificationText = `Hello ${user.firstName} ${user.lastName},
                                   \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;

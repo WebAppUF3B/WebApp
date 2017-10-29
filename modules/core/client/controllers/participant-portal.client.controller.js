@@ -14,7 +14,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
 
-      // TODO Assign user
       $scope.user = Authentication.user;
       console.log($scope.user);
 
@@ -31,7 +30,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           const today = new Date();
           let date;
           $scope.allSessions.forEach((session) => {
-            date = new Date(session.sessionTime);
+            date = new Date(session.startTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
             session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
@@ -46,7 +45,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           $scope.upcomingSessions = new NgTableParams({
             count: 5,
             sorting: {
-              sessionTime: 'asc'
+              startTime: 'asc'
             }
           }, {
             counts: [], // hides page sizes
@@ -56,7 +55,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           $scope.pastSessions = new NgTableParams({
             count: 5,
             sorting: {
-              sessionTime: 'desc'
+              startTime: 'desc'
             }
           }, {
             counts: [], // hides page sizes
