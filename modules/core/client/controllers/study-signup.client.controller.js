@@ -30,6 +30,9 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
         .then((results) => {
           $scope.studySessions = results.data.sessions;
           $scope.study = results.data.study;
+
+          if ($scope.study.closed) $state.go('forbidden');
+          
           $scope.study.compensationType.forEach((type) => {
             switch (type) {
               case 'monetary':
