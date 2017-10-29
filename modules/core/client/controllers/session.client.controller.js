@@ -18,6 +18,7 @@ angular.module('core').controller('SessionController', ['$scope','$http','NgTabl
         dataset: $scope.studySessions // select data
       });
     };
+
     $scope.getAllSessionsByStudyId = function() {
       $http.get(window.location.origin + '/api/studySessions/' + $scope.studyId)
         .then((results) => {
@@ -28,6 +29,7 @@ angular.module('core').controller('SessionController', ['$scope','$http','NgTabl
           console.log(err);
         });
     };
+
     $scope.hoursAndMinutes = function(minutes) {
       const hours = Math.floor(minutes / 60);
       const remainderMins = Math.floor(minutes % 60);
@@ -41,6 +43,11 @@ angular.module('core').controller('SessionController', ['$scope','$http','NgTabl
 
       return `${hoursStr}${conjunctionFunction}${minutesStr}`;
     };
+
+    $scope.create = function(isValid) {
+      alert('Creating Session');
+      
+    };
+
     init();
   }]);
-

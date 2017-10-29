@@ -49,7 +49,7 @@ exports.update = function(req, res) {
   console.log('hello world');
   console.log(req.body.title+'\n\n\n');
 
-  const id = req.params.studyId;
+  const id = req.params.studyID;
 
   Study.findById(id).exec((err, study) => {
     if (err) {
