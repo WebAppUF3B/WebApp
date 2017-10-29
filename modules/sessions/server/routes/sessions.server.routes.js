@@ -19,6 +19,12 @@ module.exports = function(app) {
     .get(sessions.allSessionsFromStudy);
   app.route('/api/sessions/course/:courseName').get(sessions.getExtraCredit);
 
+  app.route('/api/studySessions/signup/:studyId')
+    .get(sessions.allSessionsForSignup);
+
+  app.route('/api/studySession/signup')
+    .post(sessions.sessionSignup);
+
   /*
     The 'router.param' method allows us to specify middleware we would like to use to handle
     requests with a parameter.

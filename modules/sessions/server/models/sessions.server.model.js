@@ -8,8 +8,13 @@ const sessionSchema = new Schema({
       ref: 'User'
     },
     attended: Boolean,
-    compensationType: String,
-    extraCreditCourse: String,
+    compensationType: {
+      type: String,
+      enum: ['extraCredit', 'monetary', 'none'],
+    },
+    extraCreditCourse: {
+      type: String
+    },
     compensationGiven: Boolean
   }],
   studyID: {
