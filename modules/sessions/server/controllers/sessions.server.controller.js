@@ -248,7 +248,8 @@ const getMinimalSessions = (sessions) => {
       id: session._id,
       date: dateUtils.formatMMDDYYYY(startTime),
       dow: dateUtils.DOWMap(startTime.getDay()),
-      duration: duration
+      duration: duration,
+      startTime: dateUtils.getTimeOfDay(startTime)
     };
     minimalSessions.push(minimalSession);
   });
