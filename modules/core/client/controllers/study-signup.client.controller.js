@@ -82,7 +82,7 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       }
 
       $scope.credentials.sessionId = $scope.currentSession.id;
-      $scope.credentials.userId = $scope.user.id;
+      $scope.credentials.userId = $scope.user._id;
 
       $http.post(window.location.origin + '/api/studySession/signup', $scope.credentials)
         .then(() => {
