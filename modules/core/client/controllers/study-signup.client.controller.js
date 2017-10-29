@@ -87,6 +87,7 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       $http.post(window.location.origin + '/api/studySession/signup', $scope.credentials)
         .then(() => {
           alert(`You are successfully signed up for ${$scope.study.title}!`);
+          $('#studySignupModal').modal('hide');
           $state.go('participant-portal');
         })
         .catch((err) => {
