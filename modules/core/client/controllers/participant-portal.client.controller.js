@@ -11,7 +11,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     $scope.init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
-      
+
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
@@ -28,6 +28,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.allSessions = results.data;
+          console.log($scope.allSessions);
 
           // Populate date and time fields for each sessions
           const today = new Date();

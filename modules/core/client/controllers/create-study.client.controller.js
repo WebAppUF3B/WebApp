@@ -1,9 +1,11 @@
 'use strict';
 
-angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$document',
-  function($scope, $rootScope, $http, $state, $document) {
+angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$document', 'Authentication',
+  function($scope, $rootScope, $http, $state, $document, Authentication) {
     /* Get all the listings, then bind it to the scope */
     console.log($rootScope.getMockUser());
+    $scope.user = Authentication.user;
+    console.log('PV', $scope.user);
 
     $document.ready(() => {
       $scope.request = window.location.pathname;
@@ -51,7 +53,9 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
     $scope.create = function(isValid) {
       //alert('Hello World');
       $scope.error = null;
-
+      $scope.study.researchers = [];
+      $scope.study.researchers.push({ 'userID': $scope.user._id });
+      console.log('PV', $scope.study);
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
@@ -84,7 +88,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       $http.put('/api/studies/'+$scope.pass, $scope.study).success((response) => {
         //alert($scope.study.title+' meow');
         console.log('PV', 'Study Updated!');
-        //$state.go('researcher-portal');
+        $state.go('researcher-portal');
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);

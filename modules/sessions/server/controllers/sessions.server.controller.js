@@ -5,7 +5,7 @@ const mongoose = require('mongoose'),
   Session = mongoose.model('studySession'),
   Study = mongoose.model('Study'),
   nodemailer = require('nodemailer'),
-  dateUtils = require('../../../../utils/dateUtilities'),
+  dateUtils = require('../../../utils/dateUtilities'),
   studies = require('../../../studies/server/controllers/studies.server.controller.js');
 
 /**
