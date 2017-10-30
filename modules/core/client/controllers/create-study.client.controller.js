@@ -88,7 +88,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       $http.put('/api/studies/'+$scope.pass, $scope.study).success((response) => {
         //alert($scope.study.title+' meow');
         console.log('PV', 'Study Updated!');
-        //$state.go('researcher-portal');
+        $state.go('researcher-portal');
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);
