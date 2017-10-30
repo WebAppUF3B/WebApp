@@ -89,8 +89,25 @@ exports.approveUser = function(req, res) {
   User.findById(thisUser.id)
     .then((thisUser) => {
       //if (thisUser.adminApproved = false) {
+      const verificationText = `Hello ${thisUser.firstName} ${thisUser.lastName},
+                                \n\nYour request for ${thisUser.role} privilege has been approved!
+                                \n\nFeel free to log in now`;
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: thisUser.email,
+        subject: 'HCC Research Pool Account Approval',
+        text: verificationText
+      };
       thisUser.adminApproved = true;
       thisUser.save();
+      return transporter.sendMail(mailOptions);
+
     });
 
 
@@ -103,7 +120,6 @@ exports.denyUser = function(req, res) {
   User.findById(thisUser.id)
     .then((thisUser) => {
       //if (thisUser.adminApproved = false) {
-    console.log(thisUser.email);
       const verificationText = `Hello ${thisUser.firstName} ${thisUser.lastName},
                                 \n\nWe regret to inform you that your request for ${thisUser.role} privilege has been denied
                                 \n\nIf you believe this was in error, please contact the administrator`;
