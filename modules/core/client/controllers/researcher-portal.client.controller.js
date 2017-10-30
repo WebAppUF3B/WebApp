@@ -64,10 +64,12 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
             session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             // Place session in correct array
-            if (date >= today) {
-              $scope.upcomingSessions.data.push(session);
-            } else {
-              $scope.pastSessions.data.push(session);
+            if (session.participants.length !== 0) {
+              if (date >= today) {
+                $scope.upcomingSessions.data.push(session);
+              } else {
+                $scope.pastSessions.data.push(session);
+              }
             }
 
             // Populate table with users awaiting compensationType
