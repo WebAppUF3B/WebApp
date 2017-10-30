@@ -420,6 +420,10 @@ table.ng-table tbody td, table.ng-table thead th {
   cursor: pointer;
 }
 
+.selectable:hover{
+  cursor: pointer;
+}
+
 .mini-title{
   font-size: 16px;
   font-weight: bold;
