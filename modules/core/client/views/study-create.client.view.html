@@ -20,33 +20,6 @@
               </div>
             </div>
           </div>
-          <!--
-          <div class="row">
-            <div class="col-sm-6">
-              <div class="form-group" show-errors>
-                <label for="building">Building</label>
-                <div id="building" class="location">
-                  <input type="text" id="building" name="building" class="form-control" ng-model="study.location.building" placeholder="Building" required>
-                  <div ng-messages="userForm.birthday.$error" role="alert">
-                    <p class="help-block error-text" ng-message="required">Birthday is required.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-sm-6">
-              <div class="form-group" show-errors>
-                <label for="room">Room Number</label>
-                <div id="room" class="location">
-                  <input type="text" id="room" name="room" class="form-control" ng-model="study.location.room" placeholder="Room Number" required>
-                  <div ng-messages="userForm.birthday.$error" role="alert">
-                    <p class="help-block error-text" ng-message="required">Birthday is required.</p>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-          </div>
-          -->
           <div class="row">
             <div class="col-sm-12">
               <div class="form-group" show-errors>
@@ -93,7 +66,7 @@
           <div class="row">
             <div class="col-sm-6">
               <div class="form-group" show-errors>
-                <label for="maxParticipants">Participants per session</label>
+                <label for="maxParticipants">Participants in Study</label>
                 <div id="maxParticipants" class="maxParticipants">
                   <input type="number" id="maxParticipants" name="maxParticipants" class="form-control" ng-model="study.maxParticipants" placeholder="Max Study Participants" required>
                   <!--
@@ -115,6 +88,19 @@
                   </div>
                 -->
                 </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group" show-errors>
+                <label for="satisfactory">Satisfactory Threshold</label>
+                <input type="number" id="satisfactory" name="satisfactory" class="form-control" ng-model="study.satisfactoryNumber" placeholder="Minimum Participants to Fulfill Study" required>
+                <!--
+                <div ng-messages="userForm.address.$error" role="alert">
+                  <p class="help-block error-text" ng-message="required">Address is required.</p>
+                </div>
+              -->
               </div>
             </div>
           </div>
