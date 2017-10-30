@@ -1,4 +1,4 @@
-const dateUtils = require('../dateUtilities');
+const dateUtils = require('../../dateUtilities');
 const assert = require('assert');
 
 const mockStartTime = '2017-05-15T08:30:00.000Z';
