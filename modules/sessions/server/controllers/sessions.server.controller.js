@@ -46,18 +46,28 @@ exports.allSessionsFromStudy = function(req, res) {
 
 /* Create a session */
 exports.create = function(req, res) {
-
-  /* Instantiate a session */
-  const session = new Session(req.body);
-
-  /* Then save the session */
-  session.save()
-    .then(() => {
-      res.json(session);
-    })
-    .catch((err) => {
+  console.log(req.body.sessStart);
+  console.log(req.study);
+  //Instantiate a session
+  const session = {
+    studyID: req.study._id,
+    startTime: req.body.sessStart,
+    endTime: req.body.sessEnd,
+    completed: false,
+    researchers: req.study.researchers
+  };
+  console.log('PV', session);
+  const newSession = new Session(session);
+  //Then save the session
+  newSession.save((err) => {
+    if (err) {
+      console.log(err);
       res.status(400).send(err);
-    });
+    } else {
+      res.json(newSession);
+    }
+  });
+
 };
 
 /* Show the current session */

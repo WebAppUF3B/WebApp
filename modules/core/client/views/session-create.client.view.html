@@ -9,7 +9,7 @@
             <div class="col-sm-12">
               <div class="form-group" show-errors>
                 <label for="sessionDate">Session Date</label>
-                <input type="date" id="sessionDate" name="sessionDate" class="form-control" ng-model="study.sessionDate" placeholder = "MM-dd-yyyy" required>
+                <input type="date" id="sessionDate" name="sessionDate" class="form-control" ng-model="session.sessionDate" placeholder = "MM-dd-yyyy" required>
                 <!--
                 <div ng-messages="userForm.firstName.$error" role="alert">
                   <p class="help-block error-text" ng-message="required">First name is required.</p>
@@ -22,7 +22,7 @@
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="startTime">Start Time</label>
-                <input type="time" id="startTime" name="startTime" class="form-control" ng-model="study.startTime" placeholder="12:00 PM" required>
+                <input type="time" id="startTime" name="startTime" class="form-control" ng-model="session.startTime" placeholder="12:00 PM" required>
                 <!--
                 <div ng-messages="userForm.email.$error" role="alert">
                   <p class="help-block error-text" ng-message="required">Email address is required.</p>
@@ -34,8 +34,8 @@
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <div class="form-group" show-errors>
-                  <label for="endTime">Start Time</label>
-                  <input type="time" id="endTime" name="endTime" class="form-control" ng-model="study.endTime" placeholder="12:00 PM" required>
+                  <label for="endTime">End Time</label>
+                  <input type="time" id="endTime" name="endTime" class="form-control" ng-model="session.endTime" placeholder="12:00 PM" required>
                   <!--
                   <div ng-messages="userForm.email.$error" role="alert">
                     <p class="help-block error-text" ng-message="required">Email address is required.</p>
