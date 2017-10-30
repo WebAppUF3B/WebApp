@@ -5,7 +5,7 @@ const mongoose = require('mongoose'),
   Study = mongoose.model('Study');
 
 /**
- * Backend functions for CRUD operations on study collection
+ * Backend functions for CRUD operations on course collection
  */
 
 /* Retreive all the studies */
@@ -46,18 +46,42 @@ exports.get = function(req, res) {
 
 /* Update a study */
 exports.update = function(req, res) {
-  const study = req.study;
+  console.log('hello world');
+  console.log(req.body.title+'\n\n\n');
 
-  /* TODO Replace the study's old properties with the new properties found in req.body */
+  const id = req.params.studyID;
 
-  /* Save the study */
-  study.save((err) => {
+  Study.findById(id).exec((err, study) => {
     if (err) {
       console.log(err);
       res.status(400).send(err);
     } else {
-      res.json(study);
+      console.log('MEOW', study);
+      console.log('MEOW', req.body.title);
+      console.log('MEOW', req.body.location);
+      console.log('MEOW', req.body.irb);
+      console.log('MEOW', req.body.compensationType);
+      console.log('MEOW', req.body.maxParticipants);
+      console.log('MEOW', req.body.maxParticipantsPerSession);
+      console.log('MEOW', req.body.description);
+
+      study.title = req.body.title;
+      study.location = req.body.location;
+      study.irb = req.body.irb;
+      study.compensationType = req.body.compensationType;
+      study.maxParticipants = req.body.maxParticipants;
+      study.maxParticipantsPerSession = req.body.maxParticipantsPerSession;
+      study.description = req.body.description;
+
     }
+    study.save((err) => {
+      if (err) {
+        console.log(err);
+        res.status(400).send(err);
+      } else {
+        res.json(study);
+      }
+    });
   });
 };
 
@@ -140,6 +164,7 @@ exports.modifyCount = function(id, attended) {
   Middleware: find a study by its ID, then pass it to the next request handler.
  */
 exports.studyById = function(req, res, next, id) {
+  console.log('PV', 'StudyById fired');
   Study.findById(id).exec((err, study) => {
     if (err) {
       res.status(400).send(err);

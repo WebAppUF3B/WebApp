@@ -2,7 +2,7 @@
 
 // Setting up route
 angular.module('core').config(['$stateProvider', '$urlRouterProvider',
-  function ($stateProvider, $urlRouterProvider) {
+  function($stateProvider, $urlRouterProvider) {
 
     // Redirect to 404 when route not found
     $urlRouterProvider.otherwise(function ($injector, $location) {
@@ -48,6 +48,14 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
     .state('studies.edit', {
       url: '/edit/:studyId',
       templateUrl: 'modules/core/client/views/study-edit.client.view.html'
+    })
+    .state('sessions', {
+      url: '/sessions/:studyId',
+      templateUrl: 'modules/core/client/views/session-handle.client.view.html'
+    })
+    .state('sessions-create', {
+      url: '/create/:studyId',
+      templateUrl: 'modules/core/client/views/session-create.client.view.html'
     })
     .state('faculty-portal', {
       url: '/faculty',

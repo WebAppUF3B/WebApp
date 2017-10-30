@@ -32,8 +32,8 @@
         <tr ng-click="sessionDetails(session, 'upcoming', $index)" ng-repeat="session in upcomingSessions.data">
           <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
           <td title="'Location'" filter="{ 'studyID.location': 'text'}" sortable="'studyID.location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
-          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
-          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'startTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'startTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
         </tr>
       </table>
     </div>
@@ -46,8 +46,8 @@
         <tr ng-click="sessionDetails(session, 'past', $index)" ng-repeat="session in pastSessions.data">
           <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{session.studyID.title}}</td>
           <td title="'Location'" filter="{ 'studyID.location': 'text'}" sortable="'studyID.location'" ng-attr-title="{{null}}">{{session.studyID.location}}</td>
-          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
-          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'startTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'startTime'" width=90px ng-attr-title="{{null}}">{{session.time}}</td>
         </tr>
       </table>
     </div>
@@ -177,11 +177,14 @@
 
 
           <div class="row pad-top" ng-if="!currentStudy.closed">
-            <div class="col-sm-6">
-              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit({ studyId: currentStudy._id })">Edit Study</a>
+            <div class="col-sm-4">
+              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit({ studyId: currentStudy._id })">Edit</a>
             </div>
-            <div class="col-sm-6">
-              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#closeStudyModal">Close Study</a>
+            <div class="col-sm-4">
+              <a class="btn btn-orange full-width" data-dismiss="modal" ui-sref="sessions({ studyId: currentStudy._id })">Sessions</a>
+            </div>
+            <div class="col-sm-4">
+              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#closeStudyModal">Close</a>
             </div>
           </div>
           <div class="row pad-top" ng-if="currentStudy.closed">
@@ -216,7 +219,7 @@
         </div>
         <div class="row" ng-if="error">
           <div class="col-sm-12">
-            <p class="error text-center">There was a problem closing your study, please contact the admin!</button>
+            <p class="error text-center">There was a problem closing your study, please contact the admin!</p>
           </div>
         </div>
         </div>
@@ -245,7 +248,7 @@
         </div>
         <div class="row" ng-if="error">
           <div class="col-sm-12">
-            <p class="error text-center">There was a problem removing your study, please contact the admin!</button>
+            <p class="error text-center">There was a problem removing your study, please contact the admin!</p>
           </div>
         </div>
         </div>
@@ -443,7 +446,7 @@
         </div>
         <div class="row" ng-if="error">
           <div class="col-sm-12">
-            <p class="error text-center">There was a problem canceling your session, please contact the researcher running your session!</button>
+            <p class="error text-center">There was a problem canceling your session, please contact the researcher running your session!</p>
           </div>
         </div>
         </div>

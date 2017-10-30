@@ -104,8 +104,10 @@ exports.approveUser = function(req, res) {
         subject: 'HCC Research Pool Account Approval',
         text: verificationText
       };
+    
       thisUser.adminApproved = true;
       thisUser.save();
+      res.json(thisUser);
       return transporter.sendMail(mailOptions);
 
     });
@@ -137,8 +139,8 @@ exports.denyUser = function(req, res) {
       };
 
       thisUser.remove();
+      res.json(thisUser);
       return transporter.sendMail(mailOptions);
-
 
     });
 

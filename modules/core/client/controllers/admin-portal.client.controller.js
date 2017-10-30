@@ -2,11 +2,16 @@
 
 angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams',
   function($scope, $http, NgTableParams) {
+
+    let alreadyClicked = false;
+
     const init = () => {
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
+
       $scope.admin.getWaitingUsers()
         .then((results) => {
           $scope.allUsers = results.data;
-          console.log(results.data);
           $scope.approvalTable = new NgTableParams({
             count: 10,
             sorting: {
@@ -26,21 +31,48 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     $scope.approvalDetails = function(user, index) {
       $scope.currentUser = user;
       $scope.currentIndex = index;
-      $scope.error = false;
+      $scope.error = '';
       $('#approvalModal').modal('show');
     };
 
     $scope.approveUser = function() {
-      console.log('Approved!');
-      console.log($scope.currentUser._id);
-      return $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id);
-      //init();
+      if (!alreadyClicked) {
+        $scope.error = '';
+        alreadyClicked = true;
+        console.log('Approved!');
+        $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id)
+          .then(() => {
+            // Reinitialize table
+            init();
+            $('#approvalModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            console.log(err);
+            $scope.error = err;
+            alreadyClicked = false;
+          });
+      }
     };
 
     $scope.denyUser = function() {
-      console.log('DENIED!');
-      console.log($scope.currentUser._id);
-      return $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id);
+      if (!alreadyClicked) {
+        $scope.error = '';
+        alreadyClicked = true;
+        console.log('DENIED!');
+        $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id)
+          .then(() => {
+            // Reinitialize table
+            init();
+            $('#approvalModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            console.log(err);
+            $scope.error = err;
+            alreadyClicked = false;
+          });
+      }
     };
 
     // Declare methods that can be used to access administrative data
@@ -53,25 +85,6 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
           .catch((err) => {
             return err;
           });
-      },
-
-      approve: function(id) {
-        console.log('eyyyyyyyy');
-        return $.ajax({
-          url: window.location.origin + '/api/admin/approval/' + id,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json'
-        });
-      },
-
-      deny: function(id) {
-        return $.ajax({
-          url: window.location.origin + '/api/admin/approval/' + id,
-          type: 'DELETE',
-          contentType: 'application/json',
-          dataType: 'json',
-        });
       }
     };
 

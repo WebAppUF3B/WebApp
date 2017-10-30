@@ -440,6 +440,11 @@ table.ng-table tbody td, table.ng-table thead th {
   max-width: 500px;
 }
 
+.course-modal{
+  margin-top: 170px !important;
+  max-width: 500px;
+}
+
 .modal-header {
   border: none !important;
   padding: 20px;
@@ -631,4 +636,8 @@ hr {
 
 .shrink-col-3 th:nth-child(3){
   width: 200px;
+}
+
+.text-area{
+  min-height: 100px;
 }
