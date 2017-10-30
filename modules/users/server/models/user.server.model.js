@@ -49,7 +49,11 @@ const userSchema = new Schema({
     type: String,
     required: [true, 'Please pick a gender option.'],
   },
-  department: {
+  position: {
+    enum: ['Undergraduate Student', 'Research Assistant', 'Graduate Student', 'Post Doctorate', 'Faculty'],
+    type: String
+  },
+  address: {
     type: String
   },
   email: {
@@ -74,13 +78,15 @@ const userSchema = new Schema({
   salt: {
     type: String
   },
-  roles: {
-    type: [{
-      type: String,
-      enum: ['user', 'researcher', 'faculty', 'admin']
-    }],
-    default: ['user'],
-    required: 'Please provide at least one role'
+  role: {
+    type: String,
+    enum: ['participant', 'researcher', 'faculty', 'admin'],
+    default: 'participant',
+    required: true
+  },
+  adminApproved: {
+    type: Boolean,
+    default: false
   },
   updated: {
     type: Date
@@ -190,4 +196,8 @@ userSchema.statics.generateRandomPassphrase = function () {
   });
 };
 
-mongoose.model('User', userSchema);
+/* Instantiate User model */
+var User = mongoose.model('User', userSchema);
+
+/* Export model */
+module.exports = User;

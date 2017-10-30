@@ -2,6 +2,13 @@
   rules: {
     indent: [2, 2, {"SwitchCase": 1}],
     no-multi-spaces: 2,
+    eqeqeq: ["error", "always"],
+    semi: ["error", "always"],
+    semi-spacing: "error",
+    key-spacing: ["error", { "beforeColon": false, "afterColon": true, "mode": "strict" }],
+    keyword-spacing: ["error", { "after": true, "before": true }],
+    space-before-blocks: "error",
+    space-before-function-paren: ["error", "never"],
     no-underscore-dangle: 0,
     no-unused-expressions: 0,
     no-empty-class: 0,

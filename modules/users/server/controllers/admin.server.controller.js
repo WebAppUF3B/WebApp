@@ -6,6 +6,7 @@
 var path = require('path'),
   mongoose = require('mongoose'),
   User = mongoose.model('User'),
+  nodemailer = require('nodemailer'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 /**
@@ -25,7 +26,7 @@ exports.update = function (req, res) {
   user.firstName = req.body.firstName;
   user.lastName = req.body.lastName;
   user.displayName = user.firstName + ' ' + user.lastName;
-  user.roles = req.body.roles;
+  user.role = req.body.role;
 
   user.save(function (err) {
     if (err) {
@@ -70,17 +71,93 @@ exports.list = function (req, res) {
   });
 };
 
+//*//
+exports.getWaitingUsers = function(req, res) {
+  User.find({ emailValidated: true, adminApproved: false }, '-salt -password')
+    .exec()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((err) => {
+      res.status(400).send();
+    });
+};
+//*//
+exports.approveUser = function(req, res) {
+  const thisUser = req.model;
+
+  User.findById(thisUser.id)
+    .then((thisUser) => {
+      //if (thisUser.adminApproved = false) {
+      const verificationText = `Hello ${thisUser.firstName} ${thisUser.lastName},
+                                \nYour request for ${thisUser.role} privilege has been approved!
+                                \nFeel free to log in now.`;
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: thisUser.email,
+        subject: 'HCC Research Pool Account Approval',
+        text: verificationText
+      };
+
+      thisUser.adminApproved = true;
+      thisUser.save();
+      res.json(thisUser);
+      return transporter.sendMail(mailOptions);
+
+    });
+
+
+};
+
+//*//
+exports.denyUser = function(req, res) {
+  const thisUser = req.model;
+
+  User.findById(thisUser.id)
+    .then((thisUser) => {
+      //if (thisUser.adminApproved = false) {
+      const verificationText = `Hello ${thisUser.firstName} ${thisUser.lastName},
+                                \nWe regret to inform you that your request for ${thisUser.role} privilege has been denied.
+                                \nIf you believe this was in error, please contact the administrator.`;
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: thisUser.email,
+        subject: 'HCC Research Pool Account Denial',
+        text: verificationText
+      };
+
+      thisUser.remove();
+      res.json(thisUser);
+      return transporter.sendMail(mailOptions);
+
+    });
+
+
+};
+
 /**
  * User middleware
  */
-exports.userByID = function (req, res, next, id) {
+exports.userByID = function(req, res, next, id) {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).send({
-      message: 'User is invalid'
+      message: 'User  invalid'
     });
   }
 
-  User.findById(id, '-salt -password').exec(function (err, user) {
+  User.findById(id, '-salt -password').exec(function(err, user) {
     if (err) {
       return next(err);
     } else if (!user) {
@@ -89,5 +166,20 @@ exports.userByID = function (req, res, next, id) {
 
     req.model = user;
     next();
+  });
+};
+
+/* Retreive all the Users */
+exports.getAll = function(req, res) {
+  User.find()
+  .then((results) => {
+    console.log(results);
+    return res.status(200).send({
+      users: results
+    });
+  })
+  .catch((err) => {
+    console.log('get all users error:\n', err);
+    return res.status(err.code).send(err);
   });
 };
