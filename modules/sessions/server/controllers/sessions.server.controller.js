@@ -165,10 +165,19 @@ exports.markCompensated = function(req, res) {
 };
 
 exports.sessionSignup = function(req, res) {
+  const study = req.body.study;
+  const newSession = req.body.newSession;
   const sessionId = mongoose.Types.ObjectId(req.body.sessionId);
-  const userId = mongoose.Types.ObjectId(req.body.userId);
+  const singingUser = req.body.user;
   const compensationType = req.body.compensation;
   const classCode = req.body.classCode;
+
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+  });
+
+  let mailOptionArray = [];
 
   const invalidSessionErr = {
     message: 'There is a problem with this session, please contact an admin.',
@@ -176,25 +185,41 @@ exports.sessionSignup = function(req, res) {
   };
 
   Session.findById(sessionId)
-    .then((session) => {
+    .populate('participants.userID')
+    .populate('researchers.userID')
+    .exec(function(err, session) { // eslint-disable-line
       if (!session) throw invalidSessionErr;
+      if (err) {
+        console.log('exec err', err);
+        throw err;
+      }
       const newParticipant = {
-        userID: userId,
+        userID: mongoose.Types.ObjectId(singingUser._id),
         attended: false,
         compensationType: compensationType,
         extraCreditCourse: classCode,
         compensationGiven: false
       };
+
       session.participants.push(newParticipant);
-      return session.save();
-    })
-    .then((result) => {
-      console.log('tw signed up study', result);
-      res.status(200).send();
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(err.code).send(err);
+
+      const effectedUsers = session.participants.concat(session.researchers);
+      mailOptionArray = generateMailOptionsForSignup(effectedUsers, singingUser, newSession, study.title);
+      session.save()
+        .then(() => {
+          return Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)));
+        })
+        .then(() => {
+          res.status(200).send();
+        })
+        .catch((err) => {
+          console.log('Session Signup Err:\n', err);
+          if (err.code && err.message) {
+            res.status(err.code).send(err.message);
+          } else {
+            res.status(500).send();
+          }
+        });
     });
 };
 
@@ -242,13 +267,13 @@ exports.getExtraCredit = function(req, res) {
   sessions.forEach((session) => {
     // Loop through each participant of each session
     session.participants.forEach((participant) => {
-      if(participant.attended && !users.find((e) => {
-        return e._id == participant.userID._id
-      })){
+      if (participant.attended && !users.find((e) => {
+        return e._id === participant.userID._id;
+      })) {
         users.push({ '_id': participant.userID._id, 'firstName': participant.userID.firstName, 'lastName': participant.userID.lastName, 'email': participant.userID.email });
       }
-    })
-  })
+    });
+  });
 
   /* send back the list of users as json from the request */
   res.json(users);
@@ -296,10 +321,10 @@ exports.sessionsByStudyId = function(req, res, next, id) {
     });
 };
 
-const generateMailOptions = (affectedUsers, cancellor, studyTitle) => {
+const generateMailOptions = (effectedUsers, cancellor, studyTitle) => {
   // Email any other participants involved
   const mailOptionArray = [];
-  affectedUsers.forEach((affectedUser) => {
+  effectedUsers.forEach((affectedUser) => {
     if (affectedUser.userID._id !== cancellor._id) {
       const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
                    \n\nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${studyTitle}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
@@ -308,6 +333,40 @@ const generateMailOptions = (affectedUsers, cancellor, studyTitle) => {
         from: 'no.replyhccresearch@gmail.com',
         to: affectedUser.userID.email,
         subject: 'Research Session Cancellation - ' + cancellor.date,
+        text: emailBody
+      };
+      mailOptionArray.push(mailOptions);
+    }
+  });
+  return mailOptionArray;
+};
+
+const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, studyTitle) => {
+  // Email any other participants involved
+  const mailOptionArray = [];
+
+  const signingUserMsg = `Hello ${signingUser.firstName} ${signingUser.lastName},
+                   \n\nYou have signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime}`;
+
+  const signingUserOptions = {
+    from: 'no.replyhccresearch@gmail.com',
+    to: signingUser.email,
+    subject: `Study Sign up for "${studyTitle}"`,
+    text: signingUserMsg
+  };
+
+  mailOptionArray.push(signingUserOptions);
+
+  effectedUsers.forEach((populatedUser) => {
+    const affectedUser = populatedUser.userID;
+    if (affectedUser !== null && affectedUser.email) {
+      const emailBody = `Hello ${affectedUser.firstName} ${affectedUser.lastName},
+                   \n\n${signingUser.firstName} ${signingUser.lastName} has signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime}`;
+
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: affectedUser.email,
+        subject: `Participant Sign up for "${studyTitle}"`,
         text: emailBody
       };
       mailOptionArray.push(mailOptions);
