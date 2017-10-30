@@ -81,7 +81,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         return false;
       }
 
-      $http.put('/api/studies/'+pass, $scope.study).success((response) => {
+      $http.put('/api/studies/'+$scope.pass, $scope.study).success((response) => {
         //alert($scope.study.title+' meow');
         console.log('PV', 'Study Updated!');
         //$state.go('researcher-portal');

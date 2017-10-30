@@ -8,13 +8,13 @@ module.exports = function (app) {
   app.route('/api/studies/')
     .get(studies.getAll)
     .post(studies.create);
-  app.route('/api/studies/:studyId')
+  app.route('/api/studies/:studyID')
     .get(studies.get)
     .put(studies.update)
     .delete(studies.delete);
-  app.route('/api/studies/user/:userId').get(studies.get);
-  app.route('/api/studies/close/:studyId').put(studies.closeStudy);
-  app.route('/api/studies/remove/:studyId').put(studies.removeStudy);
+  app.route('/api/studies/user/:userID').get(studies.get);
+  app.route('/api/studies/close/:studyID').put(studies.closeStudy);
+  app.route('/api/studies/remove/:studyID').put(studies.removeStudy);
 
   app.route('/api/studies/create').post(studies.create);
 
@@ -22,6 +22,6 @@ module.exports = function (app) {
     The 'router.param' method allows us to specify middleware we would like to use to handle
     requests with a parameter.
    */
-  app.param('studyId', studies.studyById);
-  app.param('userId', studies.studyByUserId);
+  app.param('studyID', studies.studyById);
+  app.param('userID', studies.studyByUserId);
 };

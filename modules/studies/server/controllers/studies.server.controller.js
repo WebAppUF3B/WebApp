@@ -49,7 +49,7 @@ exports.update = function(req, res) {
   console.log('hello world');
   console.log(req.body.title+'\n\n\n');
 
-  const id = req.params.studyId;
+  const id = req.params.studyID;
 
   Study.findById(id).exec((err, study) => {
     if (err) {
@@ -164,6 +164,7 @@ exports.modifyCount = function(id, attended) {
   Middleware: find a study by its ID, then pass it to the next request handler.
  */
 exports.studyById = function(req, res, next, id) {
+  console.log('PV', 'StudyById fired');
   Study.findById(id).exec((err, study) => {
     if (err) {
       res.status(400).send(err);
