@@ -38,12 +38,20 @@ angular.module('users').config(['$stateProvider',
         url: '/signup',
         templateUrl: 'modules/users/client/views/authentication/signup.client.view.html'
       })
+      .state('authentication.faculty-signup', {
+        url: '/signup/faculty',
+        templateUrl: 'modules/users/client/views/authentication/faculty-signup.client.view.html'
+      })
+      .state('authentication.researcher-signup', {
+        url: '/signup/researcher',
+        templateUrl: 'modules/users/client/views/authentication/researcher-signup.client.view.html'
+      })
       .state('authentication.signin', {
         url: '/signin?err',
         templateUrl: 'modules/users/client/views/authentication/signin.client.view.html'
       })
-      .state('authentication.email', {
-        url: '/email',
+      .state('authentication.email-sent', {
+        url: '/email-sent',
         templateUrl: 'modules/users/client/views/authentication/email.client.view.html'
       })
       .state('authentication.verify', {

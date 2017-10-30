@@ -3,6 +3,7 @@
 /**
  * Module dependencies.
  */
+process.env = require('dotenv').config().parsed;
 var _ = require('lodash'),
   chalk = require('chalk'),
   glob = require('glob'),

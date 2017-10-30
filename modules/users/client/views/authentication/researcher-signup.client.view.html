@@ -1,0 +1,74 @@
+<!-- TODO modify the role of the user to "researcher" in the controller and then set "adminApproved" field to false -->
+<div class="container inner-container" ng-controller="AuthenticationController">
+  <h1 class="text-center pad-top"><strong>Create a Researcher Account</strong></h1>
+  <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 moile-no-pad">
+    <!-- TODO replace the form fields below with what we have in balsamiq -->
+    <div class="form-panel">
+      <form name="userForm" ng-submit="researcherSignup(userForm.$valid)" class="signin" novalidate autocomplete="off">
+        <fieldset>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group" show-errors>
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" class="form-control" ng-model="credentials.firstName" placeholder="First Name" required>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group" show-errors>
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" class="form-control" ng-model="credentials.lastName" placeholder="Last Name" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group" show-errors>
+                <div id="postion" class="form-group">
+                  <label>Position</label>
+                  <select name="position" class="form-control" ng-model="credentials.position" required>
+                    <option value="Undergraduate Student">Undergraduate Student</option>
+                    <option value="Research Assistant">Research Assistant</option>
+                    <option value="Graduate Student">Graduate Student</option>
+                    <option value="Post Doctorate">Post Doctorate</option>
+                    <option value="Faculty">Faculty</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group" show-errors>
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-control lowercase" ng-model="credentials.email" placeholder="Email" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group" show-errors>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" class="form-control" ng-model="credentials.password" placeholder="Password" popover="{{popoverMsg}}" popover-trigger="focus" password-validator required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group" show-errors>
+                <label for="confirm">Confirm Password</label>
+                <input type="password" id="confirm" name="confirm" class="form-control" ng-model="credentials.confirm" placeholder="Confirm Password" ng-change="validateConfirmPassword(credentials.confirm)" required>
+              </div>
+            </div>
+          </div>
+          <div class="form-group no-margin">
+            <button type="submit" class="btn btn-primary full-width no-margin small-top-margin">Sign Up</button>
+          </div>
+          <div ng-show="error" class="text-center text-danger small-top-pad">
+            <strong ng-bind="error"></strong>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>

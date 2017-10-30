@@ -1,6 +1,6 @@
 <div class="container inner-container" ng-controller="AuthenticationController">
-  <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 mobile-no-pad">
-    <div class="form-panel padding-top">
+  <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 mobile-no-pad pad-top">
+    <div class="form-panel">
       <form name="userForm" ng-submit="signin(userForm.$valid)" class="signin" novalidate autocomplete="off">
         <fieldset>
           <div class="row">
@@ -25,26 +25,15 @@
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-sm-12">
-          <div class="form-group" show-errors>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username" class="form-control" ng-model="credentials.username" placeholder="Username" lowercase required>
-            <div ng-messages="userForm.username.$error" role="alert">
-              <p class="help-block error-text" ng-message="required">Remove me when done testing.</p>
-            </div>
-          </div>
-          </div>
-        </div>
           <div class="text-center form-group small-top-pad">
             <button type="submit" class="full-width btn btn-primary">Sign In</button>
           </div>
           <div class="text-center forgot-password">
             <a ui-sref="password.forgot">Forgot your password?</a>
           </div>
-          <alert type="danger" ng-show="error" class="text-center text-danger">
-            <span ng-bind="error"></span>
-          </alert>
+          <div ng-show="error" class="text-center text-danger small-top-pad">
+            <strong ng-bind="error"></strong>
+          </div>
         </fieldset>
       </form>
   </div>
