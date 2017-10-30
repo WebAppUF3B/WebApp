@@ -295,7 +295,7 @@ module.exports = function (grunt) {
   grunt.registerTask('test:client', ['env:test', 'karma:unit']);
   grunt.registerTask('test:e2e', ['env:test', 'dropdb', 'server', 'protractor']);
   // Run project coverage
-  grunt.registerTask('coverage', ['env:test', 'mocha_istanbul:coverage', 'karma:unit']);
+  grunt.registerTask('coverage', ['env:test', 'mocha_istanbul:coverage']);
 
   // Run the project in development mode
   grunt.registerTask('default', ['env:dev', 'mkdir:upload', 'copy:localConfig', 'concurrent:default']);
