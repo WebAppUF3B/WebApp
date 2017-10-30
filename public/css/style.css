@@ -637,3 +637,7 @@ hr {
 .shrink-col-3 th:nth-child(3){
   width: 200px;
 }
+
+.text-area{
+  min-height: 100px;
+}
