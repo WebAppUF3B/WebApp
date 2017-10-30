@@ -249,7 +249,7 @@ exports.verify = function(req, res) {
     })
     .then(() => {
       if (thisUser.role === 'participant') {
-        return res.status(200).send('The account is now active and available for login!');
+        res.json(thisUser);
       }
       User.find({ role: 'admin' })
         .then((admins) => {
@@ -272,7 +272,7 @@ exports.verify = function(req, res) {
         })
         .then((results) => {
           console.log('Sent emails to admin', results);
-          return res.status(200).send(`A new ${thisUser.role} account is now awaiting admin approval!`);
+          res.json(thisUser);
         });
     })
     .catch((err) => {

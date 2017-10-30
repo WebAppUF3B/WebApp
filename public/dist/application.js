@@ -118,11 +118,6 @@ angular.element(document).ready(function () {
 'use strict';
 
 // Use Applicaion configuration module to register a new module
-ApplicationConfiguration.registerModule('articles');
-
-'use strict';
-
-// Use Applicaion configuration module to register a new module
 ApplicationConfiguration.registerModule('core');
 ApplicationConfiguration.registerModule('core.admin', ['core']);
 ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
@@ -133,171 +128,6 @@ ApplicationConfiguration.registerModule('core.admin.routes', ['ui.router']);
 ApplicationConfiguration.registerModule('users', ['core']);
 ApplicationConfiguration.registerModule('users.admin', ['core.admin']);
 ApplicationConfiguration.registerModule('users.admin.routes', ['core.admin.routes']);
-
-'use strict';
-
-// Configuring the Articles module
-angular.module('articles').run(['Menus',
-  function (Menus) {
-    // Add the articles dropdown item
-    Menus.addMenuItem('topbar', {
-      title: 'Articles',
-      state: 'articles',
-      type: 'dropdown',
-      roles: ['*']
-    });
-
-    // Add the dropdown list item
-    Menus.addSubMenuItem('topbar', 'articles', {
-      title: 'List Articles',
-      state: 'articles.list'
-    });
-
-    // Add the dropdown create item
-    Menus.addSubMenuItem('topbar', 'articles', {
-      title: 'Create Articles',
-      state: 'articles.create',
-      roles: ['user']
-    });
-  }
-]);
-
-'use strict';
-
-// Setting up route
-angular.module('articles').config(['$stateProvider',
-  function ($stateProvider) {
-    // Articles state routing
-    $stateProvider
-      .state('articles', {
-        abstract: true,
-        url: '/articles',
-        template: '<ui-view/>'
-      })
-      .state('articles.list', {
-        url: '',
-        templateUrl: 'modules/articles/client/views/list-articles.client.view.html'
-      })
-      .state('articles.create', {
-        url: '/create',
-        templateUrl: 'modules/articles/client/views/create-article.client.view.html',
-        data: {
-          roles: ['user', 'admin']
-        }
-      })
-      .state('articles.view', {
-        url: '/:articleId',
-        templateUrl: 'modules/articles/client/views/view-article.client.view.html'
-      })
-      .state('articles.edit', {
-        url: '/:articleId/edit',
-        templateUrl: 'modules/articles/client/views/edit-article.client.view.html',
-        data: {
-          roles: ['user', 'admin']
-        }
-      });
-  }
-]);
-
-'use strict';
-
-// Articles controller
-angular.module('articles').controller('ArticlesController', ['$scope', '$stateParams', '$location', 'Authentication', 'Articles',
-  function ($scope, $stateParams, $location, Authentication, Articles) {
-    $scope.authentication = Authentication;
-
-    // Create new Article
-    $scope.create = function (isValid) {
-      $scope.error = null;
-
-      if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'articleForm');
-
-        return false;
-      }
-
-      // Create new Article object
-      var article = new Articles({
-        title: this.title,
-        content: this.content
-      });
-
-      // Redirect after save
-      article.$save(function (response) {
-        $location.path('articles/' + response._id);
-
-        // Clear form fields
-        $scope.title = '';
-        $scope.content = '';
-      }, function (errorResponse) {
-        $scope.error = errorResponse.data.message;
-      });
-    };
-
-    // Remove existing Article
-    $scope.remove = function (article) {
-      if (article) {
-        article.$remove();
-
-        for (var i in $scope.articles) {
-          if ($scope.articles[i] === article) {
-            $scope.articles.splice(i, 1);
-          }
-        }
-      } else {
-        $scope.article.$remove(function () {
-          $location.path('articles');
-        });
-      }
-    };
-
-    // Update existing Article
-    $scope.update = function (isValid) {
-      $scope.error = null;
-
-      if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'articleForm');
-
-        return false;
-      }
-
-      var article = $scope.article;
-
-      article.$update(function () {
-        $location.path('articles/' + article._id);
-      }, function (errorResponse) {
-        $scope.error = errorResponse.data.message;
-      });
-    };
-
-    // Find a list of Articles
-    $scope.find = function () {
-      $scope.articles = Articles.query();
-    };
-
-    // Find existing Article
-    $scope.findOne = function () {
-      $scope.article = Articles.get({
-        articleId: $stateParams.articleId
-      });
-    };
-  }
-]);
-
-'use strict';
-
-//Articles service used for communicating with the articles REST endpoints
-angular.module('articles').factory('Articles', ['$resource',
-  function ($resource) {
-    return $resource('api/articles/:articleId', {
-      articleId: '@_id'
-    }, {
-      update: {
-        method: 'PUT'
-      }
-    });
-  }
-]);
 
 'use strict';
 
@@ -333,7 +163,7 @@ angular.module('core.admin.routes').config(['$stateProvider',
 
 // Setting up route
 angular.module('core').config(['$stateProvider', '$urlRouterProvider',
-  function ($stateProvider, $urlRouterProvider) {
+  function($stateProvider, $urlRouterProvider) {
 
     // Redirect to 404 when route not found
     $urlRouterProvider.otherwise(function ($injector, $location) {
@@ -384,6 +214,10 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/sessions/:studyId',
       templateUrl: 'modules/core/client/views/session-handle.client.view.html'
     })
+    .state('sessions-create', {
+      url: '/create/:studyId',
+      templateUrl: 'modules/core/client/views/session-create.client.view.html'
+    })
     .state('faculty-portal', {
       url: '/faculty',
       templateUrl: 'modules/core/client/views/faculty-portal.client.view.html'
@@ -432,11 +266,16 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
 
 angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams',
   function($scope, $http, NgTableParams) {
+
+    let alreadyClicked = false;
+
     const init = () => {
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
+
       $scope.admin.getWaitingUsers()
         .then((results) => {
           $scope.allUsers = results.data;
-          console.log(results.data);
           $scope.approvalTable = new NgTableParams({
             count: 10,
             sorting: {
@@ -456,21 +295,48 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     $scope.approvalDetails = function(user, index) {
       $scope.currentUser = user;
       $scope.currentIndex = index;
-      $scope.error = false;
+      $scope.error = '';
       $('#approvalModal').modal('show');
     };
 
     $scope.approveUser = function() {
-      console.log('Approved!');
-      console.log($scope.currentUser._id);
-      return $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id);
-      //init();
+      if (!alreadyClicked) {
+        $scope.error = '';
+        alreadyClicked = true;
+        console.log('Approved!');
+        $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id)
+          .then(() => {
+            // Reinitialize table
+            init();
+            $('#approvalModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            console.log(err);
+            $scope.error = err;
+            alreadyClicked = false;
+          });
+      }
     };
 
     $scope.denyUser = function() {
-      console.log('DENIED!');
-      console.log($scope.currentUser._id);
-      return $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id);
+      if (!alreadyClicked) {
+        $scope.error = '';
+        alreadyClicked = true;
+        console.log('DENIED!');
+        $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id)
+          .then(() => {
+            // Reinitialize table
+            init();
+            $('#approvalModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            console.log(err);
+            $scope.error = err;
+            alreadyClicked = false;
+          });
+      }
     };
 
     // Declare methods that can be used to access administrative data
@@ -483,25 +349,6 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
           .catch((err) => {
             return err;
           });
-      },
-
-      approve: function(id) {
-        console.log('eyyyyyyyy');
-        return $.ajax({
-          url: window.location.origin + '/api/admin/approval/' + id,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json'
-        });
-      },
-
-      deny: function(id) {
-        return $.ajax({
-          url: window.location.origin + '/api/admin/approval/' + id,
-          type: 'DELETE',
-          contentType: 'application/json',
-          dataType: 'json',
-        });
       }
     };
 
@@ -592,7 +439,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         return false;
       }
 
-      $http.put('/api/studies/'+pass, $scope.study).success((response) => {
+      $http.put('/api/studies/'+$scope.pass, $scope.study).success((response) => {
         //alert($scope.study.title+' meow');
         console.log('PV', 'Study Updated!');
         //$state.go('researcher-portal');
@@ -647,7 +494,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
           $scope.extraCredit = new NgTableParams({
             count: 10,
             sorting: {
-              lastName: 'desc'
+              lastName: 'asc'
             }
           }, {
             counts: [], // hides page sizes
@@ -793,12 +640,14 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
 
     // Called after page loads
     $scope.init = function() {
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
+
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
 
-      // TODO Assign user
       $scope.user = Authentication.user;
       console.log($scope.user);
 
@@ -810,12 +659,13 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.allSessions = results.data;
+          console.log($scope.allSessions);
 
           // Populate date and time fields for each sessions
           const today = new Date();
           let date;
           $scope.allSessions.forEach((session) => {
-            date = new Date(session.sessionTime);
+            date = new Date(session.startTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
             session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
@@ -830,7 +680,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           $scope.upcomingSessions = new NgTableParams({
             count: 5,
             sorting: {
-              sessionTime: 'asc'
+              startTime: 'asc'
             }
           }, {
             counts: [], // hides page sizes
@@ -840,7 +690,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           $scope.pastSessions = new NgTableParams({
             count: 5,
             sorting: {
-              sessionTime: 'desc'
+              startTime: 'desc'
             }
           }, {
             counts: [], // hides page sizes
@@ -962,8 +812,8 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
 'use strict';
 
 // TODO consider replacing $http requests with factory
-angular.module('core').controller('ResearcherPortalController', ['$scope','$http','NgTableParams', '$rootScope',
-  function($scope, $http, NgTableParams, $rootScope) {
+angular.module('core').controller('ResearcherPortalController', ['$scope','$http','NgTableParams', '$rootScope', "Authentication",
+  function($scope, $http, NgTableParams, $rootScope, Authentication) {
 
     // Prevent race conditions
     let alreadyClicked = false;
@@ -979,8 +829,8 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.compensation = {};
       $scope.compensation.data = [];
 
-      // TODO Assign user
-      $scope.user = $rootScope.getMockUser();
+      $scope.user = Authentication.user;
+      console.log($scope.user);
 
       $scope.studies.getUserStudies($scope.user._id)
         .then((results) => {
@@ -1020,15 +870,17 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           const today = new Date();
           let date;
           $scope.allSessions.forEach((session) => {
-            date = new Date(session.sessionTime);
+            date = new Date(session.startTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
             session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             // Place session in correct array
-            if (date >= today) {
-              $scope.upcomingSessions.data.push(session);
-            } else {
-              $scope.pastSessions.data.push(session);
+            if (session.participants.length !== 0) {
+              if (date >= today) {
+                $scope.upcomingSessions.data.push(session);
+              } else {
+                $scope.pastSessions.data.push(session);
+              }
             }
 
             // Populate table with users awaiting compensationType
@@ -1045,7 +897,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           $scope.upcomingSessions = new NgTableParams({
             count: 10,
             sorting: {
-              sessionTime: 'asc'
+              startTime: 'asc'
             }
           }, {
             counts: [], // hides page sizes
@@ -1055,7 +907,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           $scope.pastSessions = new NgTableParams({
             count: 10,
             sorting: {
-              sessionTime: 'desc'
+              startTime: 'desc'
             }
           }, {
             counts: [], // hides page sizes
@@ -1378,8 +1230,8 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
   }
 ]);
 
-angular.module('core').controller('SessionController', ['$scope','$http','NgTableParams', '$location',
-  function($scope, $http, NgTableParams, $location) {
+angular.module('core').controller('SessionController', ['$scope','$http','NgTableParams', '$location', '$state',
+  function($scope, $http, NgTableParams, $location, $state) {
     const init = function() {
 
       const url = $location.absUrl().split('/');
@@ -1398,6 +1250,7 @@ angular.module('core').controller('SessionController', ['$scope','$http','NgTabl
         dataset: $scope.studySessions // select data
       });
     };
+
     $scope.getAllSessionsByStudyId = function() {
       $http.get(window.location.origin + '/api/studySessions/' + $scope.studyId)
         .then((results) => {
@@ -1408,6 +1261,7 @@ angular.module('core').controller('SessionController', ['$scope','$http','NgTabl
           console.log(err);
         });
     };
+
     $scope.hoursAndMinutes = function(minutes) {
       const hours = Math.floor(minutes / 60);
       const remainderMins = Math.floor(minutes % 60);
@@ -1421,9 +1275,43 @@ angular.module('core').controller('SessionController', ['$scope','$http','NgTabl
 
       return `${hoursStr}${conjunctionFunction}${minutesStr}`;
     };
+
+    $scope.create = function(isValid) {
+      //alert('Creating Session');
+      //alert($scope.session.sessionDate.getFullYear());
+      $scope.session.sessStart = new Date (
+        $scope.session.sessionDate.getFullYear(),
+        $scope.session.sessionDate.getMonth(),
+        $scope.session.sessionDate.getDate(),
+        $scope.session.startTime.getHours(),
+        $scope.session.startTime.getMinutes()
+      );
+      //alert($scope.session.sessStart);
+      $scope.session.sessEnd = new Date (
+        $scope.session.sessionDate.getFullYear(),
+        $scope.session.sessionDate.getMonth(),
+        $scope.session.sessionDate.getDate(),
+        $scope.session.endTime.getHours(),
+        $scope.session.endTime.getMinutes()
+      );
+      //alert($scope.session.sessEnd);
+
+      $http.post('/api/sessions/create/'+$scope.studyId, $scope.session).success((response) => {
+        //alert(response);
+        // If successful we assign the response to the global user model
+        console.log('PV', 'Session Created!');
+        console.log(response);
+        // And redirect to the previous or home page
+        $state.go('sessions',{ 'studyId': $scope.studyId });
+      }).error((response) => {
+        $scope.error = response.message;
+        alert(response.message);
+      });
+
+    };
+
     init();
   }]);
-
 
 'use strict';
 
@@ -1635,6 +1523,9 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
         .then((results) => {
           $scope.studySessions = results.data.sessions;
           $scope.study = results.data.study;
+
+          if ($scope.study.closed) $state.go('forbidden');
+          
           $scope.study.compensationType.forEach((type) => {
             switch (type) {
               case 'monetary':
@@ -1687,11 +1578,19 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       }
 
       $scope.credentials.sessionId = $scope.currentSession.id;
-      $scope.credentials.userId = $scope.user.id;
+      $scope.credentials.study = $scope.study;
+      $scope.credentials.user = {
+        _id: $scope.user._id,
+        firstName: $scope.user.firstName,
+        lastName: $scope.user.lastName,
+        email: $scope.user.email,
+      };
+      $scope.credentials.newSession = $scope.currentSession;
 
       $http.post(window.location.origin + '/api/studySession/signup', $scope.credentials)
         .then(() => {
           alert(`You are successfully signed up for ${$scope.study.title}!`);
+          $('#studySignupModal').modal('hide');
           $state.go('participant-portal');
         })
         .catch((err) => {
@@ -2578,13 +2477,13 @@ angular.module('users').controller('SettingsController', ['$scope', 'Authenticat
 ]);
 
 'use strict';
-angular.module('users').controller('VerificationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication',
-  function($scope, $state, $http, $location, $window, Authentication) {
+angular.module('users').controller('VerificationController', ['$scope', '$state', '$stateParams', '$http', '$location', '$window', 'Authentication',
+  function($scope, $state, $stateParams, $http, $location, $window, Authentication) {
     const verify = function() {
       $scope.error = false;
       // mark verify field for this user as True (don't know if you need all the vars included above, just copied them from authentication controller)
-      const request = window.location.pathname;
-      const pass = request.slice(23);
+      const pass = $stateParams.userId;
+      console.log(pass);
       $http.post('/api/auth/verify/'+pass, $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
         $scope.user = response;
