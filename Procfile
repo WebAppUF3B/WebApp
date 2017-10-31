@@ -1,2 +1,2 @@
-dev: grunt build && grunt --force
+dev: grunt build --force && grunt --force
 web: ./node_modules/.bin/forever -m 5 server.js
