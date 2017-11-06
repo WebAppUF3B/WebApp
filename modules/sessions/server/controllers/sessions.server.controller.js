@@ -203,8 +203,7 @@ exports.sessionSignup = function(req, res) {
 
       session.participants.push(newParticipant);
 
-      const effectedUsers = session.participants.concat(session.researchers);
-      mailOptionArray = generateMailOptionsForSignup(effectedUsers, singingUser, newSession, study.title);
+      mailOptionArray = generateMailOptionsForSignup(session.researchers, singingUser, newSession, study.title, study.location);
       session.save()
         .then(() => {
           return Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)));
@@ -341,12 +340,12 @@ const generateMailOptions = (effectedUsers, cancellor, studyTitle) => {
   return mailOptionArray;
 };
 
-const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, studyTitle) => {
+const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, studyTitle, studyLocation) => {
   // Email any other participants involved
   const mailOptionArray = [];
 
   const signingUserMsg = `Hello ${signingUser.firstName} ${signingUser.lastName},
-                   \n\nYou have signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime}`;
+                   \nYou have signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime} located at ${studyLocation}.`;
 
   const signingUserOptions = {
     from: 'no.replyhccresearch@gmail.com',
@@ -361,7 +360,7 @@ const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, st
     const affectedUser = populatedUser.userID;
     if (affectedUser !== null && affectedUser.email) {
       const emailBody = `Hello ${affectedUser.firstName} ${affectedUser.lastName},
-                   \n\n${signingUser.firstName} ${signingUser.lastName} has signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime}`;
+                   \n${signingUser.firstName} ${signingUser.lastName} has signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime} located at ${studyLocation}.`;
 
       const mailOptions = {
         from: 'no.replyhccresearch@gmail.com',
