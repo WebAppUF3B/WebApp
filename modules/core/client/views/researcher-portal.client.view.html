@@ -18,7 +18,7 @@
         <tr ng-class="{'study-satisfied' : study.satisfied, 'study-closed' : study.closed}" ng-click="studyDetails(study, $index)" ng-repeat="study in myStudies.data">
           <td title="'Title'" filter="{ 'title': 'text'}" sortable="'title'" class="half-width" ng-attr-title="{{null}}">{{study.title}}</td>
           <td title="'Location'" filter="{ 'location': 'text'}" sortable="'location'" ng-attr-title="{{null}}">{{study.location}}</td>
-          <td title="'Desired #'" sortable="'satisfied'" width=115px ng-attr-title="{{null}}">{{study.currentNumber}}/{{study.satisfactoryNumber}}</td>
+          <td title="'Completed/Desired'" sortable="'satisfied'" width=200px ng-attr-title="{{null}}">{{study.currentNumber}}/{{study.satisfactoryNumber}}</td>
         </tr>
       </table>
     </div>
@@ -169,7 +169,7 @@
               <p class="mini-title">Participants Enrolled: <span class="not-bold"> 	&nbsp;{{currentStudy.enrolledNumber}}</span></p>
             </div>
           </div>
-          <div class="row">
+          <div class="row" ng-if="currentStudy.satisfactoryNumber != 'NA'">
             <div class="col-sm-12">
               <p class="mini-title">Participants Desired: <span class="not-bold"> 	&nbsp;{{currentStudy.satisfactoryNumber}}</span></p>
             </div>

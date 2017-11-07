@@ -26,16 +26,21 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
           // Update satisfied value of each study
           results.data.forEach((study) => {
-            if (!study.removed) {
-              if (study.currentNumber > study.satisfactoryNumber) {
-                study.satisfied = true;
+            if (study.satisfactoryNumber) {
+              if (!study.removed) {
+                if (study.currentNumber > study.satisfactoryNumber) {
+                  study.satisfied = true;
+                }
               }
-              // Initialize enrolled number to 0
-              study.enrolledNumber = 0;
-
-              // Store in array
-              $scope.myStudies.data.push(study);
+            } else {
+              study.satisfactoryNumber ='NA';
             }
+
+            // Initialize enrolled number to 0
+            study.enrolledNumber = 0;
+
+            // Store in array
+            $scope.myStudies.data.push(study);
           });
         })
         .then(() => {
