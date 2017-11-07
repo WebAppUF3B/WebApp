@@ -47,7 +47,7 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
     })
     .state('studies.edit', {
       url: '/edit/:studyId',
-      templateUrl: 'modules/core/client/views/study-edit.client.view.html'
+      templateUrl: 'modules/core/client/views/study-create.client.view.html'
     })
     .state('sessions', {
       url: '/sessions/:studyId',

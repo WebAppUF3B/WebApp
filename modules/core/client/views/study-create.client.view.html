@@ -2,16 +2,16 @@
 <div class="container inner-container" ng-controller='StudyController'>
 
   <!-- TODO Copy the html from one of the other form fields to match style -->
-  <h1 class="text-center pad-top"><strong>Create a Study</strong></h1>
+  <h1 class="text-center pad-top"><strong ng-if="state!=='edit'">Create a Study</strong><strong ng-if="state==='edit'">Edit Study</strong></h1>
   <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 moile-no-pad">
     <div class="form-panel">
-      <form name="studyForm" ng-submit="create(studyForm.$valid)" class="createstudy" novalidate autocomplete="off">
+      <form name="studyForm" ng-submit="submit(studyForm.$valid)" class="createstudy" novalidate autocomplete="off">
         <fieldset>
           <div class="row">
             <div class="col-sm-12">
               <div class="form-group" show-errors>
                 <label for="title">Title</label>
-                <input type="text" id="title" name="title" class="form-control" ng-model="study.title" placeholder="Title of Study" required>
+                <input type="text" id="title" name="title" class="form-control" ng-model="currentStudy.title" placeholder="Title of Study" required>
                 <!--
                 <div ng-messages="userForm.firstName.$error" role="alert">
                   <p class="help-block error-text" ng-message="required">First name is required.</p>
@@ -24,7 +24,7 @@
             <div class="col-sm-12">
               <div class="form-group" show-errors>
                 <label for="address">Location</label>
-                <input type="text" id="address" name="address" class="form-control" ng-model="study.location" placeholder="Room Number or Address" required>
+                <input type="text" id="address" name="address" class="form-control" ng-model="currentStudy.location" placeholder="Room Number or Address" required>
                 <!--
                 <div ng-messages="userForm.address.$error" role="alert">
                   <p class="help-block error-text" ng-message="required">Address is required.</p>
@@ -37,7 +37,7 @@
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="irb">IRB</label>
-                <input type="text" id="irb" name="irb" class="form-control" ng-model="study.irb" placeholder="IRB Number" required>
+                <input type="text" id="irb" name="irb" class="form-control" ng-model="currentStudy.irb" placeholder="IRB Number" required>
                 <!--
                 <div ng-messages="userForm.email.$error" role="alert">
                   <p class="help-block error-text" ng-message="required">Email address is required.</p>
@@ -50,7 +50,7 @@
               <div class="form-group" show-errors>
                 <div id="compensation" class="form-group">
                   <label>Compensation</label>
-                  <select name="compensation" class="form-control" ng-model="study.compensationType" required>
+                  <select name="compensation" class="form-control" ng-model="currentStudy.compensationType" required>
                     <option value="extraCredit">Extra Credit</option>
                     <option value="monetary">Monetary</option>
                   </select>
@@ -68,7 +68,7 @@
               <div class="form-group" show-errors>
                 <label for="maxParticipants">Max Participants for Study</label>
                 <div id="maxParticipants" class="maxParticipants">
-                  <input type="number" id="maxParticipants" name="maxParticipants" class="form-control" ng-model="study.maxParticipants" placeholder="Max Study Participants" required>
+                  <input type="number" id="maxParticipants" name="maxParticipants" class="form-control" ng-model="currentStudy.maxParticipants" placeholder="Max Study Participants" required>
                   <!--
                   <div ng-messages="userForm.birthday.$error" role="alert">
                     <p class="help-block error-text" ng-message="required">Birthday is required.</p>
@@ -81,7 +81,7 @@
               <div class="form-group" show-errors>
                 <label for="maxParticipantsPerSession">Participants per Session</label>
                 <div id="maxParticipantsPerSession" class="ParticipantsPerSession">
-                  <input type="number" id="ParticipantsPerSession" name="ParticipantsPerSession" class="form-control" ng-model="study.participantsPerSession" placeholder="Participants per Session" required>
+                  <input type="number" id="ParticipantsPerSession" name="ParticipantsPerSession" class="form-control" ng-model="currentStudy.participantsPerSession" placeholder="Participants per Session" required>
                   <!--
                   <div ng-messages="userForm.birthday.$error" role="alert">
                     <p class="help-block error-text" ng-message="required">Birthday is required.</p>
@@ -95,13 +95,13 @@
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="satisfactory">Minimum Total Desired</label>
-                <input type="number" id="satisfactory" name="satisfactory" class="form-control" ng-model="study.satisfactoryNumber" placeholder="Minimum Participants Desired" required>
+                <input type="number" id="satisfactory" name="satisfactory" class="form-control" ng-model="currentStudy.satisfactoryNumber" placeholder="Minimum Participants Desired" required>
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="duration">Duration (in minutes)</label>
-                <input type="number" id="duration" name="duration" class="form-control" ng-model="study.duration" placeholder="Length of Study" required>
+                <input type="number" id="duration" name="duration" class="form-control" ng-model="currentStudy.duration" placeholder="Length of Study" required>
               </div>
             </div>
           </div>
@@ -109,7 +109,7 @@
             <div class="col-sm-12">
               <div class="form-group" show-errors>
                 <label for="description">Description</label>
-                <textarea type="text" id="description" name="description" class="form-control text-area" ng-model="study.description" placeholder="Brief Description of Study" required/>
+                <textarea type="text" id="description" name="description" class="form-control text-area" ng-model="currentStudy.description" placeholder="Brief Description of Study" required/>
               </div>
             </div>
           </div>
@@ -120,7 +120,7 @@
             </div>
           </div>
           <div class="form-group no-margin">
-            <button type="submit" class="btn btn-primary full-width no-margin small-top-margin">Create</button>
+            <button type="submit" class="btn btn-primary full-width no-margin small-top-margin"><span ng-if="state!=='edit'">Create</span><span ng-if="state==='edit'">Update</span></button>
           </div>
           <div ng-show="error" class="text-center text-danger">
             <strong ng-bind="error"></strong>
