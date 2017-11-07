@@ -3,7 +3,13 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
     const init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
-      
+
+      $scope.courses.getAll()
+        .then((results) => {
+          // Assign results to upcomingSessions.data
+          $scope.allCourses = results.data;
+        });
+
       const url = $location.absUrl().split('/');
       $scope.studyId = url[url.length -1];
       $scope.studySessions = null;
@@ -106,7 +112,18 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
         });
     };
 
-    $scope.hardCodedClasses = ['CEN3031', 'COP4600', 'EEL3701', 'CIS4930'];
+    // Declare methods that can be used to access course data
+    $scope.courses = {
+      getAll: function() {
+        return $http.get(window.location.origin + '/api/courses/')
+          .then((results) => {
+            return results;
+          })
+          .catch((err) => {
+            return err;
+          });
+      }
+    };
 
     init();
   }]);

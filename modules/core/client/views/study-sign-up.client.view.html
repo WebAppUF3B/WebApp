@@ -88,7 +88,7 @@
                     <div ng-show="credentials.compensation === 'extraCredit'" id="classCode" class="form-group">
                       <label>Select Class Code:</label>
                       <select name="classCode" class="form-control" ng-model="credentials.classCode">
-                        <option ng-repeat="class in hardCodedClasses" value="{{ class }}">{{ class }}</option>
+                        <option ng-repeat="course in allCourses" value="{{course.name}}">{{course.name}}</option>
                       </select>
                     </div>
                   </div>
