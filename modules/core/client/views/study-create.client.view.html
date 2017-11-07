@@ -66,7 +66,7 @@
           <div class="row">
             <div class="col-sm-6">
               <div class="form-group" show-errors>
-                <label for="maxParticipants">Participants in Study</label>
+                <label for="maxParticipants">Max Participants for Study</label>
                 <div id="maxParticipants" class="maxParticipants">
                   <input type="number" id="maxParticipants" name="maxParticipants" class="form-control" ng-model="study.maxParticipants" placeholder="Max Study Participants" required>
                   <!--
@@ -79,9 +79,9 @@
             </div>
             <div class="col-sm-6">
               <div class="form-group" show-errors>
-                <label for="maxParticipantsPerSession">Participants Per Session</label>
-                <div id="maxParticipantsPerSession" class="maxParticipantsPerSession">
-                  <input type="number" id="maxParticipantsPerSession" name="maxParticipantsPerSession" class="form-control" ng-model="study.maxParticipantsPerSession" placeholder="Max Session Participants" required>
+                <label for="maxParticipantsPerSession">Participants per Session</label>
+                <div id="maxParticipantsPerSession" class="ParticipantsPerSession">
+                  <input type="number" id="ParticipantsPerSession" name="ParticipantsPerSession" class="form-control" ng-model="study.participantsPerSession" placeholder="Participants per Session" required>
                   <!--
                   <div ng-messages="userForm.birthday.$error" role="alert">
                     <p class="help-block error-text" ng-message="required">Birthday is required.</p>
@@ -92,15 +92,16 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
               <div class="form-group" show-errors>
-                <label for="satisfactory">Satisfactory Threshold</label>
-                <input type="number" id="satisfactory" name="satisfactory" class="form-control" ng-model="study.satisfactoryNumber" placeholder="Minimum Participants to Fulfill Study" required>
-                <!--
-                <div ng-messages="userForm.address.$error" role="alert">
-                  <p class="help-block error-text" ng-message="required">Address is required.</p>
-                </div>
-              -->
+                <label for="satisfactory">Minimum Total Desired</label>
+                <input type="number" id="satisfactory" name="satisfactory" class="form-control" ng-model="study.satisfactoryNumber" placeholder="Minimum Participants Desired" required>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group" show-errors>
+                <label for="duration">Duration (in minutes)</label>
+                <input type="number" id="duration" name="duration" class="form-control" ng-model="study.duration" placeholder="Length of Study" required>
               </div>
             </div>
           </div>

@@ -25,7 +25,10 @@ const studySchema = new Schema({
   maxParticipants: {
     type: Number
   },
-  maxParticipantsPerSession: {
+  participantsPerSession: {
+    type: Number
+  },
+  duration: {
     type: Number
   },
   satisfactoryNumber: {

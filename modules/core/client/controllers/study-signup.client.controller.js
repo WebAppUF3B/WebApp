@@ -1,7 +1,9 @@
 angular.module('core').controller('StudySignupController', ['$scope','$http','NgTableParams', '$location', '$state', 'Authentication',
   function($scope, $http, NgTableParams, $location, $state, Authentication) {
     const init = function() {
-
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
+      
       const url = $location.absUrl().split('/');
       $scope.studyId = url[url.length -1];
       $scope.studySessions = null;
@@ -32,7 +34,7 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
           $scope.study = results.data.study;
 
           if ($scope.study.closed) $state.go('forbidden');
-          
+
           $scope.study.compensationType.forEach((type) => {
             switch (type) {
               case 'monetary':
@@ -51,20 +53,19 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
           console.log(err);
         });
     };
-    $scope.hoursAndMinutes = function(minutes) {
-      const hours = Math.floor(minutes / 60);
-      const remainderMins = Math.floor(minutes % 60);
-      const hoursUnits = hours === 1 ? 'hour' : 'hours';
-      const hoursStr = hours > 0 ? `${hours} ${hoursUnits}` : '';
-
-      const minutesUnits = remainderMins === 1 ? 'minute' : 'minutes';
-      const minutesStr = remainderMins > 0 ? `${remainderMins} ${minutesUnits}` : '';
-
-      const conjunctionFunction = hoursStr && minutesStr ? ' and ' : '';
-
-      return `${hoursStr}${conjunctionFunction}${minutesStr}`;
-    };
-
+    // $scope.hoursAndMinutes = function(minutes) {
+    //   const hours = Math.floor(minutes / 60);
+    //   const remainderMins = Math.floor(minutes % 60);
+    //   const hoursUnits = hours === 1 ? 'hour' : 'hours';
+    //   const hoursStr = hours > 0 ? `${hours} ${hoursUnits}` : '';
+    //
+    //   const minutesUnits = remainderMins === 1 ? 'minute' : 'minutes';
+    //   const minutesStr = remainderMins > 0 ? `${remainderMins} ${minutesUnits}` : '';
+    //
+    //   const conjunctionFunction = hoursStr && minutesStr ? ' and ' : '';
+    //
+    //   return `${hoursStr}${conjunctionFunction}${minutesStr}`;
+    // };
 
     $scope.studySignupModal = function(session, index) {
       $scope.currentSession = session;
