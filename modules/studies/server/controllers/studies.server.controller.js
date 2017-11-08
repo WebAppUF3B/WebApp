@@ -46,7 +46,7 @@ exports.get = function(req, res) {
 
 /* Update a study */
 exports.update = function(req, res) {
-  let study = req.study;
+  const study = req.study;
   study.title = req.body.title;
   study.location = req.body.location;
   study.irb = req.body.irb;
@@ -107,7 +107,7 @@ exports.delete = function(req, res) {
     } else {
       res.end();
     }
-  })
+  });
 };
 
 // Close a study (no longer accept sign ups, cancel all sessions, and gray out in researcher table)
@@ -150,24 +150,23 @@ exports.modifyCount = function(id, attended) {
   Study.findById(id).exec((err, study) => {
     if (err) {
       return err;
-    } else {
-      if (attended) {
-        study.currentNumber ++;
-      } else {
-        study.currentNumber --;
-      }
-
-      // Update study
-      study.save()
-        .then(() => {
-          // Return
-          return;
-        })
-        .catch((err) => {
-          console.log(err);
-          return err;
-        });
     }
+    if (attended) {
+      study.currentNumber = study.currentNumber + 1;
+    } else {
+      study.currentNumber = study.currentNumber - 1;
+    }
+
+    // Update study
+    study.save()
+      .then(() => {
+        // Return
+        return;
+      })
+      .catch((err) => {
+        console.log(err);
+        return err;
+      });
   });
 };
 

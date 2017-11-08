@@ -125,7 +125,7 @@ exports.changeAttendance = function(req, res) {
   const change = req.body;
 
   session.participants.forEach((participant) => {
-    if (participant.userID._id === change.userID) {
+    if (String(participant.userID._id) === change.userID) {
       participant.attended = change.attended;
       studies.modifyCount(session.studyID._id, change.attended);
     }
