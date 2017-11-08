@@ -16,7 +16,8 @@ const mongoose = require('mongoose'),
 exports.getAll = function(req, res) {
   Session.find()
     .populate('studyID')
-    .populate('researchers.userID')
+    .populate('participants.userID', '-salt -password')
+    .populate('researchers.userID', '-salt -password')
     .exec()
     .then((sessions) => {
       res.json(sessions);
@@ -185,8 +186,8 @@ exports.sessionSignup = function(req, res) {
   };
 
   Session.findById(sessionId)
-    .populate('participants.userID')
-    .populate('researchers.userID')
+    .populate('participants.userID', '-salt -password')
+    .populate('researchers.userID', '-salt -password')
     .exec(function(err, session) { // eslint-disable-line
       if (!session) throw invalidSessionErr;
       if (err) {
@@ -229,8 +230,8 @@ exports.sessionSignup = function(req, res) {
 exports.sessionById = function(req, res, next, id) {
   Session.findById(id)
     .populate('studyID')
-    .populate('researchers.userID')
-    .populate('participants.userID')
+    .populate('researchers.userID', '-salt -password')
+    .populate('participants.userID', '-salt -password')
     .exec()
     .then((session) => {
       req.studySession = session;
@@ -245,8 +246,8 @@ exports.sessionsByUserId = function(req, res, next, id) {
   console.log(id);
   Session.find({ $or: [ { 'participants.userID': id }, { 'researchers.userID': id } ] })
     .populate('studyID')
-    .populate('researchers.userID')
-    .populate('participants.userID')
+    .populate('researchers.userID', '-salt -password')
+    .populate('participants.userID', '-salt -password')
     .exec()
     .then((sessions) => {
       req.studySession = sessions;
@@ -281,7 +282,7 @@ exports.getExtraCredit = function(req, res) {
 
 exports.extraCreditByCourse = function(req, res, next, name) {
   Session.find({ 'participants.extraCreditCourse': name })
-    .populate('participants.userID')
+    .populate('participants.userID', '-salt -password')
     .exec()
     .then((sessions) => {
       req.studySession = sessions;

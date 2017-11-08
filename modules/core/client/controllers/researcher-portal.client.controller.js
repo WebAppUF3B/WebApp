@@ -159,9 +159,9 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
     };
 
     // Close closeStudy modal
-    $scope.removeStudyClose = function() {
+    $scope.reopenStudyClose = function() {
       if (!alreadyClicked) {
-        $('#removeStudyModal').modal('hide');
+        $('#reopenStudyModal').modal('hide');
       }
     };
 
@@ -185,15 +185,15 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       }
     };
 
-    // Remove study in backend
-    $scope.confirmRemoveStudy = function() {
+    // Reopen study in backend
+    $scope.confirmReopenStudy = function() {
       if (!alreadyClicked) {
         alreadyClicked = true;
-        $scope.studies.remove($scope.currentStudy._id)
+        $scope.studies.reopen($scope.currentStudy._id)
           .then(() => {
             // Refetch sessions
             $scope.init();
-            $('#removeStudyModal').modal('hide');
+            $('#reopenStudyModal').modal('hide');
             alreadyClicked = false;
           })
           .catch((err) => {
@@ -406,9 +406,9 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         });
       },
 
-      remove: function(id) {
+      reopen: function(id) {
         return $.ajax({
-          url: window.location.origin + '/api/studies/remove/' + id,
+          url: window.location.origin + '/api/studies/reopen/' + id,
           type: 'PUT'
         });
       }
