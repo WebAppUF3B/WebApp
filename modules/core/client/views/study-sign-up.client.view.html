@@ -9,100 +9,101 @@
   <div class="row">
     <div class="col-sm-10 col-sm-offset-1">
       <h2 class="text-center">Available Sessions</h2>
-      <table ng-table="myStudySessions" class="table table-hover entries-selectable hide-col-2-phone hide-col-3-phone" show-filter="false">
+      <table ng-table="myStudySessions" class="table table-hover entries-selectable hide-col-1-phone hide-col-4-phone" show-filter="false">
         <tr ng-click="studySignupModal(session, $index)" ng-repeat="session in studySessions">
-          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" width=100px ng-attr-title="{{null}}">{{session.date}}</td>
-          <td title="'Day of the Week'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.dow}}</td>
-          <td title="'Starting Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{session.startTime}}</td>
-          <td title="'Duration'" filter="{ 'duration': 'text'}" sortable="'sessionTime'" width=90px ng-attr-title="{{null}}">{{hoursAndMinutes(session.duration)}}</td>
+          <td title="'Day of the Week'" filter="{ 'time': 'text'}" sortable="'sessionTime'" ng-attr-title="{{null}}">{{session.dow}}</td>
+          <td title="'Date'" filter="{ 'date': 'text'}" sortable="'sessionTime'" ng-attr-title="{{null}}">{{session.date}}</td>
+          <td title="'Time'" filter="{ 'time': 'text'}" sortable="'sessionTime'" ng-attr-title="{{null}}">{{session.startTime}}</td>
+          <td title="'Duration'" filter="{ 'duration': 'text'}" sortable="'sessionTime'" ng-attr-title="{{null}}">{{study.duration}} minutes</td>
         </tr>
       </table>
     </div>
   </div>
+
   <!--Signup Modal-->
   <div id="studySignupModal" class="modal" role="dialog">
-    <div class="small-modal">
+    <div class="modal-dialog session-modal">
       <!-- Modal content-->
       <div class="modal-content">
-        <div class="row">
-          <div class="col-sm-12 text-center">
-            <h3 class="no-margin"><strong>{{ study.title }}</strong></h3>
+        <div class="modal-header">
+          <div class="row">
+            <div class="col-xs-8 col-xs-offset-2 text-center">
+              <h3 class="no-margin"><strong>{{study.title}}</strong></h3>
+            </div>
+            <div class="col-xs-2">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-sm-12">
-            <h4 class="underline">Details</h4>
+        <div class="pane">
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Details</h4>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12">
-            <p class="mini-title">Date: <span class="not-bold"> &nbsp;{{currentSession.date}}</span></p>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Day of the Week:</p>
+              <p>{{currentSession.dow}}</p>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12">
-            <p class="mini-title">Day of Week: <span class="not-bold"> &nbsp;{{currentSession.dow}}</span></p>
+          <div class="row">
+            <div class="col-sm-6">
+              <p class="mini-title">Date:</p>
+              <p>{{currentSession.date}}</p>
+            </div>
+            <div class="col-sm-6">
+              <p class="mini-title">Time:</p>
+              <p>{{currentSession.startTime}}</p>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12">
-            <p class="mini-title">Starting Time: <span class="not-bold"> &nbsp;{{currentSession.startTime}}</span></p>
+          <div class="row">
+            <div class="col-sm-6">
+              <p class="mini-title">Location:</p>
+              <p>{{study.location}}</p>
+            </div>
+            <div class="col-sm-6">
+              <p class="mini-title">Duration:</p>
+              <p>{{study.duration}} minutes</p>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12">
-            <p class="mini-title">Duration: <span class="not-bold"> &nbsp;{{hoursAndMinutes(currentSession.duration)}}</span></p>
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Compensation</h4>
+            </div>
           </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12">
-            <p class="mini-title">Location: <span class="not-bold"> &nbsp;{{study.location}}</span></p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12">
-            <h4 class="underline">Compensation Form</h4>
-          </div>
-        </div>
-        <div>
-          <form name="sessionForm" ng-submit="studySignup(sessionForm.$valid)" class="signin" novalidate>
-            <fieldset>
-              <div class="row col-sm-12">
-                <div class="form-group" show-errors>
-                  <div id="compensation" class="form-group">
-                    <label>Select Compensation Type:</label>
-                    <select name="compensation" class="form-control" ng-model="credentials.compensation" required>
-                      <option ng-show="hasExtraCredit" value="extraCredit">Extra Credit</option>
-                      <option ng-show="hasMonetary" value="monetary">Monetary</option>
-                      <option value="none">None</option>
-                    </select>
-                  </div>
-                  <div ng-show="credentials.compensation === 'extraCredit'" id="classCode" class="form-group">
-                    <label>Select Class Code:</label>
-                    <select name="classCode" class="form-control" ng-model="credentials.classCode">
-                      <option ng-repeat="class in hardCodedClasses" value="{{ class }}">{{ class }}</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col-sm-4 col-sm-offset-1">
-                  <button class="btn btn-primary full-width" ng-click="confirmCloseStudy()">Sign up</button>
-                </div>
-                <div class="col-sm-4 col-sm-offset-1">
-                  <button class="btn btn-red full-width" ng-click="closeStudyClose()">Cancel</button>
-                </div>
-              </div>
-              <div class="row" ng-if="error">
+          <div class="row">
+            <form name="sessionForm" ng-submit="studySignup(sessionForm.$valid)" class="signin" novalidate>
+              <fieldset>
                 <div class="col-sm-12">
+                  <div class="form-group" show-errors>
+                    <div id="compensation" class="form-group">
+                      <label>Select Compensation Type:</label>
+                      <select name="compensation" class="form-control full-width" ng-model="credentials.compensation" required>
+                        <option value="">None</option>
+                        <option ng-show="hasExtraCredit" value="extraCredit">Extra Credit</option>
+                        <option ng-show="hasMonetary" value="monetary">Monetary</option>
+                      </select>
+                    </div>
+                    <div ng-show="credentials.compensation === 'extraCredit'" id="classCode" class="form-group">
+                      <label>Select Class Code:</label>
+                      <select name="classCode" class="form-control" ng-model="credentials.classCode">
+                        <option ng-repeat="course in allCourses" value="{{course.name}}">{{course.name}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6 col-sm-offset-3 pad-top">
+                  <button class="btn btn-primary full-width">Sign up</button>
+                </div>
+                <div class="col-sm-12" ng-if="error">
                   <p class="error text-center">{{ error }}</p>
                 </div>
-              </div>
-            </fieldset>
-          </form>
+              </fieldset>
+            </form>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
-

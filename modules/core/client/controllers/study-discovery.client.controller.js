@@ -1,8 +1,8 @@
 'use strict';
 
 // TODO consider replacing $http requests with factory
-angular.module('core').controller('StudyDiscoveryController', ['$scope','$http','NgTableParams', '$rootScope',
-  function($scope, $http, NgTableParams, $rootScope) {
+angular.module('core').controller('StudyDiscoveryController', ['$scope','$http','NgTableParams', '$rootScope', 'Authentication',
+  function($scope, $http, NgTableParams, $rootScope, Authentication) {
 
     // Prevent race conditions
     const alreadyClicked = false;
@@ -15,8 +15,7 @@ angular.module('core').controller('StudyDiscoveryController', ['$scope','$http',
       $scope.allStudies = [];
       $scope.filters = {};
 
-      // TODO Assign user
-      $scope.user = $rootScope.getMockUser();
+      $scope.user = Authentication.user;
 
       // TODO filter these based on study criteria and use profile
       $scope.studies.getAll()

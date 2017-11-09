@@ -4,13 +4,23 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
   function($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
-      // Get an eventual error defined in the URL query string:
+    // Get an eventual error defined in the URL query string:
     $scope.error = $location.search().err;
 
-    // If user is signed in then redirect back home
-    if ($scope.authentication.user) {
-      $location.path('/');
+    function init() {
+      if ($scope.authentication.user) {
+        if ($scope.authentication.user.role === 'participant') {
+          $state.go('participant-portal');
+        } else if ($scope.authentication.user. role === 'researcher') {
+          $state.go('researcher-portal');
+        } else if ($scope.authentication.user. role === 'faculty') {
+          $state.go('faculty-portal');
+        } else if ($scope.authentication.user. role === 'admin') {
+          $state.go('admin-portal');
+        }
+      }
     }
+    init();
 
     $scope.signup = function(isValid) {
       $scope.error = null;
@@ -82,6 +92,8 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
         return false;
       }
+
+      $scope.credentials.email = $scope.credentials.email.toLowerCase();
 
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
         localStorage.setItem('user', JSON.stringify(response));

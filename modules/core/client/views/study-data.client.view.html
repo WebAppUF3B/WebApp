@@ -1,0 +1,225 @@
+<div class="container inner-container" ng-controller="StudyDataController">
+    <div class="row">
+        <div class="col-sm-12">
+            <h1 class="phone-center"><strong>Data for "{{study.title}}"</strong></h1>
+        </div>
+    </div>
+    <div class="row">
+      <div class="text-center">
+        <h2>Participant Demographics</h2>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-10 col-sm-offset-1" ng-if="calculating">
+        <div class='stats-table'>
+          <p class="text-center">Calculating...</p>
+        </div>
+      </div>
+      <div class="col-sm-10 col-sm-offset-1" ng-if="stats.display && !calculating">
+        <div class='stats-table'>
+          <div class="row force-fit">
+            <div class="col-sm-4 expand border-right">
+              <div class="row">
+                <div class="col-sm-12 small-top-pad">
+                  <h4 class="underline text-center">Totals</h4>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Total participants: <span class="not-bold">{{stats.total}}</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title no-margin-bottom">Number of completed: <span class="not-bold">{{stats.completed}}</span></p>
+                  <p class="note">This number is factored in as the total for the other calculations</p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12 small-bottom-pad">
+                  <p class="mini-title">Number of enrolled: <span class="not-bold">{{stats.enrolled}}</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 expand border-right">
+              <div class="row">
+                <div class="col-sm-12 small-top-pad">
+                  <h4 class="underline text-center">Age</h4>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Min age: <span class="not-bold">{{stats.ageMin}}</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Max age: <span class="not-bold">{{stats.ageMax}}</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Mean age: <span class="not-bold">{{stats.ageMean}}</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12 small-bottom-pad">
+                  <p class="mini-title">Age standard deviation: <span class="not-bold">{{stats.ageStd}}</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4 expand">
+              <div class="row">
+                <div class="col-sm-12 small-top-pad">
+                  <h4 class="underline text-center">Gender</h4>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Number of males: <span class="not-bold">{{stats.maleCount}}</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Number of females: <span class="not-bold">{{stats.femaleCount}}</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Number of other: <span class="not-bold">{{stats.otherCount}}</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Percentage of males: <span class="not-bold">{{stats.malePercentage}}%</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Percentage of females: <span class="not-bold">{{stats.femalePercentage}}%</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12 small-bottom-pad">
+                  <p class="mini-title">Percentage of other: <span class="not-bold">{{stats.otherPercentage}}%</span></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-10 col-sm-offset-1" ng-if="!stats.display && !calculating">
+        <div class='stats-table'>
+          <p class='error text-center small-top-pad'>Statistics will display here once at least one participant has completed this study.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-10 col-sm-offset-1">
+        <h2 class="text-center">Sessions</h2>
+      </div>
+    </div>
+    <div class="row small-top-pad small-bottom-pad">
+      <div class="col-sm-1 col-sm-offset-4">
+          <h4>Filter:</h4>
+      </div>
+      <div class="col-sm-3">
+        <select name="filter" class="form-control" ng-model="filters.completed" ng-change="refreshTable()" required>
+          <option value="">None</option>
+          <option value="true">Completed</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-10 col-sm-offset-1">
+        <table ng-table="myStudySessions" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
+          <tr ng-click="sessionDetails(session)" ng-repeat="session in myStudySessions.data">
+            <td title="'Date'" filter="{ 'date': 'text'}" sortable="'startTime'" ng-attr-title="{{null}}">{{session.date}}</td>
+            <td title="'Time'" filter="{ 'time': 'text'}" sortable="'startTime'" ng-attr-title="{{null}}">{{session.time}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal" role="dialog">
+      <div class="modal-dialog session-modal">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="row">
+              <div class="col-xs-8 col-xs-offset-2 text-center">
+                <h3 class="no-margin"><strong>Session Details</strong></h3>
+              </div>
+              <div class="col-xs-2">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+            </div>
+          </div>
+          <div class="pane">
+            <!-- Session Area -->
+            <div class="row">
+              <div class="col-sm-12">
+                <h4 class="underline">Session</h4>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-6">
+                <p class="mini-title">Location:</p>
+                <p>{{study.location}}</p>
+              </div>
+              <div class="col-xs-6">
+                <p class="mini-title">Duration:</p>
+                <p>{{study.duration}} minutes</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-6">
+                <p class="mini-title">Date:</p>
+                <p>{{currentSession.date}}</p>
+              </div>
+              <div class="col-xs-6">
+                <p class="mini-title">Time:</p>
+                <p>{{currentSession.time}}</p>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Participant Area -->
+            <div class="row">
+              <div class="col-sm-12">
+                <h4 class="underline">Participants</h4>
+              </div>
+            </div>
+            <div class="row" ng-repeat="participant in currentSession.participants">
+              <div class="col-sm-6">
+                <p class="mini-title">Name:</p>
+                <p>{{participant.userID.firstName}} {{participant.userID.lastName}}</p>
+              </div>
+              <div class="col-sm-6">
+                <p class="mini-title">Email:</p>
+                <p><a href="mailto:{{participant.userID.email}}" target="_blank">{{participant.userID.email}}</a></p>
+              </div>
+              <div class="col-sm-6">
+                <p class="mini-title">Age:</p>
+                <p>{{participant.age}}</p>
+              </div>
+              <div class="col-sm-6">
+                <p class="mini-title">Gender:</p>
+                <p>{{toTitleCase(participant.userID.gender)}}</p>
+              </div>
+              <div class="col-sm-12">
+                <hr class="most-width small-bottom-pad" ng-class="{'hidden':$last}">
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Detail Modal -->
+
+</div>

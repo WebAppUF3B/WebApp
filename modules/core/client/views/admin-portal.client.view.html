@@ -30,7 +30,7 @@
         <tr ng-click="approvalDetails(user, $index)" ng-repeat="user in approvalTable.data">
           <td title="'Name'" filter="{ 'lastName': 'text'}" sortable="'lastName'" ng-attr-title="{{null}}">{{user.firstName}} {{user.lastName}}</td>
           <td title="'Email'" filter="{ 'email': 'text'}" sortable="'email'" ng-attr-title="{{null}}">{{user.email}}</td>
-          <td title="'Role'" filter="{ 'role': 'text'}" sortable="'role'" ng-attr-title="{{null}}">{{user.role}}</td>
+          <td title="'Role'" filter="{ 'role': 'text'}" sortable="'role'" ng-attr-title="{{null}}">{{toTitleCase(user.role)}}</td>
         </tr>
       </table>
     </div>
