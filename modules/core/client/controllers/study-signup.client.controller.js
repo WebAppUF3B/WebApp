@@ -34,7 +34,8 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       });
     };
     $scope.getAllSessionsByStudyId = function() {
-      $http.get(window.location.origin + '/api/studySessions/signup/' + $scope.studyId)
+      console.log($scope.user._id);
+      $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`)
         .then((results) => {
           $scope.studySessions = results.data.sessions;
           $scope.study = results.data.study;
