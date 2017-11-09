@@ -19,12 +19,13 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
       $scope.stats.ageMean = 0;
       $scope.stats.ageMin = 100000;
       $scope.stats.ageMax = -1;
+      $scope.stats.completed = 0;
+      $scope.stats.enrolled = 0;
 
       $scope.getAllSessionsByStudyId()
         .then((results) => {
           $scope.studySessions = results.data.sessions;
           $scope.study = results.data.study;
-          $scope.stats.total = $scope.study.currentNumber;
 
           // Parse date and mark as completed
           $scope.studySessions.forEach((session) => {
@@ -42,6 +43,7 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
               if (participant.attended) {
                 session.completed = true;
                 $scope.stats.display = true;
+                $scope.stats.completed ++;
 
                 // Update age mean
                 $scope.stats.ageMean += participant.age;
@@ -65,18 +67,20 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
                 } else {
                   $scope.stats.otherCount ++;
                 }
+              } else {
+                $scope.stats.enrolled ++;
               }
             });
           });
 
           // Finish calculating stats
-          $scope.stats.ageMean = $scope.stats.ageMean / $scope.stats.total;
-          $scope.stats.ageRange = $scope.stats.ageMax - $scope.stats.ageMin;
-          $scope.stats.malePercentage = $scope.stats.maleCount / $scope.stats.total * 100;
-          $scope.stats.femalePercentage = $scope.stats.femaleCount / $scope.stats.total * 100;
-          $scope.stats.otherPercentage = $scope.stats.otherCount / $scope.stats.total * 100;
+          $scope.stats.ageMean = $scope.stats.ageMean / $scope.stats.completed;
+          $scope.stats.malePercentage = $scope.stats.maleCount / $scope.stats.completed * 100;
+          $scope.stats.femalePercentage = $scope.stats.femaleCount / $scope.stats.completed * 100;
+          $scope.stats.otherPercentage = $scope.stats.otherCount / $scope.stats.completed * 100;
+          $scope.stats.total = $scope.stats.completed + $scope.stats.enrolled;
 
-          if ($scope.stats.total > 1) {
+          if ($scope.stats.completed > 1) {
             // Calculate standard deviation
             const squareDiffs = $scope.ages.map((value) => {
               const diff = value - $scope.stats.ageMean;
@@ -89,16 +93,16 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
               temp += value;
             });
 
-            $scope.stats.ageStd = Math.sqrt(temp / ($scope.stats.total - 1));
-            $scope.stats.ageStd = $scope.stats.ageStd.toFixed(4);
+            $scope.stats.ageStd = Math.sqrt(temp / ($scope.stats.completed - 1));
+            $scope.stats.ageStd = $scope.stats.ageStd.toFixed(2);
           } else {
             $scope.stats.ageStd = 'NA';
           }
 
-          $scope.stats.ageMean = $scope.stats.ageMean.toFixed(4);
-          $scope.stats.malePercentage = $scope.stats.malePercentage.toFixed(4);
-          $scope.stats.femalePercentage = $scope.stats.femalePercentage.toFixed(4);
-          $scope.stats.otherPercentage = $scope.stats.otherPercentage.toFixed(4);
+          $scope.stats.ageMean = $scope.stats.ageMean.toFixed(2);
+          $scope.stats.malePercentage = $scope.stats.malePercentage.toFixed(2);
+          $scope.stats.femalePercentage = $scope.stats.femalePercentage.toFixed(2);
+          $scope.stats.otherPercentage = $scope.stats.otherPercentage.toFixed(2);
           $scope.calculating = false;
 
           $scope.myStudySessions = new NgTableParams({

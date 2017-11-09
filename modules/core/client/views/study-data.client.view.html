@@ -6,7 +6,7 @@
     </div>
     <div class="row">
       <div class="text-center">
-        <h2>Statistics</h2>
+        <h2>Participant Demographics</h2>
       </div>
     </div>
     <div class="row">
@@ -21,12 +21,23 @@
             <div class="col-sm-4 expand border-right">
               <div class="row">
                 <div class="col-sm-12 small-top-pad">
-                  <h4 class="underline text-center">Total</h4>
+                  <h4 class="underline text-center">Totals</h4>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title">Total participants: <span class="not-bold">{{stats.total}}</span></p>
+                </div>
+              </div>
+              <div class="row small-top-pad">
+                <div class="col-sm-12">
+                  <p class="mini-title no-margin-bottom">Number of completed: <span class="not-bold">{{stats.completed}}</span></p>
+                  <p class="note">This number is factored in as the total for the other calculations</p>
                 </div>
               </div>
               <div class="row small-top-pad">
                 <div class="col-sm-12 small-bottom-pad">
-                  <p class="mini-title">Number of participants: <span class="not-bold">{{stats.total}}</span></p>
+                  <p class="mini-title">Number of enrolled: <span class="not-bold">{{stats.enrolled}}</span></p>
                 </div>
               </div>
             </div>
@@ -44,11 +55,6 @@
               <div class="row small-top-pad">
                 <div class="col-sm-12">
                   <p class="mini-title">Max age: <span class="not-bold">{{stats.ageMax}}</span></p>
-                </div>
-              </div>
-              <div class="row small-top-pad">
-                <div class="col-sm-12">
-                  <p class="mini-title">Age range: <span class="not-bold">{{stats.ageRange}}</span></p>
                 </div>
               </div>
               <div class="row small-top-pad">
@@ -153,37 +159,6 @@
             </div>
           </div>
           <div class="pane">
-
-            <!-- Participant Area -->
-            <div class="row">
-              <div class="col-sm-12">
-                <h4 class="underline">Participants</h4>
-              </div>
-            </div>
-            <div class="row" ng-repeat="participant in currentSession.participants">
-              <div class="col-sm-6">
-                <p class="mini-title">Name:</p>
-                <p>{{participant.userID.firstName}} {{participant.userID.lastName}}</p>
-              </div>
-              <div class="col-sm-6">
-                <p class="mini-title">Email:</p>
-                <p><a href="mailto:{{participant.userID.email}}" target="_blank">{{participant.userID.email}}</a></p>
-              </div>
-              <div class="col-sm-6">
-                <p class="mini-title">Age:</p>
-                <p>{{participant.age}}</p>
-              </div>
-              <div class="col-sm-6">
-                <p class="mini-title">Gender:</p>
-                <p>{{toTitleCase(participant.userID.gender)}}</p>
-              </div>
-              <div class="col-sm-12">
-                <hr class="most-width small-bottom-pad" ng-class="{'hidden':$last}">
-              </div>
-            </div>
-
-            <hr>
-            
             <!-- Session Area -->
             <div class="row">
               <div class="col-sm-12">
@@ -211,9 +186,33 @@
               </div>
             </div>
 
-            <div class="row pad-top" ng-if="currentTable=='upcoming'">
-              <div class="col-sm-6 col-sm-offset-3">
-                <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#cancelModal">Cancel Your Session</a>
+            <hr>
+
+            <!-- Participant Area -->
+            <div class="row">
+              <div class="col-sm-12">
+                <h4 class="underline">Participants</h4>
+              </div>
+            </div>
+            <div class="row" ng-repeat="participant in currentSession.participants">
+              <div class="col-sm-6">
+                <p class="mini-title">Name:</p>
+                <p>{{participant.userID.firstName}} {{participant.userID.lastName}}</p>
+              </div>
+              <div class="col-sm-6">
+                <p class="mini-title">Email:</p>
+                <p><a href="mailto:{{participant.userID.email}}" target="_blank">{{participant.userID.email}}</a></p>
+              </div>
+              <div class="col-sm-6">
+                <p class="mini-title">Age:</p>
+                <p>{{participant.age}}</p>
+              </div>
+              <div class="col-sm-6">
+                <p class="mini-title">Gender:</p>
+                <p>{{toTitleCase(participant.userID.gender)}}</p>
+              </div>
+              <div class="col-sm-12">
+                <hr class="most-width small-bottom-pad" ng-class="{'hidden':$last}">
               </div>
             </div>
 

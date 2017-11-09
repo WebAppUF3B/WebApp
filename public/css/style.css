@@ -291,6 +291,10 @@ footer .uf-monogram {
   margin-bottom: 0px !important;
 }
 
+.no-margin-bottom{
+  margin-bottom: 0px !important;
+}
+
 .btn{
   border-radius: 2px !important;
   font-size: 1.3em !important;
