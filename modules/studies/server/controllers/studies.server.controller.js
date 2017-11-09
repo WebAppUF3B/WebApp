@@ -45,30 +45,53 @@ exports.get = function(req, res) {
 
 /* Update a study */
 exports.update = function(req, res) {
-  const id = req.params.studyID;
+  let study = req.study;
+  study.title = req.body.title;
+  study.location = req.body.location;
+  study.irb = req.body.irb;
+  study.compensationType = req.body.compensationType;
+  study.duration = req.body.duration;
+  study.satisfactoryNumber = req.body.satisfactoryNumber;
+  study.maxParticipants = req.body.maxParticipants;
+  study.maxParticipantsPerSession = req.body.maxParticipantsPerSession;
+  study.description = req.body.description;
+  study.researchers = req.body.researchers;
 
-  Study.findById(id).exec((err, study) => {
+  // console.log('hello world');
+  // console.log(req.body.title+'\n\n\n');
+  //
+  // const id = req.params.studyID;
+  //
+  // Study.findById(id).exec((err, study) => {
+  //   if (err) {
+  //     console.log(err);
+  //     res.status(400).send(err);
+  //   } else {
+  //     console.log('MEOW', study);
+  //     console.log('MEOW', req.body.title);
+  //     console.log('MEOW', req.body.location);
+  //     console.log('MEOW', req.body.irb);
+  //     console.log('MEOW', req.body.compensationType);
+  //     console.log('MEOW', req.body.maxParticipants);
+  //     console.log('MEOW', req.body.maxParticipantsPerSession);
+  //     console.log('MEOW', req.body.description);
+  //
+  //     study.title = req.body.title;
+  //     study.location = req.body.location;
+  //     study.irb = req.body.irb;
+  //     study.compensationType = req.body.compensationType;
+  //     study.maxParticipants = req.body.maxParticipants;
+  //     study.maxParticipantsPerSession = req.body.maxParticipantsPerSession;
+  //     study.description = req.body.description;
+  //
+  //   }
+  study.save((err) => {
     if (err) {
       console.log(err);
       res.status(400).send(err);
     } else {
-      study.title = req.body.title;
-      study.location = req.body.location;
-      study.irb = req.body.irb;
-      study.compensationType = req.body.compensationType;
-      study.maxParticipants = req.body.maxParticipants;
-      study.maxParticipantsPerSession = req.body.maxParticipantsPerSession;
-      study.description = req.body.description;
-
+      res.json(study);
     }
-    study.save((err) => {
-      if (err) {
-        console.log(err);
-        res.status(400).send(err);
-      } else {
-        res.json(study);
-      }
-    });
   });
 };
 

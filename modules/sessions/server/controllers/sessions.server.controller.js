@@ -28,8 +28,7 @@ exports.getAll = function(req, res) {
 };
 
 exports.allSessionsFromStudy = function(req, res) {
-  const minimalSessions = getMinimalSessions(req.allSessionsByStudyId);
-  res.status(200).send(minimalSessions);
+  res.status(200).send({ sessions: req.allSessionsByStudyId, study: req.study });
 };
 
 exports.allSessionsForSignup = function(req, res) {
@@ -126,7 +125,7 @@ exports.changeAttendance = function(req, res) {
   const change = req.body;
 
   session.participants.forEach((participant) => {
-    if (participant.userID._id === change.userID) {
+    if (participant.userID._id == change.userID) {
       participant.attended = change.attended;
       studies.modifyCount(session.studyID._id, change.attended);
     }
@@ -204,8 +203,7 @@ exports.sessionSignup = function(req, res) {
 
       session.participants.push(newParticipant);
 
-      const effectedUsers = session.participants.concat(session.researchers);
-      mailOptionArray = generateMailOptionsForSignup(effectedUsers, singingUser, newSession, study.title);
+      mailOptionArray = generateMailOptionsForSignup(session.researchers, singingUser, newSession, study.title, study.location);
       session.save()
         .then(() => {
           return Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)));
@@ -306,11 +304,11 @@ exports.sessionsByStudyId = function(req, res, next, id) {
     message: 'There is a problem with this study.'
   };
 
-  Promise.all([Session.find({ studyID: _id }), Study.findById(id)])
+  Promise.all([Session.find({ studyID: _id }).populate('participants.userID', '-salt -password'), Study.findById(id)])
     .then((results) => {
       const sessions = results[0];
       const study = results[1];
-      if (!sessions || sessions.length === 0) throw noSessionsAvailableErr;
+      // if (!sessions || sessions.length === 0) throw noSessionsAvailableErr;
       if (!study) throw studyNotFound;
       req.allSessionsByStudyId = sessions;
       req.study = study;
@@ -342,12 +340,12 @@ const generateMailOptions = (effectedUsers, cancellor, studyTitle) => {
   return mailOptionArray;
 };
 
-const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, studyTitle) => {
+const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, studyTitle, studyLocation) => {
   // Email any other participants involved
   const mailOptionArray = [];
 
   const signingUserMsg = `Hello ${signingUser.firstName} ${signingUser.lastName},
-                   \n\nYou have signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime}`;
+                   \nYou have signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime} located at ${studyLocation}.`;
 
   const signingUserOptions = {
     from: 'no.replyhccresearch@gmail.com',
@@ -362,7 +360,7 @@ const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, st
     const affectedUser = populatedUser.userID;
     if (affectedUser !== null && affectedUser.email) {
       const emailBody = `Hello ${affectedUser.firstName} ${affectedUser.lastName},
-                   \n\n${signingUser.firstName} ${signingUser.lastName} has signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime}`;
+                   \n${signingUser.firstName} ${signingUser.lastName} has signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime} located at ${studyLocation}.`;
 
       const mailOptions = {
         from: 'no.replyhccresearch@gmail.com',

@@ -28,6 +28,12 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
         });
     };
 
+    $scope.toTitleCase = function(str) {
+      return str.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      });
+    };
+
     $scope.approvalDetails = function(user, index) {
       $scope.currentUser = user;
       $scope.currentIndex = index;

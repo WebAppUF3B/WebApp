@@ -9,8 +9,9 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
     // Called after page loads
     $scope.init = function() {
+      $scope.filters = {};
+      $scope.allStudies = [];
       $scope.myStudies = {};
-      $scope.myStudies.data = [];
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
@@ -26,97 +27,129 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
           // Update satisfied value of each study
           results.data.forEach((study) => {
-            if (!study.removed) {
-              if (study.currentNumber > study.satisfactoryNumber) {
-                study.satisfied = true;
-              }
-              // Store in array
-              $scope.myStudies.data.push(study);
-            }
-          });
+            // Initialize to 0
+            study.satisfied = 0;
 
-          $scope.myStudies = new NgTableParams({
-            count: 10,
-            sorting: {
-              title: 'asc'
-            }
-          }, {
-            counts: [], // hides page sizes
-            dataset: $scope.myStudies.data // select data
-          });
-
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-
-      $scope.sessions.getUserSessions($scope.user._id)
-        .then((results) => {
-          // Assign results to upcomingSessions.data
-          $scope.allSessions = results.data;
-
-          // Populate date and time fields for each sessions
-          const today = new Date();
-          let date;
-          $scope.allSessions.forEach((session) => {
-            date = new Date(session.startTime);
-            session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
-
-            // Place session in correct array
-            if (session.participants.length !== 0) {
-              if (date >= today) {
-                $scope.upcomingSessions.data.push(session);
+            // If study is closed make it -1 (bottom of list)
+            if (study.closed) {
+              study.satisfied = -1;
+            } else {
+              if (study.satisfactoryNumber) {
+                // If the number has been met, mark green
+                if (study.currentNumber >= study.satisfactoryNumber) {
+                  study.satisfied = 1;
+                }
               } else {
-                $scope.pastSessions.data.push(session);
+                study.satisfactoryNumber ='NA';
               }
             }
 
-            // Populate table with users awaiting compensationType
-            session.participants.forEach((participant) => {
-              if (participant.attended && participant.compensationType === 'monetary' && !participant.compensationGiven) {
-                const temp = participant;
-                temp.studyID = session.studyID;
-                temp.session = session._id;
-                $scope.compensation.data.push(temp);
-              }
+            // Initialize enrolled number to 0
+            study.enrolledNumber = 0;
+
+            // Store in array
+            $scope.allStudies.push(study);
+          });
+        })
+        .then(() => {
+          $scope.sessions.getUserSessions($scope.user._id)
+            .then((results) => {
+              // Assign results to upcomingSessions.data
+              $scope.allSessions = results.data;
+
+              // Populate date and time fields for each sessions
+              const today = new Date();
+              let date;
+              $scope.allSessions.forEach((session) => {
+                date = new Date(session.startTime);
+                session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+                session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+
+                // Place session in correct array
+                if (session.participants.length !== 0) {
+                  if (date >= today) {
+                    $scope.upcomingSessions.data.push(session);
+
+                    // Calculate enrolled number for each studyId
+                    $scope.allStudies.forEach((study) => {
+                      if (study._id === session.studyID._id) {
+                        study.enrolledNumber ++;
+                      }
+                    });
+                  } else {
+                    $scope.pastSessions.data.push(session);
+                  }
+                }
+
+                // Populate table with users awaiting compensationType
+                session.participants.forEach((participant) => {
+                  if (participant.attended && participant.compensationType === 'monetary' && !participant.compensationGiven) {
+                    const temp = participant;
+                    temp.studyID = session.studyID;
+                    temp.session = session._id;
+                    $scope.compensation.data.push(temp);
+                  }
+                });
+              });
+
+              $scope.myStudies = new NgTableParams({
+                count: 10,
+                sorting: {
+                  title: 'asc'
+                }
+              }, {
+                counts: [], // hides page sizes
+                dataset: $scope.allStudies // select data
+              });
+
+              $scope.upcomingSessions = new NgTableParams({
+                count: 10,
+                sorting: {
+                  startTime: 'asc'
+                }
+              }, {
+                counts: [], // hides page sizes
+                dataset: $scope.upcomingSessions.data // select data
+              });
+
+              $scope.pastSessions = new NgTableParams({
+                count: 10,
+                sorting: {
+                  startTime: 'desc'
+                }
+              }, {
+                counts: [], // hides page sizes
+                dataset: $scope.pastSessions.data // select data
+              });
+
+              $scope.compensation = new NgTableParams({
+                count: 10,
+                sorting: {
+                  'userID.lastName': 'desc'
+                }
+              }, {
+                counts: [], // hides page sizes
+                dataset: $scope.compensation.data // select data
+              });
+
             });
-          });
-
-          $scope.upcomingSessions = new NgTableParams({
-            count: 10,
-            sorting: {
-              startTime: 'asc'
-            }
-          }, {
-            counts: [], // hides page sizes
-            dataset: $scope.upcomingSessions.data // select data
-          });
-
-          $scope.pastSessions = new NgTableParams({
-            count: 10,
-            sorting: {
-              startTime: 'desc'
-            }
-          }, {
-            counts: [], // hides page sizes
-            dataset: $scope.pastSessions.data // select data
-          });
-
-          $scope.compensation = new NgTableParams({
-            count: 10,
-            sorting: {
-              'userID.lastName': 'desc'
-            }
-          }, {
-            counts: [], // hides page sizes
-            dataset: $scope.compensation.data // select data
-          });
-
         })
         .catch((err) => {
           console.log(err);
         });
+    };
+
+    $scope.refreshTable = function() {
+      $scope.myStudies = new NgTableParams({
+        count: 10,
+        sorting: {
+          title: 'asc'
+        },
+        filter: $scope.filters
+      }, {
+        counts: [], // hides page sizes
+        dataset: $scope.allStudies // select data
+      });
     };
 
     // Show modal and populate it with study details

@@ -115,6 +115,18 @@
             </div>
             <div class="row">
               <div class="col-sm-12">
+                <p class="mini-title">Duration:</p>
+                <p>{{currentStudy.duration}} minutes</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="mini-title">Participants per Session:</p>
+                <p>{{currentStudy.participantsPerSession}}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
                 <p class="mini-title">Compensation Types Offered:</p>
                 <p ng-if="currentStudy.compensationType.length == 1 && currentStudy.compensationType[0] == 'extraCredit'">
                   Extra Credit
@@ -144,6 +156,9 @@
               <div class="col-sm-6">
                 <p class="mini-title">Email:</p>
                 <p><a href="mailto:{{researcher.userID.email}}" target="_blank">{{researcher.userID.email}}</a></p>
+              </div>
+              <div class="col-sm-12">
+                <hr class="most-width small-bottom-pad" ng-class="{'hidden':$last}">
               </div>
             </div>
 
