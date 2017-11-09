@@ -19,7 +19,7 @@ module.exports = function(app) {
     .get(sessions.allSessionsFromStudy);
   app.route('/api/sessions/course/:courseName').get(sessions.getExtraCredit);
 
-  app.route('/api/studySessions/signup/:studyId')
+  app.route('/api/studySessions/signup/:userId/:studyId')
     .get(sessions.allSessionsForSignup);
 
   app.route('/api/studySession/signup')

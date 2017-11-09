@@ -32,9 +32,8 @@ exports.allSessionsFromStudy = function(req, res) {
 };
 
 exports.allSessionsForSignup = function(req, res) {
-  const sessions = getMinimalSessions(req.allSessionsByStudyId);
   const study = req.study;
-
+  const sessions = getMinimalSessions(filterAttendedSessions(req.allSessionsByStudyId, req.userId, study.participantsPerSession));
   res.status(200).send({ study: study, sessions: sessions });
 };
 
@@ -125,7 +124,7 @@ exports.changeAttendance = function(req, res) {
   const change = req.body;
 
   session.participants.forEach((participant) => {
-    if (participant.userID._id == change.userID) {
+    if (String(participant.userID._id) === change.userID) {
       participant.attended = change.attended;
       studies.modifyCount(session.studyID._id, change.attended);
     }
@@ -241,7 +240,6 @@ exports.sessionById = function(req, res, next, id) {
 };
 
 exports.sessionsByUserId = function(req, res, next, id) {
-  console.log(id);
   Session.find({ $or: [ { 'participants.userID': id }, { 'researchers.userID': id } ] })
     .populate('studyID')
     .populate('researchers.userID', '-salt -password')
@@ -249,6 +247,7 @@ exports.sessionsByUserId = function(req, res, next, id) {
     .exec()
     .then((sessions) => {
       req.studySession = sessions;
+      req.userId = id;
       next();
     })
     .catch((err) => {
@@ -375,6 +374,7 @@ const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, st
 };
 
 const getMinimalSessions = (sessions) => {
+  if (!sessions || sessions.length === 0) return;
   const minimalSessions = [];
 
   sessions.forEach((session) => {
@@ -391,4 +391,21 @@ const getMinimalSessions = (sessions) => {
     minimalSessions.push(minimalSession);
   });
   return minimalSessions;
+};
+
+const filterAttendedSessions = (sessions, participantId, participantsPerSession) => {
+  if (!sessions || sessions.length === 0) return;
+  const today = Date.now();
+  const filteredSessions = [];
+  sessions.forEach((session) => {
+    const startDate = new Date(session.startTime);
+    if (session.participants.length >= participantsPerSession || startDate < today) return;
+    const attended = session.participants.some((participant) => {
+      if (String(participant.userID) === participantId) return true;
+    });
+    if (!attended) {
+      filteredSessions.push(session);
+    }
+  });
+  return filteredSessions;
 };
