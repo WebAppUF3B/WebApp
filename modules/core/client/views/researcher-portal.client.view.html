@@ -216,7 +216,7 @@
           </div>
           <div class="row pad-top" ng-if="currentStudy.closed">
             <div class="col-sm-6 col-sm-offset-3">
-              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#removeStudyModal">Remove Study</a>
+              <a class="btn btn-primary full-width" data-dismiss="modal" data-toggle="modal" data-target="#reopenStudyModal">Reopen Study</a>
             </div>
           </div>
 
@@ -255,22 +255,22 @@
   </div>
   <!-- End Close Study Modal -->
 
-  <!-- Remove Study Modal -->
-  <div id="removeStudyModal" class="modal" role="dialog">
+  <!-- Reopen Study Modal -->
+  <div id="reopenStudyModal" class="modal" role="dialog">
     <div class="small-modal">
         <!-- Modal content-->
         <div class="modal-content">
         <div class="row">
           <div class="col-xs-12 text-center">
-            <p>Are you sure you want to remove this study from your view?</p>
+            <p>Are you sure you want to reopen this study?</p>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-4 col-sm-offset-1">
-            <button class="btn small-modal-btn full-width" ng-click="confirmRemoveStudy()">Yes</button>
+            <button class="btn small-modal-btn full-width" ng-click="confirmReopenStudy()">Yes</button>
           </div>
           <div class="col-sm-4 col-sm-offset-1">
-            <button class="btn small-modal-btn full-width" ng-click="removeStudyClose()">No</button>
+            <button class="btn small-modal-btn full-width" ng-click="reopenStudyClose()">No</button>
           </div>
         </div>
         <div class="row" ng-if="error">
@@ -282,7 +282,7 @@
     </div>
 
   </div>
-  <!-- End Remove Study Modal -->
+  <!-- End Reopen Study Modal -->
 
   <!-- Compensation Modal -->
   <div id="compensationModal" class="modal" role="dialog">

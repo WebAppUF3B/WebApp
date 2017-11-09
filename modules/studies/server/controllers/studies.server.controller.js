@@ -11,7 +11,7 @@ const mongoose = require('mongoose'),
 /* Retreive all the studies */
 exports.getAll = function(req, res) {
   Study.find()
-    .populate('researchers.userID')
+    .populate('researchers.userID', '-salt -password')
     .exec((err, studies) => {
       if (err) {
         res.status(400).send(err);
@@ -25,7 +25,6 @@ exports.getAll = function(req, res) {
 exports.create = function(req, res) {
   /* Instantiate a study */
   const study = new Study(req.body);
-  console.log('PV', study);
   /* Then save the study */
   study.save((err) => {
     if (err) {
@@ -107,19 +106,17 @@ exports.delete = function(req, res) {
     } else {
       res.end();
     }
-  })
+  });
 };
 
-// Close a study (no longer accept sign ups, cancel all sessions, and gray out in researcher table)
+// Reopen a study and return it to
 exports.closeStudy = function(req, res) {
   const study = req.study;
   study.closed = true;
-  const cancellor = req.body;
 
   /* Update the study */
   study.save()
     .then(() => {
-      // TODO Cancel all sessions associated with this study
       res.json(study);
     })
     .catch((err) => {
@@ -129,9 +126,9 @@ exports.closeStudy = function(req, res) {
 };
 
 // Remove study (no longer appear in researcher table)
-exports.removeStudy = function(req, res) {
+exports.reopenStudy = function(req, res) {
   const study = req.study;
-  study.removed = true;
+  study.closed = false;
 
   /* Update the study */
   study.save()
@@ -175,7 +172,6 @@ exports.modifyCount = function(id, attended) {
   Middleware: find a study by its ID, then pass it to the next request handler.
  */
 exports.studyById = function(req, res, next, id) {
-  console.log('PV', 'StudyById fired');
   Study.findById(id).exec((err, study) => {
     if (err) {
       res.status(400).send(err);
@@ -188,7 +184,7 @@ exports.studyById = function(req, res, next, id) {
 
 exports.studyByUserId = function(req, res, next, id) {
   Study.find({ 'researchers.userID': id })
-    .populate('researchers.userID')
+    .populate('researchers.userID', '-salt -password')
     .exec()
     .then((studies) => {
       req.study = studies;

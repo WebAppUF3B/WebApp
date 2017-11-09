@@ -25,7 +25,6 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
           $scope.studySessions = results.data.sessions;
           $scope.study = results.data.study;
           $scope.stats.total = $scope.study.currentNumber;
-          console.log($scope.studySessions);
 
           // Parse date and mark as completed
           $scope.studySessions.forEach((session) => {
@@ -101,8 +100,6 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
           $scope.stats.femalePercentage = $scope.stats.femalePercentage.toFixed(4);
           $scope.stats.otherPercentage = $scope.stats.otherPercentage.toFixed(4);
           $scope.calculating = false;
-
-          console.log($scope.stats);
 
           $scope.myStudySessions = new NgTableParams({
             count: 10,
