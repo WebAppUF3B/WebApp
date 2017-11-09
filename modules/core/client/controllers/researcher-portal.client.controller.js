@@ -9,8 +9,9 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
     // Called after page loads
     $scope.init = function() {
+      $scope.filters = {};
+      $scope.allStudies = [];
       $scope.myStudies = {};
-      $scope.myStudies.data = [];
       $scope.upcomingSessions = {};
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
@@ -26,21 +27,28 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
           // Update satisfied value of each study
           results.data.forEach((study) => {
-            if (study.satisfactoryNumber) {
-              if (!study.removed) {
-                if (study.currentNumber > study.satisfactoryNumber) {
-                  study.satisfied = true;
-                }
-              }
+            // Initialize to 0
+            study.satisfied = 0;
+
+            // If study is closed make it -1 (bottom of list)
+            if (study.closed) {
+              study.satisfied = -1;
             } else {
-              study.satisfactoryNumber ='NA';
+              if (study.satisfactoryNumber) {
+                // If the number has been met, mark green
+                if (study.currentNumber >= study.satisfactoryNumber) {
+                  study.satisfied = 1;
+                }
+              } else {
+                study.satisfactoryNumber ='NA';
+              }
             }
 
             // Initialize enrolled number to 0
             study.enrolledNumber = 0;
 
             // Store in array
-            $scope.myStudies.data.push(study);
+            $scope.allStudies.push(study);
           });
         })
         .then(() => {
@@ -63,7 +71,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
                     $scope.upcomingSessions.data.push(session);
 
                     // Calculate enrolled number for each studyId
-                    $scope.myStudies.data.forEach((study) => {
+                    $scope.allStudies.forEach((study) => {
                       if (study._id === session.studyID._id) {
                         study.enrolledNumber ++;
                       }
@@ -91,7 +99,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
                 }
               }, {
                 counts: [], // hides page sizes
-                dataset: $scope.myStudies.data // select data
+                dataset: $scope.allStudies // select data
               });
 
               $scope.upcomingSessions = new NgTableParams({
@@ -129,6 +137,19 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         .catch((err) => {
           console.log(err);
         });
+    };
+
+    $scope.refreshTable = function() {
+      $scope.myStudies = new NgTableParams({
+        count: 10,
+        sorting: {
+          title: 'asc'
+        },
+        filter: $scope.filters
+      }, {
+        counts: [], // hides page sizes
+        dataset: $scope.allStudies // select data
+      });
     };
 
     // Show modal and populate it with study details

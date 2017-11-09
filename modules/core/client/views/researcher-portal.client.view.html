@@ -10,12 +10,27 @@
       <a class="btn btn-orange mobile-full-width float-right no-margin-bottom phone-top-margin" ui-sref="studies.create">Create a New Study</a>
     </div>
   </div>
-
   <div class="row">
     <div class="col-sm-10 col-sm-offset-1">
       <h2 class="text-center">My Studies</h2>
+    </div>
+  </div>
+  <div class="row small-top-pad small-bottom-pad">
+    <div class="col-sm-1 col-sm-offset-4">
+        <h4>Filter:</h4>
+    </div>
+    <div class="col-sm-3">
+      <select name="filter" class="form-control" ng-model="filters.closed" ng-change="refreshTable()" required>
+        <option value="">None</option>
+        <option value="false">Open</option>
+        <option value="true">Closed</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
       <table ng-table="myStudies" class="table table-hover entries-selectable hide-col-2-phone hide-col-3-phone" show-filter="false">
-        <tr ng-class="{'study-satisfied' : study.satisfied, 'study-closed' : study.closed}" ng-click="studyDetails(study, $index)" ng-repeat="study in myStudies.data">
+        <tr ng-class="{'study-satisfied' : study.satisfied == 1, 'study-closed' : study.closed}" ng-click="studyDetails(study, $index)" ng-repeat="study in myStudies.data">
           <td title="'Title'" filter="{ 'title': 'text'}" sortable="'title'" class="half-width" ng-attr-title="{{null}}">{{study.title}}</td>
           <td title="'Location'" filter="{ 'location': 'text'}" sortable="'location'" ng-attr-title="{{null}}">{{study.location}}</td>
           <td title="'Completed/Desired'" sortable="'satisfied'" width=200px ng-attr-title="{{null}}">{{study.currentNumber}}/{{study.satisfactoryNumber}}</td>
@@ -186,14 +201,14 @@
           </div>
 
           <div class="row pad-top" ng-if="!currentStudy.closed">
-            <div class="col-sm-4">
-              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit({ studyId: currentStudy._id })">Edit</a>
+            <div class="col-sm-6">
+              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit({ studyId: currentStudy._id })">Edit Study</a>
             </div>
-            <div class="col-sm-4">
-              <a class="btn btn-orange full-width" data-dismiss="modal" ui-sref="sessions({ studyId: currentStudy._id })">Sessions</a>
+            <div class="col-sm-6">
+              <a class="btn btn-orange full-width" data-dismiss="modal" ui-sref="studies.data({ studyId: currentStudy._id })">View Data</a>
             </div>
-            <div class="col-sm-4">
-              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#closeStudyModal">Close</a>
+            <div class="col-sm-6 col-sm-offset-3">
+              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#closeStudyModal">Close Study</a>
             </div>
           </div>
           <div class="row pad-top" ng-if="currentStudy.closed">

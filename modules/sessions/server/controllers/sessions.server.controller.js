@@ -27,8 +27,7 @@ exports.getAll = function(req, res) {
 };
 
 exports.allSessionsFromStudy = function(req, res) {
-  const minimalSessions = getMinimalSessions(req.allSessionsByStudyId);
-  res.status(200).send(minimalSessions);
+  res.status(200).send({ sessions: req.allSessionsByStudyId, study: req.study });
 };
 
 exports.allSessionsForSignup = function(req, res) {
@@ -125,7 +124,7 @@ exports.changeAttendance = function(req, res) {
   const change = req.body;
 
   session.participants.forEach((participant) => {
-    if (participant.userID._id === change.userID) {
+    if (participant.userID._id == change.userID) {
       participant.attended = change.attended;
       studies.modifyCount(session.studyID._id, change.attended);
     }
@@ -304,11 +303,11 @@ exports.sessionsByStudyId = function(req, res, next, id) {
     message: 'There is a problem with this study.'
   };
 
-  Promise.all([Session.find({ studyID: _id }), Study.findById(id)])
+  Promise.all([Session.find({ studyID: _id }).populate('participants.userID', '-salt -password'), Study.findById(id)])
     .then((results) => {
       const sessions = results[0];
       const study = results[1];
-      if (!sessions || sessions.length === 0) throw noSessionsAvailableErr;
+      // if (!sessions || sessions.length === 0) throw noSessionsAvailableErr;
       if (!study) throw studyNotFound;
       req.allSessionsByStudyId = sessions;
       req.study = study;
