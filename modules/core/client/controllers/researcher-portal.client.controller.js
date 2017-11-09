@@ -16,8 +16,10 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.upcomingSessions.data = [];
       $scope.pastSessions = {};
       $scope.pastSessions.data = [];
-      $scope.compensation = {};
-      $scope.compensation.data = [];
+      $scope.awaitingCompensation = {};
+      $scope.awaitingCompensation.data = [];
+      $scope.compensated = {};
+      $scope.compensated.data = [];
 
       $scope.user = Authentication.user;
       console.log($scope.user);
@@ -83,11 +85,21 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
                 // Populate table with users awaiting compensationType
                 session.participants.forEach((participant) => {
-                  if (participant.attended && participant.compensationType === 'monetary' && !participant.compensationGiven) {
+                  if (participant.attended && participant.compensationType === 'monetary') {
                     const temp = participant;
                     temp.studyID = session.studyID;
                     temp.session = session._id;
-                    $scope.compensation.data.push(temp);
+
+                    if (!participant.compensationGiven) {
+                      // Go to awaitin compensation table
+                      $scope.awaitingCompensation.data.push(temp);
+                    } else {
+                      // Foramt date and go to compensated table
+                      date = new Date(participant.compensationDate);
+                      participant.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+
+                      $scope.compensated.data.push(temp);
+                    }
                   }
                 });
               });
@@ -122,14 +134,24 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
                 dataset: $scope.pastSessions.data // select data
               });
 
-              $scope.compensation = new NgTableParams({
+              $scope.awaitingCompensation = new NgTableParams({
                 count: 10,
                 sorting: {
                   'userID.lastName': 'desc'
                 }
               }, {
                 counts: [], // hides page sizes
-                dataset: $scope.compensation.data // select data
+                dataset: $scope.awaitingCompensation.data // select data
+              });
+
+              $scope.compensated = new NgTableParams({
+                count: 10,
+                sorting: {
+                  'compensationDate': 'desc'
+                }
+              }, {
+                counts: [], // hides page sizes
+                dataset: $scope.compensated.data // select data
               });
 
             });
@@ -161,9 +183,9 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
     };
 
     // Show modal and populate it with compensation data
-    $scope.compensationDetails = function(participant, index) {
+    $scope.compensationDetails = function(participant, table) {
       $scope.currentParticipant = participant;
-      $scope.currentIndex = index;
+      $scope.currentTable = table;
       $scope.error = false;
       $('#compensationModal').modal('show');
     };

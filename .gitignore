@@ -73,5 +73,4 @@ mongod
 *.sln
 .env
 
-public/dist/application.js
-public/dist/application.min.js
+public/dist

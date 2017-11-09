@@ -15,7 +15,8 @@ const sessionSchema = new Schema({
     extraCreditCourse: {
       type: String
     },
-    compensationGiven: Boolean
+    compensationGiven: Boolean,
+    compensationDate: Date
   }],
   studyID: {
     type: Schema.Types.ObjectId,

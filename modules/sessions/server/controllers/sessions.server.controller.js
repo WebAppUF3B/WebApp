@@ -141,14 +141,15 @@ exports.changeAttendance = function(req, res) {
     });
 };
 
-// Change the attendance value for a participant
+// Change the compensated value for a participant
 exports.markCompensated = function(req, res) {
   const session = req.studySession;
   const compensated = req.body;
 
   session.participants.forEach((participant) => {
-    if (participant.userID._id === compensated.userID) {
+    if (String(participant.userID._id) === compensated.userID) {
       participant.compensationGiven = true;
+      participant.compensationDate = new Date();
     }
   });
 

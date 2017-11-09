@@ -70,10 +70,25 @@
   <div class="row">
     <div class="col-sm-10 col-sm-offset-1">
       <h2 class="text-center">Participants Awaiting Compensation</h2>
-      <table ng-table="compensation" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
-        <tr ng-click="compensationDetails(user, $index)" ng-repeat="user in compensation.data">
+      <table ng-table="awaitingCompensation" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
+        <tr ng-click="compensationDetails(user, 'awaitingCompensation')" ng-repeat="user in awaitingCompensation.data">
+          <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{user.studyID.title}}</td>
           <td title="'Name'" filter="{ 'userID.lastName': 'text'}" sortable="'userID.lastName'" ng-attr-title="{{null}}">{{user.userID.firstName}} {{user.userID.lastName}}</td>
-          <td title="'Email'" filter="{ 'userID.email': 'text'}" sortable="'userID.email'" ng-attr-title="{{null}}">{{user.userID.email}}</td>
+          <td title="'Amount'" filter="{ 'studyID.compensationAmount': 'text'}" width='100px' sortable="'studyID.compensationAmount'" ng-attr-title="{{null}}">${{user.studyID.compensationAmount}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
+      <h2 class="text-center">Compensated Participants</h2>
+      <table ng-table="compensated" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
+        <tr ng-click="compensationDetails(user, 'compensated')" ng-repeat="user in compensated.data">
+          <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{user.studyID.title}}</td>
+          <td title="'Name'" filter="{ 'userID.lastName': 'text'}" sortable="'userID.lastName'" ng-attr-title="{{null}}">{{user.userID.firstName}} {{user.userID.lastName}}</td>
+          <td title="'Amount'" filter="{ 'studyID.compensationAmount': 'text'}" width='100px' sortable="'studyID.compensationAmount'" ng-attr-title="{{null}}">${{user.studyID.compensationAmount}}</td>
+          <td title="'Date'" filter="{ 'compensationDate': 'text'}" width='100px' sortable="'compensationDate'" ng-attr-title="{{null}}">{{user.date}}</td>
         </tr>
       </table>
     </div>
@@ -146,6 +161,12 @@
               </p>
             </div>
           </div>
+          <div class="row" ng-if="currentStudy.compensationType[0] == 'monetary' || currentStudy.compensationType[1] == 'monetary'">
+            <div class="col-sm-12">
+              <p class="mini-title">Compensation Amount:</p>
+              <p>${{currentStudy.compensationAmount}}</p>
+            </div>
+          </div>
 
           <hr>
 
@@ -215,8 +236,11 @@
             </div>
           </div>
           <div class="row pad-top" ng-if="currentStudy.closed">
-            <div class="col-sm-6 col-sm-offset-3">
+            <div class="col-sm-6">
               <a class="btn btn-primary full-width" data-dismiss="modal" data-toggle="modal" data-target="#reopenStudyModal">Reopen Study</a>
+            </div>
+            <div class="col-sm-6">
+              <a class="btn btn-orange full-width" data-dismiss="modal" ui-sref="studies.data({ studyId: currentStudy._id })">View Data</a>
             </div>
           </div>
 
@@ -301,6 +325,27 @@
           </div>
         </div>
         <div class="pane">
+          <!-- Study Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Study</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Title:</p>
+              <p>{{currentParticipant.studyID.title}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Compensation Amount:</p>
+              <p>${{currentParticipant.studyID.compensationAmount}}</p>
+            </div>
+          </div>
+
+          <hr>
+
           <!-- Participant Area -->
           <div class="row">
             <div class="col-sm-12">
@@ -323,29 +368,14 @@
               <p>{{currentParticipant.userID.address}}</p>
             </div>
           </div>
-
-          <hr>
-
-          <!-- Study Area -->
           <div class="row">
             <div class="col-sm-12">
-              <h4 class="underline">Study</h4>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-              <p class="mini-title">Title:</p>
-              <p>{{currentParticipant.studyID.title}}</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-              <p class="mini-title">Compensation Amount:</p>
-              <p>${{currentParticipant.studyID.compensationAmount}}</p>
+              <p class="mini-title">Date Compensated:</p>
+              <p>{{currentParticipant.date}}</p>
             </div>
           </div>
 
-          <div class="row pad-top">
+          <div class="row pad-top" ng-if="currentTable=='awaitingCompensation'">
             <div class="col-sm-8 col-sm-offset-2">
               <a class="btn btn-primary full-width" ng-click="markCompensated()">Mark as Compensated</a>
             </div>
