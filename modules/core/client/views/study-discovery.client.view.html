@@ -139,6 +139,12 @@
                 </p>
               </div>
             </div>
+            <div class="row" ng-if="currentStudy.compensationType[0] == 'monetary' || currentStudy.compensationType[1] == 'monetary'">
+              <div class="col-sm-12">
+                <p class="mini-title">Compensation Amount:</p>
+                <p>${{currentStudy.compensationAmount}}</p>
+              </div>
+            </div>
 
             <hr>
 
