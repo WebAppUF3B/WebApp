@@ -74,7 +74,8 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       $http.post('/api/studies/', $scope.currentStudy).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
-        $state.go('researcher-portal');
+        console.log(response._id);
+        $state.go('studies.availability', { 'studyId': response._id });
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);

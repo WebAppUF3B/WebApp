@@ -741,3 +741,34 @@ hr {
 .selected .btn .text-info{
   color: white !important;
 }
+
+ul.dropdown-menu{
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-tab{
+  height: 45px !important;
+  line-height: 45px !important;
+}
+
+li.divider{
+  margin: 0 !important;
+}
+
+.dropdown-toggle{
+  padding: 0px !important;
+}
+
+.main-dropdown-toggle{
+  height: 100%;
+  width: 100%;
+  padding: 15px !important;
+  color: #337ab7;
+  font-size: 16px;
+}
+
+.main-dropdown-toggle:hover{
+  cursor: pointer !important;
+  color: #23527c;
+}
