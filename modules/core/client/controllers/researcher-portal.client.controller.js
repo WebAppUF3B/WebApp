@@ -22,7 +22,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.compensated.data = [];
 
       $scope.user = Authentication.user;
-      console.log($scope.user);
+      console.log('tw user', $scope.user);
 
       $scope.studies.getUserStudies($scope.user._id)
         .then((results) => {

@@ -9,6 +9,7 @@ const path = require('path'),
   passport = require('passport'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
+  jwt = require('jsonwebtoken'),
   utils = require('../../../../utils/stringUtils');
 
 // URLs for which user can't be redirected on signin
@@ -166,14 +167,18 @@ exports.signin = function(req, res, next) {
         birthday: user.birthday,
         email: user.email,
         role: user.role,
-        _id: user._id
+        _id: user._id,
       };
+
+      const token = jwt.sign(minimalUser, process.env.JWT, {
+        expiresIn: '1d'
+      });
 
       req.login(user, (err) => {
         if (err) {
           res.status(400).send(err);
         } else {
-          res.json(minimalUser);
+          res.json({ authToken: token, user: minimalUser });
         }
       });
     }

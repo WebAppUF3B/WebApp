@@ -2,7 +2,8 @@
 
 /* Dependencies */
 const mongoose = require('mongoose'),
-  Study = mongoose.model('Study');
+  Study = mongoose.model('Study'),
+  authUtils = require('../../../utils/authUtils');
 
 /**
  * Backend functions for CRUD operations on course collection
@@ -193,4 +194,26 @@ exports.studyByUserId = function(req, res, next, id) {
       console.log(err);
       res.status(400).send(err);
     });
+};
+
+exports.authUser = function(req, res, next) {
+  const decodedUser = authUtils.parseAuthToken(req);
+  if (decodedUser.err) {
+    if (decodedUser.err.code === 401) {
+      res.statusCode = 302;
+      res.setHeader("Location", '/authentication/signin');
+      res.end();
+      return;
+    }
+    return res.status(403).render('modules/core/server/views/403', {
+      error: 'Oops! Something went wrong...'
+    });
+  }
+  if (decodedUser.role !== 'researcher' || decodedUser.role !== 'admin') {
+    return res.status(authUtils.unauthorizedUserErr.code).render('modules/core/server/views/403', {
+      error: 'Oops! Something went wrong...'
+    });
+  }
+  req.decodedUser = decodedUser;
+  next();
 };

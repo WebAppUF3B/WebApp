@@ -5,6 +5,7 @@ const studies = require('../controllers/studies.server.controller.js');
 
 module.exports = function (app) {
   // Setting up the users profile api
+  // app.use(studies.authUser);
   app.route('/api/studies/')
     .get(studies.getAll)
     .post(studies.create);
