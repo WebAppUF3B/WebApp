@@ -13,24 +13,20 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
 
         return false;
       }
-
       //var user = new Users($scope.user);
       let id = $scope.user._id;
+      console.log(id);
       let user = {
         firstName: $scope.user.firstName,
         lastName: $scope.user.lastName,
-        email: $scope.user.email
+        _id: id
       };
-
-      Users.update(id, user).then(function(response) {
-        $scope.$broadcast('show-errors-reset', 'userForm');
-
-        $scope.success = true;
-        Authentication.user = response;
-        //$state.go();
-      }, function(response) {
-        $scope.error = response.data.message;
-      });
+      //$scope.user.update(id, user);
+      Users.update(user);
+      $scope.$broadcast('show-errors-reset', 'userForm');
+      $scope.success = true;
+      //Authentication.user = response;
+      $http.get(window.location.origin + '/api/profile/' + id);
     };
   }
 ]);

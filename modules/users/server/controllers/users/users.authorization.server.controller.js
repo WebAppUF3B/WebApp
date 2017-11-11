@@ -16,7 +16,7 @@ exports.userByID = function (req, res, next, id) {
       message: 'User is invalid'
     });
   }
-
+  
   User.findOne({
     _id: id
   }).exec(function (err, user) {
@@ -27,6 +27,7 @@ exports.userByID = function (req, res, next, id) {
     }
 
     req.profile = user;
+    //console.log(id);
     next();
   });
 };

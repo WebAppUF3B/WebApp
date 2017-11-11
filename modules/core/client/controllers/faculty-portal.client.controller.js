@@ -21,7 +21,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         });
     };
 
-    $scope.populateCourse = function(){
+    $scope.populateCourse = function() {
       $scope.sessions.extraCreditByCourse($scope.selectedCourse.name)
         .then((results) => {
           // Assign results to upcomingSessions.data
@@ -41,11 +41,11 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     };
 
     $scope.addCourse = function() {
-      if(!alreadyClicked){
+      if (!alreadyClicked) {
         $scope.error = '';
-        if(!$scope.newCourse.name){
+        if (!$scope.newCourse.name) {
           $scope.error = "The course name cannot be empty!";
-        } else{
+        } else {
           $http.post('/api/courses/', $scope.newCourse).success((response) => {
             $('#addCourseModal').modal('hide');
             $scope.init();
