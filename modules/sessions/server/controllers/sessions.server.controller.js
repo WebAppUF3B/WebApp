@@ -256,6 +256,75 @@ exports.sessionsByUserId = function(req, res, next, id) {
     });
 };
 
+exports.approveUser = function(req, res) {
+  let studySession = req.studySession;
+  const user = req.body;
+
+  studySession.participants.forEach((participant) => {
+    if (String(participant.userID._id) === user.userID._id) {
+      participant.approved = true;
+    }
+  });
+
+  const verificationText = `Hello ${user.userID.firstName} ${user.userID.lastName},
+                            \nYour request to participate in ${studySession.studyID.title} on ${user.sessionDate} at ${user.sessionTime} has been approved by a researcher!`;
+
+  //established modemailer email transporter object to send email with mailOptions populating mail with link
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+  });
+  const mailOptions = {
+    from: 'no.replyhccresearch@gmail.com',
+    to: user.userID.email,
+    subject: 'HCC Research Pool Account Approval',
+    text: verificationText
+  };
+
+  studySession.save();
+
+  res.json(studySession);
+  return transporter.sendMail(mailOptions);
+};
+
+//*//
+exports.denyUser = function(req, res) {
+  let studySession = req.studySession;
+  const user = req.body;
+  let currIndex = 0;
+  let deleteIndex;
+
+  studySession.participants.forEach((participant) => {
+    if (String(participant.userID._id) === user.userID._id) {
+      deleteIndex = currIndex;
+    }
+    currIndex++;
+  });
+
+  const verificationText = `Hello ${user.userID.firstName} ${user.userID.lastName},
+                            \nYour request to participate in ${studySession.studyID.title} on ${user.sessionDate} at ${user.sessionTime} has been denied by a researcher.
+                            \nPlease contact one of the researchers involved in the study if you think this was done in error.`;
+
+  //established modemailer email transporter object to send email with mailOptions populating mail with link
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+  });
+  const mailOptions = {
+    from: 'no.replyhccresearch@gmail.com',
+    to: user.userID.email,
+    subject: 'HCC Research Pool Account Approval',
+    text: verificationText
+  };
+
+  studySession.participants.splice(deleteIndex, 1);
+  console.log(studySession);
+  studySession.save();
+
+  res.json(studySession);
+  return transporter.sendMail(mailOptions);
+};
+
 /* Get the students who recieved extra */
 exports.getExtraCredit = function(req, res) {
   const sessions = req.studySession;
@@ -315,7 +384,7 @@ exports.sessionsByStudyId = function(req, res, next, id) {
       next();
     })
     .catch((err) => {
-      console.log('Get all sessions from a study Error:\n', err);
+      console.log(err);
       res.status(err.code).send(err);
     });
 };

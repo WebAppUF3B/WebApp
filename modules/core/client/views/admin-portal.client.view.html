@@ -68,13 +68,19 @@
           <div class="row">
             <div class="col-sm-12">
               <p class="mini-title">Email:</p>
-              <p>{{currentUser.email}}</p>
+              <p><a href='mailto:{{currentUser.email}}' target='_blank'>{{currentUser.email}}</a></p>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-12">
               <p class="mini-title">Role:</p>
-              <p>{{currentUser.role}}</p>
+              <p>{{toTitleCase(currentUser.role)}}</p>
+            </div>
+          </div>
+          <div class="row" ng-if="currentUser.role === 'researcher'">
+            <div class="col-sm-12">
+              <p class="mini-title">Position:</p>
+              <p>{{currentUser.position}}</p>
             </div>
           </div>
 

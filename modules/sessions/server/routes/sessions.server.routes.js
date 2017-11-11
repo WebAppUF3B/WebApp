@@ -15,6 +15,9 @@ module.exports = function(app) {
   app.route('/api/sessions/user/:userId').get(sessions.get);
   app.route('/api/sessions/attend/:sessionId').put(sessions.changeAttendance);
   app.route('/api/sessions/compensate/:sessionId').put(sessions.markCompensated);
+  app.route('/api/sessions/approveUser/:sessionId').put(sessions.approveUser);
+  app.route('/api/sessions/denyUser/:sessionId').put(sessions.denyUser);
+
   app.route('/api/studySessions/:studyId')
     .get(sessions.allSessionsFromStudy);
   app.route('/api/sessions/course/:courseName').get(sessions.getExtraCredit);
