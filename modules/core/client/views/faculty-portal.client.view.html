@@ -39,6 +39,19 @@
     </div>
   </div>
 
+<<<<<<< a35d8c8cec82e55d4a3538fac181fb11c0a54e8b
+=======
+  <div class="row" ng-show="extraCredit.data.length">
+    <div class="col-sm-2 col-sm-offset-5">
+      <a class="btn btn-orange full-width small-top-margin" ng-click="exportCSV()">Export</a>
+      <input type="radio" name="newAssignment" checked> New Assignment<br>
+      <input type="radio" name="existingAssignment"> Existing Assignment<br>
+      <input name="newAssignmentName" type="text" id="newAssignmentName" ng-model="newAssignment">
+      <input name="maxPoints" type="number" id="maxPoints" ng-model="maxPoints">
+    </div>
+  </div>
+
+>>>>>>> some bugs in /settings/profile, fixed exportCSV
   <!-- Add Course Modal -->
   <div id="addCourseModal" class="modal fade" role="dialog">
     <div class="modal-dialog course-modal">

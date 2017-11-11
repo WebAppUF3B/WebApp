@@ -138,6 +138,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
 
     // Export the list of students for canvas
     $scope.exportCSV = function() {
+<<<<<<< a35d8c8cec82e55d4a3538fac181fb11c0a54e8b
       if (!alreadyClicked) {
         alreadyClicked = true;
 
@@ -146,6 +147,16 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         //$scope.extraCredit.data
         let data = [['Student,' , 'ID,' , 'SIS User ID,' , 'SIS Login ID,' , 'Section,' , $scope.newAssignment]];
         let tempArray = [""];
+=======
+      const fileName = "Grades-" + $scope.selectedCourse.name + '.csv';
+      let mimeType = 'text/csv;encoding=utf-8';
+      $scope.extraCredit.data
+      let data = [["Student"], ["ID"], ["SIS User ID"], ["SIS Login ID"], ["Section"], ["Existing Assignment (ID)"], ["New Assignment"]];
+      let tempArray = ["Points Possible   " + $scope.maxPoints];
+      data.push(tempArray);
+      for (let i = 0; i < $scope.extraCredit.data.length; i++) {
+        tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\"" + "000000  "]; //some random ID?
+>>>>>>> some bugs in /settings/profile, fixed exportCSV
         data.push(tempArray);
         for (let i = 0; i < $scope.extraCredit.data.length; i++) {
           tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\""]; //some random ID?
