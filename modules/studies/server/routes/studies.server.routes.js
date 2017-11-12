@@ -2,10 +2,11 @@
 
 // Study Routes
 const studies = require('../controllers/studies.server.controller.js');
+const authUtils = require('../../../utils/authUtils');
 
 module.exports = function (app) {
   // Setting up the users profile api
-  app.use(studies.authUser);
+  app.use(authUtils.authUser);
   app.route('/api/studies/')
     .get(studies.getAll)
     .post(studies.create);

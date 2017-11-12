@@ -20,6 +20,17 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $scope.user = Authentication.user;
       console.log($scope.user);
 
+      $scope.authToken = Authentication.authToken;
+      console.log($scope.authToken);
+
+      $scope.header = {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': $scope.authToken
+        }
+      };
+      console.log('header', $scope.header);
+
       if (!$scope.user) {
         $state.go('authentication.signin');
       }
@@ -113,7 +124,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     // Declare methods that can be used to access session data
     $scope.sessions = {
       getAll: function() {
-        return $http.get(window.location.origin + '/api/sessions/')
+        return $http.get(window.location.origin + '/api/sessions/', $scope.header)
           .then((results) => {
             return results;
           })
@@ -123,7 +134,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       },
 
       getUserSessions: function(userId) {
-        return $http.get(window.location.origin + '/api/sessions/user/' + userId)
+        return $http.get(window.location.origin + '/api/sessions/user/' + userId, $scope.header)
           .then((results) => {
             return results;
           })
@@ -137,13 +148,14 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           url: window.location.origin + '/api/sessions/',
           type: 'POST',
           contentType: 'application/json',
+          headers: { 'x-access-token': $scope.authToken },
           dataType: 'json',
           data: JSON.stringify(newSession)
         });
       },
 
       get: function(id) {
-        return $http.get(window.location.origin + '/api/sessions/' + id)
+        return $http.get(window.location.origin + '/api/sessions/' + id, $scope.header)
           .then((results) => {
             return results;
           })
@@ -157,6 +169,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           url: window.location.origin + '/api/sessions/' + id, newSession,
           type: 'PUT',
           contentType: 'application/json',
+          headers: { 'x-access-token': $scope.authToken },
           dataType: 'json',
           data: JSON.stringify(newSession)
         });
@@ -167,6 +180,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           url: window.location.origin + '/api/sessions/' + id,
           type: 'DELETE',
           contentType: 'application/json',
+          headers: { 'x-access-token': $scope.authToken },
           dataType: 'json',
           data: JSON.stringify(cancellor)
         });

@@ -2,9 +2,7 @@
 
 /* Dependencies */
 const mongoose = require('mongoose'),
-  Study = mongoose.model('Study'),
-  authUtils = require('../../../utils/authUtils'),
-  lodash = require('lodash');
+  Study = mongoose.model('Study');
 
 /**
  * Backend functions for CRUD operations on course collection
@@ -195,37 +193,4 @@ exports.studyByUserId = function(req, res, next, id) {
       console.log(err);
       res.status(400).send(err);
     });
-};
-
-exports.authUser = function(req, res, next) {
-  const reqPath = req.path;
-  console.log('tw req', reqPath);
-  console.log('secure compare', lodash.contains(authUtils.allSecureRoutes, reqPath));
-  console.log('secure paths', authUtils.allSecureRoutes);
-
-  if (!lodash.contains(authUtils.allSecureRoutes, reqPath)) {
-    next();
-  } else {
-    const decodedUser = authUtils.parseAuthToken(req);
-    if (decodedUser.err) {
-      if (decodedUser.err.code === 401) {
-        res.statusCode = 302;
-        res.setHeader("Location", '/authentication/signin');
-        res.end();
-        return;
-      }
-      res.redirect('forbidden', 403, {
-        error: 'Resource is forbidden without logging in.'
-      });
-    }
-
-    if (decodedUser.role !== 'researcher' || decodedUser.role !== 'admin') {
-      res.redirect('forbidden', 403, {
-        error: 'Resource is forbidden without the proper credentials.\n' +
-        'Please contact an admin if access to this page is needed.'
-      });
-    }
-    req.decodedUser = decodedUser;
-    next();
-  }
 };

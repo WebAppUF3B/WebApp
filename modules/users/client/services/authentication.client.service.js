@@ -8,7 +8,8 @@ angular.module('users').factory('Authentication', ['$window', '$injector',
     const authToken = JSON.parse(localStorage.getItem('authToken'));
 
     return {
-      user: user
+      user: user,
+      authToken: authToken
     };
   }
 ]);

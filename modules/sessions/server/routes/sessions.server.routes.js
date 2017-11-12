@@ -2,9 +2,11 @@
 
 // Session Routes
 const sessions = require('../controllers/sessions.server.controller.js');
+const authUtils = require('../../../utils/authUtils');
 
 module.exports = function(app) {
   // Setting up the session api
+  app.use(authUtils.authUser);
   app.route('/api/sessions/')
     .get(sessions.getAll)
     .post(sessions.create);
