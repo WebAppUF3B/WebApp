@@ -17,3 +17,32 @@ exports.unauthorizedUserErr = {
   code: 403,
   message: 'User does not have the correct permissions to access this page.'
 };
+
+const secureProfileClientRoutes = [
+  '/settings',
+  '/profile',
+  '/accounts',
+  '/picture',
+];
+
+const secureParticipantsClientRoutes = [
+  '/participant'
+];
+
+const secureParticipantsServerRoutes = [
+  '/settings',
+  '/profile',
+  '/accounts',
+  '/picture',
+];
+
+
+const allSecureRoutes = secureProfileClientRoutes
+  .concat(secureParticipantsClientRoutes)
+  .concat(secureParticipantsServerRoutes);
+
+exports.secureProfileClientRoutes = secureProfileClientRoutes;
+exports.secureParticipantsClientRoutes = secureParticipantsClientRoutes;
+exports.secureParticipantsServerRoutes = secureParticipantsServerRoutes;
+
+exports.allSecureRoutes = allSecureRoutes;

@@ -414,12 +414,3 @@ exports.removeOAuthProvider = function(req, res, next) {
     });
   });
 };
-
-
-const gatherErrors = (validationResults) => {
-
-  //TODO: TwF, server side validation for user here.
-
-  return validationResults;
-
-};

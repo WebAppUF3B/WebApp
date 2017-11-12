@@ -97,7 +97,8 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
         localStorage.setItem('authToken', JSON.stringify(response.authToken));
-        redirect(response.role);
+        localStorage.setItem('user', JSON.stringify(response.user));
+        redirect(response.user);
       }).error((response) => {
         $scope.error = response.message;
       });
@@ -120,11 +121,13 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       }
       $scope.userForm.confirm.$setValidity('goodConfirm', true);
     };
-    const redirect = (role) => {
+    const redirect = (response) => {
       // If successful we assign the response to the global user model
+      console.log(response);
+      $scope.authentication.user = response;
 
       let destination;
-      switch (role) {
+      switch ($scope.authentication.user.role) {
         case 'participant':
           destination = 'participant-portal';
           break;
