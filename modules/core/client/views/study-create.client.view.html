@@ -21,10 +21,21 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="address">Location</label>
                 <input type="text" id="address" name="address" class="form-control" ng-model="currentStudy.location" placeholder="Room Number or Address" required>
+                <!--
+                <div ng-messages="userForm.address.$error" role="alert">
+                  <p class="help-block error-text" ng-message="required">Address is required.</p>
+                </div>
+              -->
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group" show-errors>
+                <label for="requireApproval" class="full-width">Require Approval</label>
+                <input id="requireApproval" ng-model="currentStudy.requireApproval" type="checkbox">
                 <!--
                 <div ng-messages="userForm.address.$error" role="alert">
                   <p class="help-block error-text" ng-message="required">Address is required.</p>

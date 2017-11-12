@@ -25,6 +25,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         $scope.currentStudy.irb = results.data.irb;
         $scope.currentStudy.compensationType = results.data.compensationType;
         $scope.currentStudy.maxParticipants = results.data.maxParticipants;
+        $scope.currentStudy.requireApproval = results.data.requireApproval;
         $scope.currentStudy.satisfactoryNumber = results.data.satisfactoryNumber;
         $scope.currentStudy.duration = results.data.duration;
         $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
