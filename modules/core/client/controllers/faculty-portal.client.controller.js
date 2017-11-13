@@ -10,7 +10,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     let alreadyClicked = false;
 
     // Called after page loads
-    $scope.init = function(){
+    $scope.init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
 
@@ -62,7 +62,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       const fileName = "Grades-" + $scope.selectedCourse.name + '.csv';
       let mimeType = 'text/csv;encoding=utf-8';
       $scope.extraCredit.data
-      let data = [["Student"], ["ID"], ["SIS User ID"], ["SIS Login ID"], ["Section"], ["Existing Assignment (ID)"], ["New Assignment"]];
+      let data = [["Student", "ID", "\"SIS User ID\"", "\"SIS Login ID\"", "Section", "\"Existing Assingment (ID)\"", "\"New Assignment\""]];
       let tempArray = ["Points Possible   " + $scope.maxPoints];
       data.push(tempArray);
       for (let i = 0; i < $scope.extraCredit.data.length; i++) {
@@ -77,11 +77,11 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       let csvContent = lineArray.join("\n");
       let a = document.createElement('a');
       mimeType = mimeType || 'application/octet-stream';
-      if(navigator.msSaveBlob) { //IE10
+      if (navigator.msSaveBlob) { //IE10
         navigator.msSaveBlob(new Blob([csvContent], {
           type: mimeType
         }), fileName);
-      } else if(URL && 'download' in a) { //html5 A[download]
+      } else if (URL && 'download' in a) { //html5 A[download]
         a.href = URL.createObjectURL(new Blob([csvContent], {
           type: mimeType
         }));
