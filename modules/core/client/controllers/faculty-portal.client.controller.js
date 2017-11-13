@@ -62,8 +62,8 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       const fileName = "Grades-" + $scope.selectedCourse.name + '.csv';
       let mimeType = 'text/csv;encoding=utf-8';
       //$scope.extraCredit.data
-      let data = [["Student", "ID", "\"SIS User ID\"", "\"SIS Login ID\"", "Section", "\"Existing Assingment (ID)\"", "\"New Assignment\""]];
-      let tempArray = ["Points Possible   " + $scope.maxPoints];
+      let data = [["Student", "ID", "\"SIS User ID\"", "\"SIS Login ID\"", "Section", $scope.newAssignment]];
+      let tempArray = ["\"Points Possible\"   " + $scope.maxPoints];
       data.push(tempArray);
       for (let i = 0; i < $scope.extraCredit.data.length; i++) {
         tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\"" + "000000  "]; //some random ID?
@@ -98,12 +98,12 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     $scope.sessions = {
       extraCreditByCourse: function(courseName) {
         return $http.get(window.location.origin + '/api/sessions/course/' + courseName)
-            .then((results) => {
-              return results;
-            })
-            .catch((err) => {
-              return err;
-            });
+          .then((results) => {
+            return results;
+          })
+          .catch((err) => {
+            return err;
+          });
       }
     };
 
