@@ -61,7 +61,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     $scope.exportCSV = function() {
       const fileName = "Grades-" + $scope.selectedCourse.name + '.csv';
       let mimeType = 'text/csv;encoding=utf-8';
-      $scope.extraCredit.data
+      //$scope.extraCredit.data
       let data = [["Student", "ID", "\"SIS User ID\"", "\"SIS Login ID\"", "Section", "\"Existing Assingment (ID)\"", "\"New Assignment\""]];
       let tempArray = ["Points Possible   " + $scope.maxPoints];
       data.push(tempArray);
