@@ -267,7 +267,7 @@ exports.approveUser = function(req, res) {
   });
 
   const verificationText = `Hello ${user.userID.firstName} ${user.userID.lastName},
-                            \nYour request to participate in ${studySession.studyID.title} on ${user.sessionDate} at ${user.sessionTime} has been approved by a researcher!`;
+                            \nYour request to participate in ${studySession.studyID.title} on ${user.sessionDate} at ${user.sessionTime} in ${studySession.studyID.location} has been approved by a researcher!`;
 
   //established modemailer email transporter object to send email with mailOptions populating mail with link
   const transporter = nodemailer.createTransport({
@@ -395,7 +395,7 @@ const generateMailOptions = (effectedUsers, cancellor, studyTitle) => {
   effectedUsers.forEach((affectedUser) => {
     if (affectedUser.userID._id !== cancellor._id) {
       const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
-                   \n\nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${studyTitle}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
+                   \nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${studyTitle}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
 
       const mailOptions = {
         from: 'no.replyhccresearch@gmail.com',
@@ -478,4 +478,59 @@ const filterAttendedSessions = (sessions, participantId, participantsPerSession)
     }
   });
   return filteredSessions;
+};
+
+/* Send reminder email to all participants who have a session tomorrow */
+exports.emailReminders = function(req, res) {
+  // Get all sessions
+  Session.find()
+    .populate('studyID')
+    .populate('participants.userID', '-salt -password')
+    .exec()
+    .then((sessions) => {
+      // Then see if any sessions are tomorrow
+      const today = new Date();
+      const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+      const mailOptionArray = [];
+
+      sessions.forEach((session) => {
+        const date = new Date(session.startTime);
+        const sessionDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+        const sessionTime = `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+
+        if (date.getFullYear() === tomorrow.getFullYear() && date.getMonth() === tomorrow.getMonth() && date.getDate() === tomorrow.getDate()) {
+          console.log("Found a match!");
+
+          // Set up emails for each participant
+          session.participants.forEach((affectedUser) => {
+            const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
+                         \nThis is a reminder that you are scheduled to participate in "${session.studyID.title}" tomorrow (${sessionDate}) at ${sessionTime} in ${session.studyID.location}.`;
+
+            const mailOptions = {
+              from: 'no.replyhccresearch@gmail.com',
+              to: affectedUser.userID.email,
+              subject: 'Research Study Reminder - ' + sessionDate,
+              text: emailBody
+            };
+            mailOptionArray.push(mailOptions);
+            console.log(emailBody);
+          });
+        }
+      });
+
+      // Send all emails
+      if (mailOptionArray.length > 0) {
+        Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)))
+          .then(() => {
+            res.status(200).send();
+          });
+      }
+      else{
+        res.status(200).send();
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send(err);
+    });
 };
