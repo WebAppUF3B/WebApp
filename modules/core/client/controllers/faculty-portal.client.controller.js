@@ -63,12 +63,12 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       let mimeType = 'text/csv;encoding=utf-8';
       //$scope.extraCredit.data
       let data = [['Student,' , 'ID,' , 'SIS User ID,' , 'SIS Login ID,' , 'Section,' , $scope.newAssignment]];
-      // let tempArray = ["\"Points Possible\"   " + $scope.maxPoints];
-      // data.push(tempArray);
-      // for (let i = 0; i < $scope.extraCredit.data.length; i++) {
-      //   tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\""]; //some random ID?
-      //   data.push(tempArray);
-      // }
+      let tempArray = ["\"Points Possible\"," + "," + ","+ "," + "," + $scope.maxPoints];
+      data.push(tempArray);
+      for (let i = 0; i < $scope.extraCredit.data.length; i++) {
+        tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\"," + "," + "33125689"]; //some random ID?
+        data.push(tempArray);
+      }
       let lineArray = [];
       data.forEach(function(infoArray, index) {
         let line = infoArray.join("");
