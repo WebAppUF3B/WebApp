@@ -59,6 +59,9 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     };
 
     $scope.exportCSV = function() {
+      if (!$scope.newAssignment || !$scope.maxPoints) {
+        return;
+      }
       const fileName = "Grades-" + $scope.selectedCourse.name + '.csv';
       let mimeType = 'text/csv;encoding=utf-8';
       //$scope.extraCredit.data
@@ -66,7 +69,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       let tempArray = ["\"Points Possible\"," + "," + ","+ "," + "," + $scope.maxPoints];
       data.push(tempArray);
       for (let i = 0; i < $scope.extraCredit.data.length; i++) {
-        tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\"," + "," + "33125689"]; //some random ID?
+        tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\""]; //some random ID?
         data.push(tempArray);
       }
       let lineArray = [];
