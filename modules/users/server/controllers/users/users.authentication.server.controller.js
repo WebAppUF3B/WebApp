@@ -171,7 +171,7 @@ exports.signin = function(req, res, next) {
       };
 
       const token = jwt.sign(minimalUser, process.env.JWT, {
-        expiresIn: '1d'
+        expiresIn: '1m'
       });
 
       req.login(user, (err) => {

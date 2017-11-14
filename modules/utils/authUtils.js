@@ -5,11 +5,12 @@ exports.authUser = function(req, res, next) {
   const reqPath = req.path;
   console.log('tw req', reqPath);
   console.log('secure compare', lodash.contains(allSecureRoutes, reqPath));
-  console.log('secure paths', allSecureRoutes);
 
   const isSecured = allSecureRoutes.some((route) => {
     if (reqPath.includes(route)) return true;
   });
+
+  console.log('is secured', isSecured);
 
   if (!isSecured) {
     next();
@@ -17,12 +18,16 @@ exports.authUser = function(req, res, next) {
     const decodedUser = parseAuthToken(req);
     if (decodedUser.err) {
       if (decodedUser.err.code === 401) {
-        return res.status(badTokenErr.code).send(badTokenErr);
+        return res.status(expiredTokenErr.code).send(expiredTokenErr);
       }
       return res.status(unauthorizedUserErr.code).send(unauthorizedUserErr);
     }
 
-    if (decodedUser.role !== 'researcher' || decodedUser.role !== 'admin') {
+    console.log('user role', decodedUser.role);
+    if (decodedUser.role !== 'participant'
+      && decodedUser.role !== 'researcher'
+      && decodedUser.role !== 'faculty'
+      && decodedUser.role !== 'admin') {
       return res.status(unauthorizedUserErr.code).send(unauthorizedUserErr);
     }
     req.decodedUser = decodedUser;
@@ -35,12 +40,14 @@ const parseAuthToken = function(req) {
   if (token) {
     try {
       const decodedUser = jwt.verify(token, process.env.JWT);
+      console.log('decoded user:', decodedUser);
       return decodedUser;
     } catch (err) {
-      console.log(err);
+      console.log('token parse decode err:', err);
+      if (err.name === 'TokenExpiredError') return { err: { code: 401, message: 'Token Expired.' } };
+      return { err: { code: 403, message: 'unauthorized' } };
     }
   }
-  return { err: { code: 403, message: 'unauthorized' } };
 };
 
 const unauthorizedUserErr = {
@@ -48,7 +55,7 @@ const unauthorizedUserErr = {
   message: 'User does not have the correct permissions to access this page.'
 };
 
-const badTokenErr = {
+const expiredTokenErr = {
   code: 401,
   message: 'Your session has expired, please log back in.'
 };
