@@ -31,10 +31,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       };
       console.log('header', $scope.header);
 
-      if (!$scope.user) {
-        $state.go('authentication.signin');
-      }
-
       $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
           // Assign results to upcomingSessions.data
@@ -123,16 +119,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
 
     // Declare methods that can be used to access session data
     $scope.sessions = {
-      getAll: function() {
-        return $http.get(window.location.origin + '/api/sessions/', $scope.header)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
       getUserSessions: function(userId) {
         return $http.get(window.location.origin + '/api/sessions/user/' + userId, $scope.header)
           .then((results) => {
@@ -141,38 +127,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           .catch((err) => {
             return err;
           });
-      },
-
-      create: function(newSession) {
-        return $.ajax({
-          url: window.location.origin + '/api/sessions/',
-          type: 'POST',
-          contentType: 'application/json',
-          headers: { 'x-access-token': $scope.authToken },
-          dataType: 'json',
-          data: JSON.stringify(newSession)
-        });
-      },
-
-      get: function(id) {
-        return $http.get(window.location.origin + '/api/sessions/' + id, $scope.header)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
-      update: function(id, newSession) {
-        return $.ajax({
-          url: window.location.origin + '/api/sessions/' + id, newSession,
-          type: 'PUT',
-          contentType: 'application/json',
-          headers: { 'x-access-token': $scope.authToken },
-          dataType: 'json',
-          data: JSON.stringify(newSession)
-        });
       },
 
       cancel: function(id, cancellor) {

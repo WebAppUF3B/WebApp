@@ -66,6 +66,7 @@ const seucreBasicRoutes = [
   '/accounts',
   '/picture',
   '/api/sessions/',
+  '/api/studies/'
 ];
 
 
