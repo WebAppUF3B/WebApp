@@ -5,14 +5,13 @@ angular.module('core').controller('SessionCancellationController', ['$scope','$h
 
       // Get token
       const token = $stateParams.token;
-      console.log(token);
 
       // Cancel the session
-      // $http.get(`${window.location.origin}/api/sessions/cancel/${token}`)
-      //   .catch((err) => {
-      //     $scope.error = true;
-      //     console.log(err);
-      //   });
+      $http.delete(`${window.location.origin}/api/sessions/cancel/${token}`)
+        .catch((err) => {
+          $scope.error = true;
+          console.log(err);
+        });
     };
 
     init();

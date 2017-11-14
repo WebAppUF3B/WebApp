@@ -2,7 +2,7 @@
 
 // Study Routes
 const studies = require('../controllers/studies.server.controller.js');
-const authUtils = require('../../../utils/authUtils');
+const authUtils = require('../../../utils/server/authUtils');
 
 module.exports = function (app) {
   // Setting up the users profile api
