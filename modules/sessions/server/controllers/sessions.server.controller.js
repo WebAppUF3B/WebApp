@@ -499,7 +499,6 @@ exports.emailReminders = function(req, res) {
         const sessionTime = `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
         if (date.getFullYear() === tomorrow.getFullYear() && date.getMonth() === tomorrow.getMonth() && date.getDate() === tomorrow.getDate()) {
-          console.log("Found a match!");
 
           // Set up emails for each participant
           session.participants.forEach((affectedUser) => {
@@ -513,11 +512,15 @@ exports.emailReminders = function(req, res) {
               text: emailBody
             };
             mailOptionArray.push(mailOptions);
-            console.log(emailBody);
           });
         }
       });
 
+      // Established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
       // Send all emails
       if (mailOptionArray.length > 0) {
         Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)))
@@ -531,6 +534,38 @@ exports.emailReminders = function(req, res) {
     })
     .catch((err) => {
       console.log(err);
+      res.status(400).send(err);
+    });
+};
+
+// Parse the token so that the session can be cancelled
+exports.parseToken = function(req, res, next, id) {
+  const token = id;
+
+  // Parse session ID from token
+  const sessionID = 0;
+
+  // Parse cancellor object from token
+  const cancellor = 0;
+
+  // Retrieve that session
+  Session.findById(sessionID)
+    .populate('studyID')
+    .populate('researchers.userID', '-salt -password')
+    .populate('participants.userID', '-salt -password')
+    .exec()
+    .then((session) => {
+      req.studySession = session;
+
+      // Add date and time that are needed for cancellor
+      const date = new Date(session.startTime);
+      cancellor.date = dateUtils.formatMMDDYYYY(date);
+      cancellor.time = dateUtils.getTimeOfDay(date);
+      req.body = cancellor;
+
+      next();
+    })
+    .catch((err) => {
       res.status(400).send(err);
     });
 };

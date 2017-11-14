@@ -750,6 +750,11 @@ ul.dropdown-menu{
 .dropdown-tab{
   height: 45px !important;
   line-height: 45px !important;
+  text-align: center;
+}
+
+.dropdown-tab:hover{
+  cursor: pointer;
 }
 
 li.divider{

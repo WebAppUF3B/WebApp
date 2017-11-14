@@ -10,6 +10,7 @@ module.exports = function(app) {
     .post(sessions.create);
   app.route('/api/sessions/emailReminders').get(sessions.emailReminders);
   app.route('/api/sessions/create/:studyID').post(sessions.create);
+  app.route('/api/sessions/cancel/:token').delete(sessions.delete);
   app.route('/api/sessions/approveUser/:sessionId').put(sessions.approveUser);
   app.route('/api/sessions/denyUser/:sessionId').put(sessions.denyUser);
   app.route('/api/sessions/user/:userId').get(sessions.get);
@@ -33,4 +34,5 @@ module.exports = function(app) {
   app.param('userId', sessions.sessionsByUserId);
   app.param('courseName', sessions.extraCreditByCourse);
   app.param('studyId', sessions.sessionsByStudyId);
+  app.param('token', sessions.parseToken);
 };
