@@ -9,6 +9,7 @@ const path = require('path'),
   passport = require('passport'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
+  jwt = require('jsonwebtoken'),
   utils = require('../../../../utils/stringUtils');
 
 // URLs for which user can't be redirected on signin
@@ -154,58 +155,34 @@ exports.researcherSignup = function(req, res) {
  * Signin after passport authentication
  */
 exports.signin = function(req, res, next) {
-  const signInErr = {
-    message: 'Invalid email or password',
-    code: 400
-  };
+  passport.authenticate('local', (err, user, info) => {
+    if (err || !user) {
+      res.status(400).send(info);
+    } else {
 
-  const notVerifiedErr = {
-    message: 'Email has not been verified',
-    code: 400
-  };
+      const minimalUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        gender: user.gender,
+        birthday: user.birthday,
+        email: user.email,
+        role: user.role,
+        _id: user._id,
+      };
 
-  const notAdminApproved = {
-    message: 'Researchers and Faculty members require admin approval before log in.',
-    code: 400
-  };
-
-  User.findOne({ email: req.body.email })
-      .then((user) => {
-        if (!user) {
-          throw signInErr;
-        }
-
-        if ((user.role === 'researcher' || user.role === 'faculty') && !user.adminApproved) {
-          throw notAdminApproved;
-        }
-
-        if (!user.emailValidated) {
-          throw notVerifiedErr;
-        }
-
-
-        if (!user.authenticate(req.body.password)) {
-          throw signInErr;
-        }
-
-        console.log('authentication worked');
-        const minimalUser = {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          gender: user.gender,
-          birthday: user.birthday,
-          email: user.email,
-          role: user.role,
-          _id: user._id
-        };
-
-        console.log('minimal user info:\n', minimalUser);
-        return res.status(200).send(minimalUser);
-      })
-      .catch((err) => {
-        console.log('Signin Error:\n', err.message);
-        return res.status(err.code).send(err);
+      const token = jwt.sign(minimalUser, process.env.JWT, {
+        expiresIn: '1d'
       });
+
+      req.login(user, (err) => {
+        if (err) {
+          res.status(400).send(err);
+        } else {
+          res.json({ authToken: token, user: minimalUser });
+        }
+      });
+    }
+  })(req, res, next);
 };
 
 /**
@@ -436,13 +413,4 @@ exports.removeOAuthProvider = function(req, res, next) {
       return res.json(user);
     });
   });
-};
-
-
-const gatherErrors = (validationResults) => {
-
-  //TODO: TwF, server side validation for user here.
-
-  return validationResults;
-
 };
