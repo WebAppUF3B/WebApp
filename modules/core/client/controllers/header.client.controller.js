@@ -9,11 +9,11 @@ angular.module('core').controller('HeaderController', ['$scope', '$state', 'Auth
     // Get the topbar menu
     $scope.menu = Menus.getMenu('topbar');
 
-    // Toggle the menu items
-    // $scope.isCollapsed = false;
-    // $scope.toggleCollapsibleMenu = function () {
-    //   $scope.isCollapsed = !$scope.isCollapsed;
-    // };
+    $('.nav a').click(() => {
+      if ($('.navbar-toggle').is(':visible')) {
+        $('.navbar-toggle').click();
+      }
+    });
 
     // Collapsing the menu after navigation
     $scope.$on('$stateChangeSuccess', function () {
