@@ -13,8 +13,8 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       }
     };
     $scope.availability = [];
-    $scope.durationFromStudy = '';
     $scope.time = [];
+    $scope.currentStudy = {};
     //$scope.startTime = new Date().setHours(0,0);
     //$scope.endTime = new Date().setHours(23,0);
 
@@ -27,7 +27,20 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       $scope.getStudy($scope.studyId)
       .then((results) => {
         console.log(results);
-        $scope.durationFromStudy = results.data.duration;
+        $scope.currentStudy.title = results.data.title;
+        $scope.currentStudy.location = results.data.location;
+        $scope.currentStudy.irb = results.data.irb;
+        $scope.currentStudy.compensationType = results.data.compensationType;
+        $scope.currentStudy.maxParticipants = results.data.maxParticipants;
+        $scope.currentStudy.satisfactoryNumber = results.data.satisfactoryNumber;
+        $scope.currentStudy.duration = results.data.duration;
+        $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
+        $scope.currentStudy.description = results.data.description;
+        $scope.currentStudy.researchers = results.data.researchers;
+        $scope.currentStudy.availability = [];
+
+        //$scope.currentStudy.durationFromStudy = results.data.duration;
+        console.log($scope.currentStudy);
         $scope.prepTime();
       })
       .catch((err) => {
@@ -49,12 +62,49 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
 
     $scope.sendAvailability = function() {
       alert('Sending Availability');
-      console.log('PV', 'Time Duration: '+$scope.durationFromStudy);
-      console.log('SessionStart: '+$scope.startTime);
-      for (let x = 0; x<$scope.availability.length; x++) {
-        console.log('Timeslot Start: '+$scope.availability[x].startTime);
-        console.log('Timeslot End: '+$scope.availability[x].endTime);
+      console.log('PV', 'Time Duration: '+$scope.currentStudy.duration);
+      //console.log('SessionStart: '+$scope.startTime);
+      for (let x = 0; x<$scope.currentStudy.availability.length; x++) {
+        console.log('Timeslot: '+x+' '+$scope.currentStudy.availability[x]);
       }
+
+      for (let x = 0; x < $scope.availability.length; x++) {
+        let convertedUnix = new Date($scope.availability[x].unixDate);
+
+        $scope.currentStudy.availability.push({
+          startTime: new Date(
+            convertedUnix.getFullYear(),
+            convertedUnix.getMonth(),
+            convertedUnix.getDate(),
+            $scope.availability[x].lstartTime.getHours(),
+            $scope.availability[x].lstartTime.getMinutes()
+          ),
+          endTime: new Date(
+            convertedUnix.getFullYear(),
+            convertedUnix.getMonth(),
+            convertedUnix.getDate(),
+            $scope.availability[x].lendTime.getHours(),
+            $scope.availability[x].lendTime.getMinutes()
+          )
+        });
+
+        //console.log($scope.availability[x].lstartTime.getMinutes());
+      }
+
+      console.log('Print out Current Study in sendAvailability');
+      console.log($scope.currentStudy);
+
+
+      $scope.error = null;
+      $http.put('/api/studies/'+$scope.studyId, $scope.currentStudy).success((response) => {
+        // If successful we assign the response to the global user model
+        // And redirect to the previous or home page
+        //$state.go('researcher-portal');
+      }).error((response) => {
+        $scope.error = response.message;
+        alert(response.message);
+      });
+
     };
 
     $scope.addEntry = function(date) {
@@ -62,21 +112,22 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       const convertDateToDate = new Date (date);
       //let convertStart = new Date($scope.startTime);
       //let convertEnd = new Date($scope.endTime);
-      alert(convertDateToDate);
+      //alert(convertDateToDate);
 
       $scope.availability.push({
-        startTime: null,
-        endTime: null,
-        unixDate: date,
-        meow: 'meow'
+        lstartTime: null,
+        lendTime: null,
+        unixDate: date
       });
       console.log($scope.availability);
 
       //alert('Convert Date to Date'+convertDateToDate);
       //alert('Start Time Default: '+convertStart+'\nEnd Time Default: '+convertEnd);
+      /*
       for (let x = 0; x<$scope.availability.length; x++) {
         console.log('Unix for Entry '+x+': '+$scope.availability[x].unixDate);
       }
+      */
     };
 
     $scope.getStudy = function(studyId) {
@@ -90,7 +141,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
     };
 
     $scope.prepTime = function() {
-      if ($scope.durationFromStudy === 15) {
+      if ($scope.currentStudy.duration === 15) {
         for (let hour = 0; hour <= 23; hour++) {
           for (let minute = 0; minute <= 2; minute++) {
             const unix = new Date().setHours(hour,minute*15);
@@ -100,7 +151,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
           }
         }
       }
-      if ($scope.durationFromStudy === 30) {
+      if ($scope.currentStudy.duration === 30) {
         for (let hour = 0; hour <= 23; hour++) {
           for (let minute = 0; minute <= 1; minute++) {
             const unix = new Date().setHours(hour,minute*30);
@@ -110,7 +161,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
           }
         }
       }
-      if ($scope.durationFromStudy === 60) {
+      if ($scope.currentStudy.duration === 60) {
         for (let hour = 0; hour <= 23; hour++) {
           const unix = new Date().setHours(hour,0);
           const date = new Date(unix);

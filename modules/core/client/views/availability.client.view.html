@@ -1,28 +1,41 @@
 <div class="container inner-container" ng-controller="AvailabilityController">
-
   <h1 class="text-center pad-top"><strong>Define Session Availbility</strong></h1>
-  <div class="row">
-    <div class='col-md-4'>
+  <div class="row justify-content-between">
+    <div class='col-sm-8'>
       <h3>Selection Type:</h3>
       <div class='btn-group'>
         <button class='btn btn-primary' ng-model='type' uib-btn-radio='"individual"'>Individual</button>
         <button class='btn btn-primary' ng-model='type' uib-btn-radio='"range"'>Range</button>
       </div>
     </div>
+    <div class='col-sm-4'>
+      <button type="submit" ng-click='sendAvailability()' class="btn btn-primary full-width no-margin small-top-margin">Submit Availability</button>
+    </div>
   </div>
   <div class='row'>
-    <div class="col-md-4" uib-datepicker ng-model='activeDate' multi-select='selectedDates' select-range='{{type=="range"}}' datepicker-options='options'></div>
-    <div class="col-md-8">
+    <div class="col-sm-4" uib-datepicker ng-model='activeDate' multi-select='selectedDates' select-range='{{type=="range"}}' datepicker-options='options'></div>
+    <div class="col-sm-8">
       <!--<h3 class="text-center">Hello World</h3>-->
       <div ng-if='type=="individual"'>
         Selected Dates:
         <div class='well well-sm'>
           <div ng-repeat='d in selectedDates | orderBy'>
             {{d | date : 'fullDate'}}
-            <button class='btn btn-xs btn-warning' style='margin:5px' ng-click='removeFromSelected(d)'>Remove</button>
-            <div ng-repeat="possibility in availability | filter:{unixDate: d}">
-              <select ng-model="possibility.startTime" ng-options="times.val as times.show for times in time"></select>
-              <select ng-model="possibility.endTime" ng-options="times.val as times.show for times in time"></select>
+            <button class='btn btn-xs btn-warning' style='margin:5px' ng-click='removeFromSelected(d)'>Remove Day</button>
+            <div class='row'ng-repeat="possibility in availability | filter:{unixDate: d}">
+              <div class="col-sm-5">
+                <label class='col-sm-5'>Start Time:</label>
+                <select class='col-sm-7' ng-model="possibility.lstartTime" ng-options="times.val as times.show for times in time"></select>
+              </div>
+              <div class="col-sm-5">
+                <label class='col-sm-5'>End Time:</label>
+                <select class='col-sm-7' ng-model="possibility.lendTime" ng-options="times.val as times.show for times in time"></select>
+              </div>
+              <div class='col-sm-2'>
+                <button class="btn btn-danger" ng-click='removeEntry(possibility)'>
+                  <span class="glyphicon glyphicon-remove"></span>
+                </button>
+              </div>
             </div>
             <button class='btn btn-xs btn-primary' style='margin:5px' ng-click='addEntry(d)'>Add Time Range</button>
           </div>
@@ -39,7 +52,9 @@
       </div>
     </div>
   </div>
+  <!--
   <div class="form-group no-margin">
     <button type="submit" ng-click='sendAvailability()' class="btn btn-primary full-width no-margin small-top-margin">Submit Availability</button>
   </div>
+  -->
 </div>
