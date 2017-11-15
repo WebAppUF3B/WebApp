@@ -48,6 +48,7 @@ const parseAuthToken = function(req) {
       return { err: { code: 403, message: 'unauthorized' } };
     }
   }
+  return { err: { code: 403, message: 'unauthorized' } };
 };
 
 const unauthorizedUserErr = {
@@ -66,7 +67,9 @@ const seucreBasicRoutes = [
   '/accounts',
   '/picture',
   '/api/sessions/',
-  '/api/studies/'
+  '/api/studies/',
+  '/api/studySession/signup',
+  '/api/courses/'
 ];
 
 

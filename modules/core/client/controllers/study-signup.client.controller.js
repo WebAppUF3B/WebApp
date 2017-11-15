@@ -19,8 +19,20 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       $scope.hasMonetary = false;
       $scope.hasExtraCredit = false;
       $scope.credentails = null;
+
       $scope.user = Authentication.user;
       console.log($scope.user);
+
+      $scope.authToken = Authentication.authToken;
+      console.log($scope.authToken);
+
+      $scope.header = {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': $scope.authToken
+        }
+      };
+      console.log('header', $scope.header);
 
       $scope.getAllSessionsByStudyId();
       $scope.myStudySessions = new NgTableParams({
