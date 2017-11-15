@@ -19,6 +19,11 @@ module.exports = function(app) {
   app.route('/api/admin/approval/:userId')
     .put(admin.approveUser)
     .delete(admin.denyUser);
+  app.route('/api/admin/getAllUsers')
+    .get(admin.getAllUsers);
+  app.route('/api/admin/editUser/:userId')
+    .get(admin.getUser)
+    .put(admin.editUser);
 
   // Single user routes
   app.route('/api/users/:userId')
