@@ -1,5 +1,4 @@
-//angular.module('core',['gm.datepickerMultiSelect']).controller('SessionController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams',
-angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('SessionController', ['$scope','$http', '$location', '$state', '$stateParams',
+angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController', ['$scope','$http', '$location', '$state', '$stateParams',
   function($scope, $http, $location, $state, $stateParams) {
     $scope.activeDate = null;
     $scope.selectedDates = [new Date().setHours(0,0,0,0)];
@@ -66,23 +65,12 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       alert(convertDateToDate);
 
       $scope.availability.push({
-        startTime: new Date(
-          convertDateToDate.getFullYear(),
-          convertDateToDate.getMonth(),
-          convertDateToDate.getDate(),
-          moment.unix($scope.startTime).format('HH'),
-          moment.unix($scope.startTime).format('mm')
-        ),
-        endTime: new Date(
-          convertDateToDate.getFullYear(),
-          convertDateToDate.getMonth(),
-          convertDateToDate.getDate(),
-          moment.unix($scope.endTime).format('HH'),
-          moment.unix($scope.endTime).format('mm')
-        ),
+        startTime: null,
+        endTime: null,
         unixDate: date,
         meow: 'meow'
       });
+      console.log($scope.availability);
 
       //alert('Convert Date to Date'+convertDateToDate);
       //alert('Start Time Default: '+convertStart+'\nEnd Time Default: '+convertEnd);
@@ -106,7 +94,9 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         for (let hour = 0; hour <= 23; hour++) {
           for (let minute = 0; minute <= 2; minute++) {
             const unix = new Date().setHours(hour,minute*15);
-            $scope.time.push(moment(unix).format('hh:mm A'));
+            const date = new Date(unix);
+            const obj = { val: date, show: moment(unix).format('hh:mm A') };
+            $scope.time.push(obj);
           }
         }
       }
@@ -114,14 +104,18 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         for (let hour = 0; hour <= 23; hour++) {
           for (let minute = 0; minute <= 1; minute++) {
             const unix = new Date().setHours(hour,minute*30);
-            $scope.time.push(moment(unix).format('hh:mm A'));
+            const date = new Date(unix);
+            const obj = { val: date, show: moment(unix).format('hh:mm A') };
+            $scope.time.push(obj);
           }
         }
       }
       if ($scope.durationFromStudy === 60) {
         for (let hour = 0; hour <= 23; hour++) {
           const unix = new Date().setHours(hour,0);
-          $scope.time.push(moment(unix).format('hh:mm A'));
+          const date = new Date(unix);
+          const obj = { val: date, show: moment(unix).format('hh:mm A') };
+          $scope.time.push(obj);
         }
       }
     };

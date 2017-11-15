@@ -1,4 +1,4 @@
-<div class="container inner-container" ng-controller="SessionController">
+<div class="container inner-container" ng-controller="AvailabilityController">
 
   <h1 class="text-center pad-top"><strong>Define Session Availbility</strong></h1>
   <div class="row">
@@ -21,8 +21,8 @@
             {{d | date : 'fullDate'}}
             <button class='btn btn-xs btn-warning' style='margin:5px' ng-click='removeFromSelected(d)'>Remove</button>
             <div ng-repeat="possibility in availability | filter:{unixDate: d}">
-              <select ng-model="startTime" ng-options="times for times in time"></select>
-              <select ng-model="endTime" ng-options="times for times in time"></select>
+              <select ng-model="possibility.startTime" ng-options="times.val as times.show for times in time"></select>
+              <select ng-model="possibility.endTime" ng-options="times.val as times.show for times in time"></select>
             </div>
             <button class='btn btn-xs btn-primary' style='margin:5px' ng-click='addEntry(d)'>Add Time Range</button>
           </div>
