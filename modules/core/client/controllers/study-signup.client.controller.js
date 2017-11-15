@@ -1,6 +1,14 @@
 angular.module('core').controller('StudySignupController', ['$scope','$http','NgTableParams', '$location', '$state', 'Authentication',
   function($scope, $http, NgTableParams, $location, $state, Authentication) {
     const init = function() {
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
+
+      $scope.courses.getAll()
+        .then((results) => {
+          // Assign results to upcomingSessions.data
+          $scope.allCourses = results.data;
+        });
 
       const url = $location.absUrl().split('/');
       $scope.studyId = url[url.length -1];
@@ -26,13 +34,14 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       });
     };
     $scope.getAllSessionsByStudyId = function() {
-      $http.get(window.location.origin + '/api/studySessions/signup/' + $scope.studyId)
+      console.log($scope.user._id);
+      $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`)
         .then((results) => {
           $scope.studySessions = results.data.sessions;
           $scope.study = results.data.study;
 
           if ($scope.study.closed) $state.go('forbidden');
-          
+
           $scope.study.compensationType.forEach((type) => {
             switch (type) {
               case 'monetary':
@@ -51,20 +60,19 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
           console.log(err);
         });
     };
-    $scope.hoursAndMinutes = function(minutes) {
-      const hours = Math.floor(minutes / 60);
-      const remainderMins = Math.floor(minutes % 60);
-      const hoursUnits = hours === 1 ? 'hour' : 'hours';
-      const hoursStr = hours > 0 ? `${hours} ${hoursUnits}` : '';
-
-      const minutesUnits = remainderMins === 1 ? 'minute' : 'minutes';
-      const minutesStr = remainderMins > 0 ? `${remainderMins} ${minutesUnits}` : '';
-
-      const conjunctionFunction = hoursStr && minutesStr ? ' and ' : '';
-
-      return `${hoursStr}${conjunctionFunction}${minutesStr}`;
-    };
-
+    // $scope.hoursAndMinutes = function(minutes) {
+    //   const hours = Math.floor(minutes / 60);
+    //   const remainderMins = Math.floor(minutes % 60);
+    //   const hoursUnits = hours === 1 ? 'hour' : 'hours';
+    //   const hoursStr = hours > 0 ? `${hours} ${hoursUnits}` : '';
+    //
+    //   const minutesUnits = remainderMins === 1 ? 'minute' : 'minutes';
+    //   const minutesStr = remainderMins > 0 ? `${remainderMins} ${minutesUnits}` : '';
+    //
+    //   const conjunctionFunction = hoursStr && minutesStr ? ' and ' : '';
+    //
+    //   return `${hoursStr}${conjunctionFunction}${minutesStr}`;
+    // };
 
     $scope.studySignupModal = function(session, index) {
       $scope.currentSession = session;
@@ -105,7 +113,18 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
         });
     };
 
-    $scope.hardCodedClasses = ['CEN3031', 'COP4600', 'EEL3701', 'CIS4930'];
+    // Declare methods that can be used to access course data
+    $scope.courses = {
+      getAll: function() {
+        return $http.get(window.location.origin + '/api/courses/')
+          .then((results) => {
+            return results;
+          })
+          .catch((err) => {
+            return err;
+          });
+      }
+    };
 
     init();
   }]);

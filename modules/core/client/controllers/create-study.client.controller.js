@@ -1,36 +1,36 @@
 'use strict';
 
-angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$document', 'Authentication',
-  function($scope, $rootScope, $http, $state, $document, Authentication) {
+angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
+  function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
     /* Get all the listings, then bind it to the scope */
-    console.log($rootScope.getMockUser());
     $scope.user = Authentication.user;
-    console.log('PV', $scope.user);
+    $scope.currentStudy = {};
 
     $document.ready(() => {
-      $scope.request = window.location.pathname;
-      $scope.pass = $scope.request.slice(14);
-      //alert('document fire');
-      if (window.location.pathname.includes('edit')) {
+      if ($state.current.name === 'studies.edit') {
         $scope.init();
       }
     });
 
 
     $scope.init = function() {
-      //alert('init called');
+      $scope.state = 'edit';
+      $scope.pass = $stateParams.studyId;
 
       $scope.getStudy($scope.pass)
       .then((results) => {
-        $scope.study = results;
-        console.log($scope.study);
-        $scope.study.title = $scope.study.data.title;
-        $scope.study.location = $scope.study.data.location;
-        $scope.study.irb = $scope.study.data.irb;
-        $scope.study.compensationType = $scope.study.data.compensationType;
-        $scope.study.maxParticipants = $scope.study.data.maxParticipants;
-        $scope.study.maxParticipantsPerSession = $scope.study.data.maxParticipantsPerSession;
-        $scope.study.description = $scope.study.data.description;
+        console.log(results);
+        $scope.currentStudy.title = results.data.title;
+        $scope.currentStudy.location = results.data.location;
+        $scope.currentStudy.irb = results.data.irb;
+        $scope.currentStudy.compensationType = results.data.compensationType;
+        $scope.currentStudy.maxParticipants = results.data.maxParticipants;
+        $scope.currentStudy.requireApproval = results.data.requireApproval;
+        $scope.currentStudy.satisfactoryNumber = results.data.satisfactoryNumber;
+        $scope.currentStudy.duration = results.data.duration;
+        $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
+        $scope.currentStudy.description = results.data.description;
+        $scope.currentStudy.researchers = results.data.researchers;
         //TODO Add researchers (and compensationAmount?)
 
       })
@@ -38,6 +38,17 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         console.log(err);
       });
 
+    };
+
+    $scope.submit = function(isValid) {
+      console.log(isValid);
+      if ($scope.state === 'edit') {
+        console.log('update');
+        $scope.update(isValid);
+      } else {
+        console.log('create');
+        $scope.create(isValid);
+      }
     };
 
     $scope.getStudy = function(studyId) {
@@ -51,11 +62,9 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
     };
 
     $scope.create = function(isValid) {
-      //alert('Hello World');
       $scope.error = null;
-      $scope.study.researchers = [];
-      $scope.study.researchers.push({ 'userID': $scope.user._id });
-      console.log('PV', $scope.study);
+      $scope.currentStudy.researchers = [];
+      $scope.currentStudy.researchers.push({ 'userID': $scope.user._id });
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
@@ -63,12 +72,11 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         return false;
       }
 
-      $http.post('/api/studies/create', $scope.study).success((response) => {
-        //alert(response);
+      $http.post('/api/studies/', $scope.currentStudy).success((response) => {
         // If successful we assign the response to the global user model
-        console.log('PV', 'Study Created!');
         // And redirect to the previous or home page
-        $state.go('researcher-portal');
+        console.log(response._id);
+        $state.go('studies.availability', { 'studyId': response._id });
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);
@@ -76,33 +84,20 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
     };
 
     $scope.update = function(isValid) {
-
-      //alert($scope.study.title);
-
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         alert('Invalid JSON');
         return false;
       }
 
-      $http.put('/api/studies/'+$scope.pass, $scope.study).success((response) => {
-        //alert($scope.study.title+' meow');
-        console.log('PV', 'Study Updated!');
+      console.log($scope.currentStudy);
+
+      $http.put('/api/studies/'+$scope.pass, $scope.currentStudy).success((response) => {
         $state.go('researcher-portal');
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);
       });
     };
-
-    /*
-    $document.ready(() => {
-      alert('document fire');
-      alert(window.location.pathname);
-      if (window.location.pathname.includes('edit')) {
-        $scope.init();
-      }
-    });
-    */
   }
 ]);

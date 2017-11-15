@@ -8,6 +8,7 @@ const sessionSchema = new Schema({
       ref: 'User'
     },
     attended: Boolean,
+    approved: Boolean,
     compensationType: {
       type: String,
       enum: ['extraCredit', 'monetary', 'none'],
@@ -15,7 +16,8 @@ const sessionSchema = new Schema({
     extraCreditCourse: {
       type: String
     },
-    compensationGiven: Boolean
+    compensationGiven: Boolean,
+    compensationDate: Date
   }],
   studyID: {
     type: Schema.Types.ObjectId,
