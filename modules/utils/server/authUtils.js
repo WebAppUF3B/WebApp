@@ -75,8 +75,8 @@ const secureBasicRoutes = [
   '/picture',
   '/api/sessions/',
   '/api/studies/',
-  '/api/studySession/signup',
-  '/api/courses/'
+  '/api/studySessions/signup',
+  '/api/courses'
 ];
 
 exports.generateCancellationToken = function(object) {

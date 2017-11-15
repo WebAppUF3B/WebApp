@@ -18,10 +18,10 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $scope.pastSessions.data = [];
 
       $scope.user = Authentication.user;
-      console.log($scope.user);
+      console.log('tw user', $scope.user);
 
       $scope.authToken = Authentication.authToken;
-      console.log($scope.authToken);
+      console.log('tw auth token', $scope.authToken);
 
       $scope.header = {
         headers: {
