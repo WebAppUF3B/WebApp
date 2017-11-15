@@ -103,6 +103,9 @@
   .expand {
     flex: 1;
   }
+  .top-divider{
+    display: none;
+  }
 }
 
 /* For Desktop Only */
@@ -153,6 +156,28 @@ h2, h3, h4, h5, h6 {
   border-top: 1px solid #9da3bd !important;
   border-bottom: 3px solid #9da3bd !important;
   margin-bottom: 0px !important;
+}
+
+.navbar-nav{
+  margin-top: 0px !important;
+  margin-bottom: 0px !important;
+}
+
+.navbar-toggle {
+  border: 2px solid #9da3bd !important;
+  margin-bottom: 10px !important;
+}
+
+.navbar-toggle .icon-bar {
+  background-color: #9da3bd !important;
+}
+
+.nav>li>a:focus, .nav>li>a:hover {
+  background: none !important;
+}
+
+.nav>li>a:focus, .nav>li>a {
+  font-size: 16px;
 }
 
 .top-logo {
@@ -768,7 +793,7 @@ li.divider{
 .main-dropdown-toggle{
   height: 100%;
   width: 100%;
-  padding: 15px !important;
+  padding: 12px 15px !important;
   color: #337ab7;
   font-size: 16px;
 }

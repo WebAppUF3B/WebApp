@@ -28,11 +28,11 @@
           <div class="text-center form-group small-top-pad">
             <button type="submit" class="full-width btn btn-primary">Sign In</button>
           </div>
-          <div class="text-center forgot-password">
-            <a ui-sref="password.forgot">Forgot your password?</a>
-          </div>
-          <div ng-show="error" class="text-center text-danger small-top-pad">
+          <div ng-show="error" class="text-center text-danger bottom-pad">
             <strong ng-bind="error"></strong>
+          </div>
+          <div class="text-center forgot-password">
+            <a ui-sref="password.forgot">Forget your password?</a>
           </div>
         </fieldset>
       </form>

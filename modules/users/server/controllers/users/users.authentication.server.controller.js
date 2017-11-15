@@ -221,6 +221,7 @@ exports.verify = function(req, res) {
       thisUser = user;
       if (thisUser === null) throw noUserErr;
       if (thisUser.emailValidated) throw alreadyVerifiedErr;
+      console.log("NOOOO");
       thisUser.emailValidated = true;
       return user.save();
     })
@@ -254,7 +255,7 @@ exports.verify = function(req, res) {
     })
     .catch((err) => {
       console.log('Verify email Error:\n', err);
-      return res.status(err.code).send(err);
+      return res.status(400).send(err);
     });
 };
 
