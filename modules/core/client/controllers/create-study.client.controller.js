@@ -14,6 +14,8 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
 
 
     $scope.init = function() {
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
       $scope.state = 'edit';
       $scope.pass = $stateParams.studyId;
 
@@ -74,8 +76,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       $http.post('/api/studies/', $scope.currentStudy).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
-        console.log(response._id);
-        $state.go('studies.availability', { 'studyId': response._id });
+        $state.go('researcher-portal');
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);
