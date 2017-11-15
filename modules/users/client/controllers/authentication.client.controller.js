@@ -8,6 +8,8 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
     $scope.error = $location.search().err;
 
     function init() {
+      $scope.credentials = {};
+      $scope.focus = false;
       if ($scope.authentication.user) {
         if ($scope.authentication.user.role === 'participant') {
           $state.go('participant-portal');
@@ -85,11 +87,21 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
+    $scope.toggleBirthdayFocus = function() {
+      $scope.focus = !$scope.focus;
+      if ($scope.focus) $('#birthday').focus();
+      else $('#birthday').blur();
+    };
+
+    $('#birthday').focus(() => {
+      $scope.focus = true;
+    });
+
     $scope.signin = function(isValid) {
       $scope.error = null;
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
-
+        $scope.error = 'Please enter your username and password.';
         return false;
       }
 
