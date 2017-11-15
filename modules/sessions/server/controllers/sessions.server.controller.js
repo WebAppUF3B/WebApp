@@ -327,9 +327,15 @@ exports.denyUser = function(req, res) {
   };
 
   studySession.participants.splice(deleteIndex, 1);
-  console.log(studySession);
-  studySession.save();
 
+  if (studySession.participants.length === 0) {
+    // If there are no more participants, remove the session
+    studySession.remove();
+  } else {
+    // Otherwise, just update it
+    studySession.save();
+  }
+  
   res.json(studySession);
   return transporter.sendMail(mailOptions);
 };

@@ -29,7 +29,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           'x-access-token': $scope.authToken
         }
       };
-      console.log('header', $scope.header);
 
       $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
