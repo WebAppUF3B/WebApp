@@ -22,7 +22,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.compensated.data = [];
 
       $scope.user = Authentication.user;
-      console.log($scope.user);
+      console.log('tw user', $scope.user);
 
       $scope.studies.getUserStudies($scope.user._id)
         .then((results) => {
@@ -65,7 +65,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
               $scope.allSessions.forEach((session) => {
                 date = new Date(session.startTime);
                 session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-                session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+                session.time = `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
                 // Place session in correct array
                 if (session.participants.length !== 0) {
