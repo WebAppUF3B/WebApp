@@ -21,25 +21,25 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
         .catch((err) => {
           console.log(err);
         });
-    };
-    $scope.getAllUsers()
-      .then((result) => {
+      $scope.admin.getAllUsers()
+      .then((results) => {
         $scope.allUsers = results.data;
         console.log(results.data);
-        $scope.AllUsersTable = new NgTableParams({
+        $scope.allUsersTable = new NgTableParams({
           count: 10,
           sorting: {
             lastName: 'asc'
           }
         }, {
-          counts: [],
-          dataset: $scope.allUsers
-        })
-        .catch((err) => {
-          console.log(err);
+          counts: [], // hides page sizes
+          dataset: $scope.allUsers // select data
         });
-      });
 
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    };
     $scope.approvalDetails = function(user, index) {
       $scope.currentUser = user;
       $scope.currentIndex = index;

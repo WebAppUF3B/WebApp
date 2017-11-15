@@ -174,9 +174,7 @@ exports.getAllUsers = function(req, res) {
   User.find({}, '-salt -password')
   .then((results) => {
     console.log(results);
-    return res.status(200).send({
-      users: results
-    });
+    res.json(results);
   })
   .catch((err) => {
     console.log('get all users error:\n', err);
