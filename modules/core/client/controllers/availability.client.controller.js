@@ -171,6 +171,24 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       }
     };
 
+    $scope.removeEntry = function(date) {
+      const convertedDate = new Date(date.unixDate);
+      let index = -1;
+      console.log(date.$$hashKey);
+      //alert('Removing Entry from date: '+convertedDate);
+
+      for (let x = 0; x < $scope.availability.length; x++) {
+        if ($scope.availability[x].$$hashKey === date.$$hashKey) {
+          index = x;
+          break;
+        }
+      }
+
+      console.log('Index of entry with '+date.$$hashKey+' is '+index);
+
+      $scope.availability.splice(index,1);
+    };
+
     init();
 
     /* Single Session Creation Method
