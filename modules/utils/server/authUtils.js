@@ -3,6 +3,7 @@ const lodash = require('lodash');
 
 exports.authUser = function(req, res, next) {
   const reqPath = req.path;
+  console.log('req', req.method);
   console.log('tw req', reqPath);
   console.log('secure compare', lodash.contains(allSecureRoutes, reqPath));
 
@@ -32,6 +33,13 @@ exports.authUser = function(req, res, next) {
       && decodedUser.role !== 'admin') {
       return res.status(unauthorizedUserErr.code).send(unauthorizedUserErr);
     }
+
+    console.log('cehck permissions', checkRolePermissions(decodedUser.role, req.method, reqPath));
+
+    if (!checkRolePermissions(decodedUser.role, req.method, reqPath)) {
+      return res.status(unauthorizedUserErr.code).send(unauthorizedUserErr);
+    };
+
     req.decodedUser = decodedUser;
     next();
   }
@@ -47,10 +55,40 @@ const parseAuthToken = function(req) {
     } catch (err) {
       console.log('token parse decode err:', err);
       if (err.name === 'TokenExpiredError') return { err: { code: 401, message: 'Token Expired.' } };
-      return { err: { code: 403, message: 'unauthorized' } };
+      return unauthorizedUserErr;
     }
   }
-  return { err: { code: 403, message: 'unauthorized' } };
+  return unauthorizedUserErr;
+};
+
+const checkRolePermissions = (role, reqMethod, reqPath) => {
+  switch (role) {
+    case 'participant':
+      return checkPermissions(participant, reqMethod, reqPath);
+    case 'participant':
+      break;
+    case 'participant':
+      break;
+    case 'participant':
+      break;
+    default:
+      return false;
+  }
+};
+
+const checkPermissions = (rolePermissions, reqMethod, reqPath) => {
+  let isAllowed = false;
+
+  isAllowed = rolePermissions.roles.some((role) => {
+    console.log('check perm role', role);
+    isAllowed = role[reqMethod].some((path) => {
+      console.log('check path in role', path);
+      if (path === reqPath) return true;
+    });
+    if (isAllowed) return isAllowed;
+  });
+
+  return isAllowed;
 };
 
 const unauthorizedUserErr = {
@@ -73,11 +111,41 @@ const secureBasicRoutes = [
   '/profile',
   '/accounts',
   '/picture',
-  '/api/sessions/',
   '/api/studies/',
-  '/api/studySessions/signup',
-  '/api/courses'
+  '/api/studySessions/signup/',
+  '/api/courses',
+  '/api/sessions/'
 ];
+
+const participantRole = {
+  GET: [
+    '/api/sessions/user/',
+    '/api/',
+    '/api/studySessions/signup/',
+    '/api/courses'
+  ],
+  PUT: [
+
+  ],
+  POST: [
+    '/api/studySession/signup'
+  ],
+  DELETE: [
+    '/api/sessions/'
+  ]
+};
+
+const participant = {
+  roles: [participantRole]
+};
+
+const researcher = {
+  roles: [participantRole]
+};
+
+const faculty = {
+  roles: [participantRole]
+};
 
 exports.generateCancellationToken = function(object) {
   const token = jwt.sign(object, process.env.JWT);
