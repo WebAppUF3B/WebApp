@@ -3,18 +3,23 @@
       <img src="/images/hcc_logo.jpg" alt="Human Centered Computing Research Portal" class="top-logo">
   </div>
 </div>
-<div class="navbar" ng-controller="HeaderController">
+<nav class="navbar" ng-controller="HeaderController">
   <div class="container">
     <div class="navbar-header">
-      <button class="navbar-toggle" type="button" ng-click="toggleCollapsibleMenu()">
-        <span class="sr-only">Toggle navigation</span>
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a ui-sref="home" class="navbar-brand">Home</a>
     </div>
-    <nav class="collapse navbar-collapse" collapse="!isCollapsed" role="navigation">
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li><a ui-sref="home" ng-show="!authentication.user">Home</a></li>
+        <li><a ui-sref="participant-portal" ng-show="authentication.user">Participant</a></li>
+        <li><a ui-sref="researcher-portal" ng-show="authentication.user.role === 'researcher' || authentication.user.role === 'admin'">Researcher</a></li>
+        <li><a ui-sref="faculty-portal" ng-show="authentication.user.role === 'faculty' || authentication.user.role === 'admin'">Faculty</a></li>
+        <li><a ui-sref="admin-portal" ng-show="authentication.user.role === 'admin'">Admin</a></li>
+      </ul>
       <ul class="nav navbar-nav navbar-right" ng-hide="authentication.user">
         <li ui-sref-active="active">
           <a ui-sref="authentication.signup">Sign Up</a>
@@ -31,9 +36,11 @@
               {{authentication.user.firstName}} <span class="caret"></span>
             </div>
             <ul class="dropdown-menu" role="menu">
+              <li class="divider top-divider"></li>
               <li ui-sref-active="active">
                 <a class="dropdown-tab" ui-sref="settings.profile"><span>Edit Profile</span></a>
               </li>
+              <li class="divider" ng-show="authentication.user.provider === 'local'"></li>
               <li ui-sref-active="active" ng-show="authentication.user.provider === 'local'">
                 <a class="dropdown-tab" ui-sref="settings.password"><span>Change Password</span></a>
               </li>
@@ -45,6 +52,6 @@
           </div>
         </div>
       </ul>
-    </nav>
+    </div>
   </div>
-</div>
+</nav>
