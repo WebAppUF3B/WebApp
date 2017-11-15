@@ -35,7 +35,7 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
           $scope.studySessions.forEach((session) => {
             date = new Date(session.startTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+            session.time = `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             session.participants.forEach((participant) => {
               // Store participants in table if they are awaiting approval
@@ -211,6 +211,8 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
     };
 
     $scope.toTitleCase = function(str) {
+      if (!str) return;
+      
       return str.replace(/\w\S*/g, (txt) => {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       });

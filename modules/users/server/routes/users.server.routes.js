@@ -1,6 +1,6 @@
 'use strict';
 const users = require('../controllers/users.server.controller');
-const authUtils = require('../../../utils/authUtils');
+const authUtils = require('../../../utils/server/authUtils');
 
 module.exports = function (app) {
   // User Routes

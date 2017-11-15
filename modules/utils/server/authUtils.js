@@ -6,9 +6,11 @@ exports.authUser = function(req, res, next) {
   console.log('tw req', reqPath);
   console.log('secure compare', lodash.contains(allSecureRoutes, reqPath));
 
-  const isSecured = allSecureRoutes.some((route) => {
-    if (reqPath.includes(route)) return true;
-  });
+  if (lodash.contains(hostRoutes, reqPath)) {
+    next();
+  }
+
+  const isSecured = lodash.contains(allSecureRoutes, reqPath);
 
   console.log('is secured', isSecured);
 
@@ -61,7 +63,12 @@ const expiredTokenErr = {
   message: 'Your session has expired, please log back in.'
 };
 
-const seucreBasicRoutes = [
+// Routes that are used by host and require special access
+const hostRoutes = [
+  '/api/sessions/reminderEmails'
+];
+
+const secureBasicRoutes = [
   '/settings',
   '/profile',
   '/accounts',
@@ -72,10 +79,18 @@ const seucreBasicRoutes = [
   '/api/courses/'
 ];
 
+exports.generateCancellationToken = function(object) {
+  const token = jwt.sign(object, process.env.JWT);
+  return token;
+};
 
+exports.parseCancellationToken = function(token) {
+  const object = jwt.verify(token, process.env.JWT);
+  return object;
+};
 
-const allSecureRoutes = seucreBasicRoutes;
+const allSecureRoutes = secureBasicRoutes;
 
-exports.seucreBasicRoutes = seucreBasicRoutes;
+exports.secureBasicRoutes = secureBasicRoutes;
 
 exports.allSecureRoutes = allSecureRoutes;

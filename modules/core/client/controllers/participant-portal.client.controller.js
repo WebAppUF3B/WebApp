@@ -29,7 +29,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           'x-access-token': $scope.authToken
         }
       };
-      console.log('header', $scope.header);
 
       $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
@@ -43,7 +42,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           $scope.allSessions.forEach((session) => {
             date = new Date(session.startTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+            session.time = `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             // Place session in correct array
             if (date >= today) {

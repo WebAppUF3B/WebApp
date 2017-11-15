@@ -10,7 +10,7 @@ const path = require('path'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
   jwt = require('jsonwebtoken'),
-  utils = require('../../../../utils/stringUtils');
+  utils = require('../../../../utils/server/stringUtils');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
@@ -34,7 +34,7 @@ exports.signup = function(req, res) {
   // Then save the user
   user.save()
       .then((user) => {
-        const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${user._id}`;
+        const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/authentication/verify/${user._id}`;
         const verificationText = `Hello ${user.firstName} ${user.lastName},
                                   \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
 
@@ -221,6 +221,7 @@ exports.verify = function(req, res) {
       thisUser = user;
       if (thisUser === null) throw noUserErr;
       if (thisUser.emailValidated) throw alreadyVerifiedErr;
+      console.log("NOOOO");
       thisUser.emailValidated = true;
       return user.save();
     })
@@ -254,7 +255,7 @@ exports.verify = function(req, res) {
     })
     .catch((err) => {
       console.log('Verify email Error:\n', err);
-      return res.status(err.code).send(err);
+      return res.status(400).send(err);
     });
 };
 
