@@ -1,7 +1,3 @@
-// An example configuration file.
-
-
-
 exports.config = {
   directConnect: true,
 
@@ -26,11 +22,11 @@ exports.config = {
 
   // Spec patterns are relative to the current working directory when
   // protractor is called.
-  specs: ['dummytest_spec.js','test.js'],
+  specs: ['login_test.js'],
 
   // Options to be passed to Jasmine.
   jasmineNodeOpts: {
-    defaultTimeoutInterval: 30000
+    defaultTimeoutInterval: 5000
   }
 
 
