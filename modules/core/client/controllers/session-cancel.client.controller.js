@@ -7,10 +7,8 @@ angular.module('core').controller('SessionCancellationController', ['$scope','$h
       const token = $stateParams.token;
 
       $scope.user = Authentication.user;
-      console.log('tw user', $scope.user);
 
       $scope.authToken = Authentication.authToken;
-      console.log('tw auth token', $scope.authToken);
 
       $scope.header = {
         headers: {

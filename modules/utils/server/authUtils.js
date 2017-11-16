@@ -3,11 +3,7 @@ const lodash = require('lodash');
 
 exports.authUser = function(req, res, next) {
 
-  if (req.method === 'DELETE') {
-    console.log(req.headers);
-  }
-
-  const reqPath = parseURLParams(req.path);
+  const reqPath = req.path;
   console.log('tw req', reqPath);
 
   if (lodash.contains(hostRoutes, reqPath)) {
@@ -87,24 +83,13 @@ const checkPermissions = (rolePermissions, reqMethod, reqPath) => {
   return rolePermissions.roles.some((role) => {
     console.log('check perm role', role);
 
-    isAllowed = role[reqMethod].some((path) => {
-      console.log('check path in role', path, reqPath, path === reqPath);
-      if (path === reqPath) return true;
+    isAllowed = role[reqMethod].some((pathRegex) => {
+      console.log('check path in role', pathRegex, reqPath, pathRegex.test(reqPath));
+      if (pathRegex.test(reqPath)) return true;
     });
 
     if (isAllowed) return isAllowed;
   });
-};
-
-const parseURLParams = (url) => {
-  // https://docs.mongodb.com/manual/reference/method/ObjectId/
-  const mongoDBObjectIdRegex = /\/([a-z0-9]){24}/;
-  let reqPath = url;
-  while (reqPath.match(mongoDBObjectIdRegex)) {
-    console.log('matches', reqPath.match(mongoDBObjectIdRegex));
-    reqPath = reqPath.replace(mongoDBObjectIdRegex, '');
-  }
-  return reqPath[reqPath.length - 1] !== '/' ? `${reqPath}/` : reqPath;
 };
 
 const unauthorizedUserErr = {
@@ -135,57 +120,59 @@ const secureBasicRoutes = [
 
 const participantRole = {
   GET: [
-    '/api/sessions/user/',
-    '/api/',
-    '/api/studySessions/signup/',
-    '/api/courses/',
-    '/api/studies/',
+    /^\/api\/sessions\/user\/\w*$/,
+    /^\/api\/studySessions\/signup\/\w*\/\w*$/,
+    /^\/api\/courses\/$/,
+    /^\/api\/studies\/$/,
   ],
   PUT: [
 
   ],
   POST: [
-    '/api/studySession/signup/'
+    /^\/api\/studySession\/signup$/
   ],
   DELETE: [
-    '/api/sessions/'
+    /^\/api\/sessions\/\w*$/
   ]
 };
 
 
 const researcherRole = {
   GET: [
-    '/api/studies/',
-    '/api/sessions/user/',
-    '/api/studies/user/',
-    '/api/studySessions/'
+    /^\/api\/studies\/\w*$/,
+    /^\/api\/sessions\/user\/\w*$/,
+    /^\/api\/studies\/user\/\w*$/,
+    /^\/api\/studySessions\/\w*$/,
   ],
   PUT: [
-    '/api/studies/',
-    '/api/sessions/attend/',
-    '/api/sessions/compensate/',
-    '/api/studies/close/',
-    '/api/studies/reopen/',
-    '/api/sessions/approveUser/',
-    '/api/sessions/denyUser/'
+    /^\/api\/studies\/\w*$/,
+    /^\/api\/sessions\/attend\/\w*$/,
+    /^\/api\/sessions\/compensate\/\w*$/,
+    /^\/api\/studies\/close\/\w*$/,
+    /^\/api\/studies\/reopen\/\w*$/,
+    /^\/api\/sessions\/approveUser\/\w*$/,
+    /^\/api\/sessions\/denyUser\/\w*$/
   ],
   POST: [
-    '/api/studies/',
-    '/api/sessions/create/'
+    /^\/api\/studies\/$/,
+    /^\/api\/sessions\/create\/\w*$/
   ],
   DELETE: [
-    '/api/sessions/',
-    '/api/sessions/cancel/'
+    /^\/api\/sessions\/\w*$/,
+    /^\/api\/sessions\/cancel\/\w*$/
   ]
 };
 
 
 const facultyRole = {
   GET: [
+    /^\/api\/sessions\/course\/\w*$/,
+    /^\/api\/courses\/$/,
   ],
   PUT: [
   ],
   POST: [
+    /^\/api\/courses\/\w*$/
   ],
   DELETE: [
   ]
