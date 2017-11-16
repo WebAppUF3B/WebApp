@@ -1,5 +1,5 @@
 <div class="container inner-container" ng-controller="AvailabilityController">
-  <h1 class="text-center pad-top"><strong>Define Session Availbility</strong></h1>
+  <h1 class="text-center pad-top"><strong ng-if="state!=='edit'">Define Session Availability</strong><strong ng-if="state==='edit'">Edit Session Availability</strong></h1>
   <div class="row justify-content-between">
     <div class='col-sm-8'>
       <h3>Selection Type:</h3>
@@ -9,7 +9,7 @@
       </div>
     </div>
     <div class='col-sm-4'>
-      <button type="submit" ng-click='sendAvailability()' class="btn btn-primary full-width no-margin small-top-margin">Submit Availability</button>
+      <button type="submit" ng-click='sendAvailability()' class="btn btn-primary full-width no-margin small-top-margin"><span ng-if="state!=='edit'">Submit Availability</span><span ng-if="state==='edit'">Edit Availability</span></button>
     </div>
   </div>
   <div class='row'>

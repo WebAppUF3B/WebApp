@@ -1,29 +1,23 @@
-angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController', ['$scope','$http', '$location', '$state', '$stateParams',
-  function($scope, $http, $location, $state, $stateParams) {
-    $scope.activeDate = null;
-    $scope.selectedDates = [new Date().setHours(0,0,0,0)];
-    $scope.options = {
-      startingDay: 1,
-      minDate: new Date(),
-      customClass: function(data) {
-        if ($scope.selectedDates.indexOf(data.date.setHours(0, 0, 0, 0)) > -1) {
-          return 'selected';
-        }
-        return '';
-      }
-    };
-    $scope.availability = [];
-    $scope.time = [];
-    $scope.currentStudy = {};
-    //$scope.startTime = new Date().setHours(0,0);
-    //$scope.endTime = new Date().setHours(23,0);
+angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController', ['$scope','$http', '$location', '$state', '$stateParams', '$document',
+  function($scope, $http, $location, $state, $stateParams, $document) {
 
     const init = function() {
       $scope.studyId = $stateParams.studyId;
+      $scope.availability = [];
+      $scope.time = [];
+      $scope.currentStudy = {};
       $scope.studySessions = null;
       $scope.error = null;
       $scope.type = 'individual';
 
+      if ($state.current.name === 'studies.availability-edit') {
+        $scope.state = 'edit';
+        $scope.tempAvailability = $stateParams.avail;
+        alert('Edit Detected');
+        console.log('tempAvailability got');
+        console.log($scope.tempAvailability);
+      }
+      alert($scope.studyId);
       $scope.getStudy($scope.studyId)
       .then((results) => {
         console.log(results);
@@ -38,7 +32,20 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         $scope.currentStudy.description = results.data.description;
         $scope.currentStudy.researchers = results.data.researchers;
         $scope.currentStudy.availability = [];
-
+        /*
+        if ($scope.state === 'edit') {
+          $scope.tempAvailability = results.data.availability;
+          $scope.putInDate = [new Date().setHours(0,0,0,0)];
+          console.log('Edit Detected, Populating temp availability');
+          console.log($scope.tempAvailability);
+          alert('going to interpret');
+          $scope.interpretCurrentAvailability();
+          console.log('interpret finished, here is the array to initialize calendar in edit');
+          console.log($scope.putInDate);
+          console.log('interpret finished, here is the array to initialize timeslots in edit');
+          console.log($scope.availability);
+        }
+        */
         //$scope.currentStudy.durationFromStudy = results.data.duration;
         console.log($scope.currentStudy);
         $scope.prepTime();
@@ -46,6 +53,35 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       .catch((err) => {
         console.log(err);
       });
+
+      $scope.putInDate = [];
+      $scope.interpretCurrentAvailability();
+
+      $scope.activeDate = null;
+      if ($scope.state === 'edit') {
+        //const madeUpDate = new Date(2017,10,16,0,0,0,0);//remember month is 0-11, not 1-12
+        //const putToUse = madeUpDate.getTime();
+        //alert('Manual/Default Entry into putInDate '+madeUpDate);
+        //$scope.putInDate = [new Date().setHours(0,0,0,0), putToUse, new Date().setHours(48,0,0,0)];
+        console.log('Finished Interpret of Passed Param');
+        console.log($scope.putInDate);
+        console.log($scope.availability);
+        $scope.selectedDates = $scope.putInDate; //able to manipulated via external array first.
+        console.log('edit date');
+      } else {
+        $scope.selectedDates = [new Date().setHours(0,0,0,0)];
+        console.log('non-edit date');
+      }
+      $scope.options = {
+        startingDay: 1,
+        minDate: new Date(),
+        customClass: function(data) {
+          if ($scope.selectedDates.indexOf(data.date.setHours(0, 0, 0, 0)) > -1) {
+            return 'selected';
+          }
+          return '';
+        }
+      };
     };
 
     $scope.removeFromSelected = function(dt) {
@@ -69,7 +105,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       }
 
       for (let x = 0; x < $scope.availability.length; x++) {
-        let convertedUnix = new Date($scope.availability[x].unixDate);
+        const convertedUnix = new Date($scope.availability[x].unixDate);
 
         $scope.currentStudy.availability.push({
           startTime: new Date(
@@ -99,7 +135,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       $http.put('/api/studies/'+$scope.studyId, $scope.currentStudy).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
-        //$state.go('researcher-portal');
+        $state.go('researcher-portal');
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);
@@ -143,7 +179,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
     $scope.prepTime = function() {
       if ($scope.currentStudy.duration === 15) {
         for (let hour = 0; hour <= 23; hour++) {
-          for (let minute = 0; minute <= 2; minute++) {
+          for (let minute = 0; minute <= 3; minute++) {
             const unix = new Date().setHours(hour,minute*15);
             const date = new Date(unix);
             const obj = { val: date, show: moment(unix).format('hh:mm A') };
@@ -187,6 +223,27 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       console.log('Index of entry with '+date.$$hashKey+' is '+index);
 
       $scope.availability.splice(index,1);
+    };
+
+    //populate what's needed to get existing data to show in edit
+    $scope.interpretCurrentAvailability = function() {
+      alert('interpeting tempAvailability');
+      for (let x = 0; x < $scope.tempAvailability.length; x++) {
+        console.log((moment($scope.tempAvailability[x].startTime)._d));
+        console.log((moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0));
+        const existingEntry = (moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0);
+        //push to initialize existing dates in calendarconsole.log((moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0));
+        if ($scope.putInDate.indexOf(existingEntry) === -1) {
+          alert('Adding'+existingEntry);
+          $scope.putInDate.push(existingEntry);
+        }
+        //push to initialize existing timeslots in $scope.availability
+        $scope.availability.push({
+          lstartTime: (moment($scope.tempAvailability[x].startTime)._d),
+          lendTime: (moment($scope.tempAvailability[x].endTime)._d),
+          unixDate: existingEntry
+        });
+      }
     };
 
     init();

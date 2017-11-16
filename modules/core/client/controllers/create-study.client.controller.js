@@ -31,6 +31,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         $scope.currentStudy.duration = results.data.duration;
         $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
         $scope.currentStudy.description = results.data.description;
+        $scope.currentStudy.availability = results.data.availability;
         $scope.currentStudy.researchers = results.data.researchers;
         //TODO Add researchers (and compensationAmount?)
 
@@ -76,7 +77,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       $http.post('/api/studies/', $scope.currentStudy).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
-        $state.go('researcher-portal');
+        $state.go('studies.availability', { 'studyId': response._id });
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);
@@ -93,7 +94,9 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       console.log($scope.currentStudy);
 
       $http.put('/api/studies/'+$scope.pass, $scope.currentStudy).success((response) => {
-        $state.go('researcher-portal');
+        console.log('Did the put, here is the return');
+        console.log(response);
+        $state.go('studies.availability-edit', { 'studyId': response._id, 'avail': response.availability });
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);
