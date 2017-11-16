@@ -4,6 +4,18 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
 
+      $scope.user = Authentication.user;
+
+      $scope.authToken = Authentication.authToken;
+
+      $scope.header = {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': $scope.authToken
+        }
+      };
+      console.log('header', $scope.header);
+
       $scope.courses.getAll()
         .then((results) => {
           // Assign results to upcomingSessions.data
@@ -19,18 +31,6 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       $scope.hasMonetary = false;
       $scope.hasExtraCredit = false;
       $scope.credentails = null;
-
-      $scope.user = Authentication.user;
-
-      $scope.authToken = Authentication.authToken;
-
-      $scope.header = {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': $scope.authToken
-        }
-      };
-      console.log('header', $scope.header);
 
       $scope.getAllSessionsByStudyId();
       $scope.myStudySessions = new NgTableParams({

@@ -2,16 +2,17 @@ const jwt = require('jsonwebtoken');
 const lodash = require('lodash');
 
 exports.authUser = function(req, res, next) {
-  const reqPath = req.path;
-  console.log('req', req.method);
+
+  const reqPath = parseURLParams(req.path);
   console.log('tw req', reqPath);
-  console.log('secure compare', lodash.contains(allSecureRoutes, reqPath));
 
   if (lodash.contains(hostRoutes, reqPath)) {
     next();
   }
 
-  const isSecured = lodash.contains(allSecureRoutes, reqPath);
+  const isSecured = allSecureRoutes.some((route) => {
+    if (reqPath.includes(route)) return true;
+  });
 
   console.log('is secured', isSecured);
 
@@ -34,7 +35,7 @@ exports.authUser = function(req, res, next) {
       return res.status(unauthorizedUserErr.code).send(unauthorizedUserErr);
     }
 
-    console.log('cehck permissions', checkRolePermissions(decodedUser.role, req.method, reqPath));
+    console.log('check permissions', checkRolePermissions(decodedUser.role, req.method, reqPath));
 
     if (!checkRolePermissions(decodedUser.role, req.method, reqPath)) {
       return res.status(unauthorizedUserErr.code).send(unauthorizedUserErr);
@@ -46,7 +47,7 @@ exports.authUser = function(req, res, next) {
 };
 
 const parseAuthToken = function(req) {
-  const token = req.body.authToken || req.query.token || req.headers['x-access-token'];
+  const token = req.body.authToken || req.headers['x-access-token'];
   if (token) {
     try {
       const decodedUser = jwt.verify(token, process.env.JWT);
@@ -65,12 +66,12 @@ const checkRolePermissions = (role, reqMethod, reqPath) => {
   switch (role) {
     case 'participant':
       return checkPermissions(participant, reqMethod, reqPath);
-    case 'participant':
-      break;
-    case 'participant':
-      break;
-    case 'participant':
-      break;
+    case 'researcher':
+      return checkPermissions(researcher, reqMethod, reqPath);
+    case 'faculty':
+      return checkPermissions(faculty, reqMethod, reqPath);
+    case 'admin':
+      return true;
     default:
       return false;
   }
@@ -79,16 +80,27 @@ const checkRolePermissions = (role, reqMethod, reqPath) => {
 const checkPermissions = (rolePermissions, reqMethod, reqPath) => {
   let isAllowed = false;
 
-  isAllowed = rolePermissions.roles.some((role) => {
+  return rolePermissions.roles.some((role) => {
     console.log('check perm role', role);
+
     isAllowed = role[reqMethod].some((path) => {
       console.log('check path in role', path);
       if (path === reqPath) return true;
     });
+
     if (isAllowed) return isAllowed;
   });
+};
 
-  return isAllowed;
+const parseURLParams = (url) => {
+  // https://docs.mongodb.com/manual/reference/method/ObjectId/
+  const mongoDBObjectIdRegex = /\/([a-z0-9]){24}/;
+  let reqPath = url;
+  while (reqPath.match(mongoDBObjectIdRegex)) {
+    console.log('matches', reqPath.match(mongoDBObjectIdRegex));
+    reqPath = reqPath.replace(mongoDBObjectIdRegex, '');
+  }
+  return reqPath[reqPath.length - 1] !== '/' ? `${reqPath}/` : reqPath;
 };
 
 const unauthorizedUserErr = {
@@ -111,13 +123,70 @@ const secureBasicRoutes = [
   '/profile',
   '/accounts',
   '/picture',
-  '/api/studies/',
-  '/api/studySessions/signup/',
+  '/api/studies',
+  '/api/studySessions',
   '/api/courses',
-  '/api/sessions/'
+  '/api/sessions'
 ];
 
 const participantRole = {
+  GET: [
+    '/api/sessions/user/',
+    '/api/',
+    '/api/studySessions/signup/',
+    '/api/courses/',
+    '/api/studies/',
+  ],
+  PUT: [
+
+  ],
+  POST: [
+    '/api/studySession/signup/'
+  ],
+  DELETE: [
+    '/api/sessions/'
+  ]
+};
+
+
+const researcherRole = {
+  GET: [
+    '/api/studies/',
+    '/api/sessions/user/',
+    '/api/studies/user/',
+    '/api/studySessions/'
+  ],
+  PUT: [
+    '/api/studies/',
+    '/api/sessions/attend/',
+    '/api/sessions/compensate/',
+    '/api/studies/close/',
+    '/api/studies/reopen/',
+    '/api/sessions/approveUser/',
+    '/api/sessions/denyUser/'
+  ],
+  POST: [
+    '/api/studies/',
+    '/api/sessions/create/'
+  ],
+  DELETE: [
+    '/api/sessions/',
+    '/api/sessions/cancel/'
+  ]
+};
+
+
+const facultyRole = {
+  GET: [
+  ],
+  PUT: [
+  ],
+  POST: [
+  ],
+  DELETE: [
+  ]
+};
+const adminRole = {
   GET: [
     '/api/sessions/user/',
     '/api/',
@@ -140,11 +209,11 @@ const participant = {
 };
 
 const researcher = {
-  roles: [participantRole]
+  roles: [researcherRole, participantRole]
 };
 
 const faculty = {
-  roles: [participantRole]
+  roles: [facultyRole, researcherRole, participantRole]
 };
 
 exports.generateCancellationToken = function(object) {
