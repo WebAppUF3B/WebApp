@@ -17,7 +17,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         console.log('tempAvailability got');
         console.log($scope.tempAvailability);
       }
-      alert($scope.studyId);
+      //alert($scope.studyId);
       $scope.getStudy($scope.studyId)
       .then((results) => {
         console.log(results);
@@ -47,6 +47,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         }
         */
         //$scope.currentStudy.durationFromStudy = results.data.duration;
+        console.log('From http.get request - availability was left blank on purpose');
         console.log($scope.currentStudy);
         $scope.prepTime();
       })
@@ -227,14 +228,14 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
 
     //populate what's needed to get existing data to show in edit
     $scope.interpretCurrentAvailability = function() {
-      alert('interpeting tempAvailability');
+      //alert('interpeting tempAvailability');
       for (let x = 0; x < $scope.tempAvailability.length; x++) {
         console.log((moment($scope.tempAvailability[x].startTime)._d));
         console.log((moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0));
         const existingEntry = (moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0);
         //push to initialize existing dates in calendarconsole.log((moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0));
         if ($scope.putInDate.indexOf(existingEntry) === -1) {
-          alert('Adding'+existingEntry);
+          //alert('Adding'+existingEntry);
           $scope.putInDate.push(existingEntry);
         }
         //push to initialize existing timeslots in $scope.availability
