@@ -1,0 +1,73 @@
+<!--
+
+// TODO create manage users controller
+<div class="container inner-container" ng-controller="ManageUsersController">
+
+// This page will look like study discovery page
+
+</div>
+
+-->
+<div class="container inner-container" ng-controller="AdminPortalController">
+
+<section>
+  <div class="page-header">
+    <h1>User: <span ng-bind="currentUser.firstName + currentUser.lastName"></span></h1><!--how do I do a space?-->
+  </div>
+  <div class="col-md-12">
+    <form name="userForm" ng-submit="editUser(userForm.$valid)" novalidate>
+      <fieldset>
+        <div class="form-group" show-errors>
+          <label for="firstName">First Name</label>
+          <input type="text" id="firstName" name="firstName" class="form-control" ng-model="currentUser.firstName" placeholder="First Name" required />
+          <div ng-messages="userForm.firstName.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">First name is required.</p>
+          </div>
+        </div>
+        <div class="form-group" show-errors>
+          <label for="lastName">Last Name</label>
+          <input type="text" id="lastName" name="lastName" class="form-control" ng-model="currentUser.lastName" placeholder="Last Name" required />
+          <div ng-messages="userForm.lastName.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Last name is required.</p>
+          </div>
+        </div>
+        <div class="form-group" show-errors>
+          <label for="address">Address</label>
+          <input type="text" id="address" name="address" class="form-control" ng-model="currentUser.address" placeholder="123 Example Street" required />
+          <div ng-messages="userForm.address.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Address is required.</p>
+          </div>
+        </div>
+        <div class="form-group" show-errors>
+          <label for="email">Email</label>
+          <input type="text" id="email" name="email" class="form-control" ng-model="currentUser.email" placeholder="email@example.com" required />
+          <div ng-messages="userForm.email.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Email is required.</p>
+          </div>
+        </div>
+        <div class="form-group" show-errors>
+          <label for="birthday">Birthday</label> <!-- Make this a date picker -->
+          <input type="text" id="birthday" name="birthday" class="form-control" ng-model="currentUser.birthday" placeholder="01/01/1970" required />
+          <div ng-messages="userForm.birthday.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Birthday is required.</p>
+          </div>
+        </div>
+        <div class="form-group" show-errors>
+          <label for="role">Role</label> <!-- Make this a drop down -->
+          <input type="text" id="role" name="role" class="form-control" ng-model="currentUser.role" placeholder="participant" required />
+          <div ng-messages="userForm.role.$error" role="alert">
+            <p class="help-block error-text" ng-message="required">Role is required.</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <input type="submit" value="Update" class="btn btn-primary">
+        </div>
+        <div ng-show="error" class="text-danger">
+          <strong ng-bind="error"></strong>
+        </div>
+      </fieldset>
+    </form>
+  </div>
+</section>
+
+</div>

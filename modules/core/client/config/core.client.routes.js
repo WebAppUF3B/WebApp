@@ -1,3 +1,4 @@
+/*~*/
 'use strict';
 
 // Setting up route
@@ -68,6 +69,10 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
     .state('manage-users', {
       url: '/admin/manage-users',
       templateUrl: 'modules/core/client/views/manage-users.client.view.html'
+    })
+    .state('manage-user', {
+      url: '/admin/manage-user/:userId',
+      templateUrl: 'modules/core/client/views/admin-manage-user.client.view.html'
     })
     .state('cancel', {
       url: '/cancel/:token',
