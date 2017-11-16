@@ -1,19 +1,16 @@
 const jwt = require('jsonwebtoken');
 const lodash = require('lodash');
-const policies = require('./userPolicyUtils');
 
 exports.authUser = function(req, res, next) {
-
   const reqPath = req.path;
   console.log('tw req', reqPath);
+  console.log('secure compare', lodash.contains(allSecureRoutes, reqPath));
 
-  if (lodash.contains(policies.hostRoutes, reqPath)) {
+  if (lodash.contains(hostRoutes, reqPath)) {
     next();
   }
 
-  const isSecured = policies.secureCommonRoutes.some((route) => {
-    if (reqPath.includes(route)) return true;
-  });
+  const isSecured = lodash.contains(allSecureRoutes, reqPath);
 
   console.log('is secured', isSecured);
 
@@ -35,20 +32,13 @@ exports.authUser = function(req, res, next) {
       && decodedUser.role !== 'admin') {
       return res.status(unauthorizedUserErr.code).send(unauthorizedUserErr);
     }
-
-    console.log('check permissions', checkRolePermissions(decodedUser.role, req.method, reqPath));
-
-    if (!checkRolePermissions(decodedUser.role, req.method, reqPath)) {
-      return res.status(unauthorizedUserErr.code).send(unauthorizedUserErr);
-    };
-
     req.decodedUser = decodedUser;
     next();
   }
 };
 
 const parseAuthToken = function(req) {
-  const token = req.body.authToken || req.headers['x-access-token'];
+  const token = req.body.authToken || req.query.token || req.headers['x-access-token'];
   if (token) {
     try {
       const decodedUser = jwt.verify(token, process.env.JWT);
@@ -57,38 +47,10 @@ const parseAuthToken = function(req) {
     } catch (err) {
       console.log('token parse decode err:', err);
       if (err.name === 'TokenExpiredError') return { err: { code: 401, message: 'Token Expired.' } };
-      return unauthorizedUserErr;
+      return { err: { code: 403, message: 'unauthorized' } };
     }
   }
-  return unauthorizedUserErr;
-};
-
-const checkRolePermissions = (role, reqMethod, reqPath) => {
-  switch (role) {
-    case 'participant':
-      return checkPermissions(policies.roles.participant, reqMethod, reqPath);
-    case 'researcher':
-      return checkPermissions(policies.roles.researcher, reqMethod, reqPath);
-    case 'faculty':
-      return checkPermissions(policies.roles.faculty, reqMethod, reqPath);
-    case 'admin':
-      return true;
-    default:
-      return false;
-  }
-};
-
-const checkPermissions = (rolePermissions, reqMethod, reqPath) => {
-  let isAllowed = false;
-
-  return rolePermissions.permissions.some((permission) => {
-    isAllowed = permission[reqMethod].some((pathRegex) => {
-      console.log('check path in permission', pathRegex, reqPath, pathRegex.test(reqPath));
-      if (pathRegex.test(reqPath)) return true;
-    });
-
-    if (isAllowed) return isAllowed;
-  });
+  return { err: { code: 403, message: 'unauthorized' } };
 };
 
 const unauthorizedUserErr = {
@@ -100,3 +62,33 @@ const expiredTokenErr = {
   code: 401,
   message: 'Your session has expired, please log back in.'
 };
+
+// Routes that are used by host and require special access
+const hostRoutes = [
+  '/api/sessions/reminderEmails'
+];
+
+const secureBasicRoutes = [
+  '/settings',
+  '/profile',
+  '/accounts',
+  '/picture',
+  '/api/sessions/',
+  '/api/studies/'
+];
+
+exports.generateCancellationToken = function(object) {
+  const token = jwt.sign(object, process.env.JWT);
+  return token;
+};
+
+exports.parseCancellationToken = function(token) {
+  const object = jwt.verify(token, process.env.JWT);
+  return object;
+};
+
+const allSecureRoutes = secureBasicRoutes;
+
+exports.secureBasicRoutes = secureBasicRoutes;
+
+exports.allSecureRoutes = allSecureRoutes;

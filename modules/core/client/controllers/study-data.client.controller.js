@@ -1,23 +1,10 @@
-angular.module('core').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams', 'Authentication',
-  function($scope, $http, NgTableParams, $location, $state, $stateParams, Authentication) {
+angular.module('core').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams',
+  function($scope, $http, NgTableParams, $location, $state, $stateParams) {
     let alreadyClicked = false;
 
     const init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
-
-      $scope.user = Authentication.user;
-      console.log('tw user', $scope.user);
-
-      $scope.authToken = Authentication.authToken;
-      console.log('tw auth token', $scope.authToken);
-
-      $scope.header = {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': $scope.authToken
-        }
-      };
 
       $scope.calculating = true;
       $scope.studyId = $stateParams.studyId;
@@ -156,7 +143,7 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
     };
 
     $scope.getAllSessionsByStudyId = function() {
-      return $http.get(window.location.origin + '/api/studySessions/' + $scope.studyId, $scope.header);
+      return $http.get(window.location.origin + '/api/studySessions/' + $scope.studyId);
     };
 
     // Show modal and populate it with session data
@@ -176,9 +163,13 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
         $scope.error = '';
         alreadyClicked = true;
 
-        $http.put(window.location.origin + '/api/sessions/approveUser/' + $scope.currentUser.sessionID,
-          $scope.currentUser,
-          $scope.header)
+        $.ajax({
+          url: window.location.origin + '/api/sessions/approveUser/' + $scope.currentUser.sessionID,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify($scope.currentUser)
+        })
           .then(() => {
             // Reinitialize table
             init();
@@ -198,9 +189,13 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
         $scope.error = '';
         alreadyClicked = true;
 
-        $http.put(window.location.origin + '/api/sessions/denyUser/' + $scope.currentUser.sessionID,
-          $scope.currentUser,
-          $scope.header)
+        $.ajax({
+          url: window.location.origin + '/api/sessions/denyUser/' + $scope.currentUser.sessionID,
+          type: 'PUT',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify($scope.currentUser)
+        })
           .then(() => {
             // Reinitialize table
             init();

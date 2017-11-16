@@ -122,17 +122,7 @@ exports.delete = function(req, res) {
       })
       .catch((errs) => {
         console.log('Remove Session Errors:\n', errs);
-        res.status(400).send(errs);
-      });
-  } else {
-    session.remove()
-      .then(() => {
-        console.log('session removed!');
-        res.json(session);
-      })
-      .catch((errs) => {
-        console.log('Remove Session Errors:\n', errs);
-        res.status(400).send(errs);
+        res.status(400).send(err);
       });
   }
 };

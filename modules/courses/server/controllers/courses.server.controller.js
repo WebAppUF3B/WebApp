@@ -36,6 +36,22 @@ exports.create = function(req, res) {
     });
 };
 
+/* Delete a course */
+exports.delete = function(req, res) {
+  const course = req.course;
+  console.log(course);
+
+  /* Remove the course */
+  // TODO FIGURE OUT WHY THIS DOESN'T WORK?????
+  course.remove((err) => {
+    if (err) {
+      res.status(400).send(err);
+    } else {
+      res.end();
+    }
+  })
+};
+
 /*
   Middleware: find a course by its name, then pass it to the next request handler.
  */
