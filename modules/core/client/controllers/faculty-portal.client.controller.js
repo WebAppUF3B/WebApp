@@ -1,20 +1,8 @@
 'use strict';
 
 // TODO consider replacing $http requests with controller (sessions.client.service.js)
-angular.module('core').controller('FacultyPortalController', ['$scope','$http','NgTableParams', 'Authentication',
-  function($scope, $http, NgTableParams, Authentication) {
-    $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
-
-    $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
-
-    $scope.header = {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-access-token': $scope.authToken
-      }
-    };
+angular.module('core').controller('FacultyPortalController', ['$scope','$http','NgTableParams', '$rootScope',
+  function($scope, $http, NgTableParams, $rootScope) {
     $scope.extraCredit = {};
     $scope.newCourse = {};
 
@@ -22,7 +10,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     let alreadyClicked = false;
 
     // Called after page loads
-    $scope.init = function() {
+    $scope.init = function(){
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
 
@@ -33,7 +21,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         });
     };
 
-    $scope.populateCourse = function() {
+    $scope.populateCourse = function(){
       $scope.sessions.extraCreditByCourse($scope.selectedCourse.name)
         .then((results) => {
           // Assign results to upcomingSessions.data
@@ -53,17 +41,16 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     };
 
     $scope.addCourse = function() {
-      if (!alreadyClicked) {
+      if(!alreadyClicked){
         $scope.error = '';
-        if (!$scope.newCourse.name) {
-          $scope.error = 'The course name cannot be empty!';
-        } else {
-          $http.post('/api/courses/', $scope.newCourse, $scope.header).success((response) => {
+        if(!$scope.newCourse.name){
+          $scope.error = "The course name cannot be empty!";
+        } else{
+          $http.post('/api/courses/', $scope.newCourse).success((response) => {
             $('#addCourseModal').modal('hide');
             $scope.init();
             alreadyClicked = false;
           }).error((response) => {
-            $('#addCourseModal').modal('hide');
             $scope.error = response.message;
             alreadyClicked = false;
           });
@@ -72,27 +59,27 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     };
 
     $scope.exportCSV = function() {
-      const fileName = 'Grades-' + $scope.selectedCourse.name + '.csv';
+      const fileName = "Grades-" + $scope.selectedCourse.name + '.csv';
       let mimeType = 'text/csv;encoding=utf-8';
-      $scope.extraCredit.data;
-      const data = [['Student']];
-      for (let i = 0; i < $scope.extraCredit.data.length; i++) {
-        const tempArray = ['"' + $scope.extraCredit.data[i].lastName + ', ' + $scope.extraCredit.data[i].firstName + '"'];
+      $scope.extraCredit.data
+      let data = [["Student"]];
+      for(let i = 0; i < $scope.extraCredit.data.length; i++) {
+        const tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\""];
         data.push(tempArray);
       }
-      const lineArray = [];
-      data.forEach((infoArray, index) => {
-        const line = infoArray.join('');
+      let lineArray = [];
+      data.forEach(function(infoArray, index) {
+        let line = infoArray.join("");
         lineArray.push(line);
       });
-      const csvContent = lineArray.join('\n');
-      const a = document.createElement('a');
+      let csvContent = lineArray.join("\n");
+      let a = document.createElement('a');
       mimeType = mimeType || 'application/octet-stream';
-      if (navigator.msSaveBlob) { //IE10
+      if(navigator.msSaveBlob) { //IE10
         navigator.msSaveBlob(new Blob([csvContent], {
           type: mimeType
         }), fileName);
-      } else if (URL && 'download' in a) { //html5 A[download]
+      } else if(URL && 'download' in a) { //html5 A[download]
         a.href = URL.createObjectURL(new Blob([csvContent], {
           type: mimeType
         }));
@@ -108,15 +95,37 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     // Declare methods that can be used to access session data
     $scope.sessions = {
       extraCreditByCourse: function(courseName) {
-        return $http.get(window.location.origin + '/api/sessions/course/' + courseName, $scope.header);
+        return $http.get(window.location.origin + '/api/sessions/course/' + courseName)
+            .then((results) => {
+              return results;
+            })
+            .catch((err) => {
+              return err;
+            });
       }
     };
 
     // Declare methods that can be used to access course data
     $scope.courses = {
       getAll: function() {
-        return $http.get(window.location.origin + '/api/courses/', $scope.header);
+        return $http.get(window.location.origin + '/api/courses/')
+          .then((results) => {
+            return results;
+          })
+          .catch((err) => {
+            return err;
+          });
       },
+
+      create: function(newCourse) {
+        return $.ajax({
+          url: window.location.origin + '/api/courses/',
+          type: 'POST',
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(newCourse)
+        });
+      }
     };
 
     // Run our init function
