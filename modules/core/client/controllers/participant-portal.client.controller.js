@@ -18,10 +18,8 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $scope.pastSessions.data = [];
 
       $scope.user = Authentication.user;
-      console.log($scope.user);
 
       $scope.authToken = Authentication.authToken;
-      console.log($scope.authToken);
 
       $scope.header = {
         headers: {
@@ -119,13 +117,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
     // Declare methods that can be used to access session data
     $scope.sessions = {
       getUserSessions: function(userId) {
-        return $http.get(window.location.origin + '/api/sessions/user/' + userId, $scope.header)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $http.get(window.location.origin + '/api/sessions/user/' + userId, $scope.header);
       },
 
       cancel: function(id, cancellor) {
