@@ -332,11 +332,13 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
         return $http.get(window.location.origin + '/api/sessions/user/' + userId, $scope.header);
       },
       cancel: function(id, cancellor) {
-        return $http({
+        return $.ajax({
           url: window.location.origin + '/api/sessions/' + id,
-          method: 'DELETE',
-          data: cancellor,
-          headers: $scope.header
+          type: 'DELETE',
+          headers: { 'x-access-token': $scope.authToken },
+          contentType: 'application/json',
+          dataType: 'json',
+          data: JSON.stringify(cancellor)
         });
       },
 

@@ -3,6 +3,10 @@ const lodash = require('lodash');
 
 exports.authUser = function(req, res, next) {
 
+  if (req.method === 'DELETE') {
+    console.log(req.headers);
+  }
+
   const reqPath = parseURLParams(req.path);
   console.log('tw req', reqPath);
 
@@ -84,7 +88,7 @@ const checkPermissions = (rolePermissions, reqMethod, reqPath) => {
     console.log('check perm role', role);
 
     isAllowed = role[reqMethod].some((path) => {
-      console.log('check path in role', path);
+      console.log('check path in role', path, reqPath, path === reqPath);
       if (path === reqPath) return true;
     });
 
