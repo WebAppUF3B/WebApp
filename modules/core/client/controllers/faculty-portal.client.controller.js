@@ -66,7 +66,9 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       let mimeType = 'text/csv;encoding=utf-8';
       //$scope.extraCredit.data
       let data = [['Student,' , 'ID,' , 'SIS User ID,' , 'SIS Login ID,' , 'Section,' , $scope.newAssignment]];
-      let tempArray = ["\"Points Possible\"," + "," + ","+ "," + "," + $scope.maxPoints];
+      let tempArray = [""];
+      data.push(tempArray);
+      tempArray = ["\"Points Possible\"," + "," + ","+ "," + "," + $scope.maxPoints];
       data.push(tempArray);
       for (let i = 0; i < $scope.extraCredit.data.length; i++) {
         tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\""]; //some random ID?
