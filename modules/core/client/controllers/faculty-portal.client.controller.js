@@ -26,6 +26,28 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
 
+      // Generate the time periods starting with Fall 2017
+      const today = new Date();
+      let temp = { date: new Date(2017, 7, 15), name: 'Fall' };
+      $scope.semesters = [];
+      // Loop until present day
+      while (temp.date <= today) {
+        if (temp.name === 'Fall') {
+          // Fall case
+          $scope.semesters.push(temp);
+          temp = { date: new Date(temp.date.getFullYear() + 1, 0, 1), name: 'Spring' };
+        } else if (temp.name === 'Spring'){
+          // Spring case
+          $scope.semesters.push(temp);
+          temp = { date: new Date(temp.date.getFullYear(), 4, 5), name: 'Summer' };
+        } else {
+          // Summer case
+          $scope.semesters.push(temp);
+          temp = { date: new Date(temp.date.getFullYear(), 7, 15), name: 'Fall' };
+        }
+      }
+
+      // Get all courses in the system
       $scope.courses.getAll()
         .then((results) => {
           // Assign results to upcomingSessions.data
@@ -33,7 +55,13 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         });
     };
 
-    $scope.populateCourse = function() {
+    $scope.attemptPopulate = function() {
+      if ($scope.selectedCourse && $scope.selectedSemester) {
+        populateCourse();
+      }
+    }
+
+    const populateCourse = function() {
       $scope.sessions.extraCreditByCourse($scope.selectedCourse.name)
         .then((results) => {
           // Assign results to upcomingSessions.data

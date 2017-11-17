@@ -7,13 +7,21 @@
   </div>
 
   <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
+      <a class="btn btn-orange mobile-full-width float-right no-margin-bottom phone-top-margin" data-target="#addCourseModal" data-toggle="modal">Add a New Course</a>
+    </div>
+  </div>
+
+  <div class="row top-margin">
     <div class="col-md-3 col-md-offset-3 col-sm-4 col-sm-offset-2">
-      <select class="form-control top-margin" ng-model="selectedCourse" ng-options="course as course.name for course in allCourses track by course.name" ng-change="populateCourse()">
+      <select class="form-control" ng-model="selectedCourse" ng-options="course as course.name for course in allCourses track by course.name" ng-change="attemptPopulate()">
         <option value="" disabled selected>Select a Course</option>
       </select>
     </div>
-    <div class="col-md-3 col-sm-4">
-      <a class="btn btn-primary full-width top-margin" data-target="#addCourseModal" data-toggle="modal">Add a New Course</a>
+    <div class="col-md-3 col-sm-4 phone-top-margin">
+      <select class="form-control" ng-model="selectedSemester" ng-options="semester as semester.name + ' ' + semester.date.getFullYear() for semester in semesters track by semester.name" ng-change="attemptPopulate()">
+        <option value="" disabled selected>Select a Semester</option>
+      </select>
     </div>
   </div>
 
