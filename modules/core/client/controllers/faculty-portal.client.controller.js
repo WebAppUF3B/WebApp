@@ -21,6 +21,13 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     // Prevent race condition
     let alreadyClicked = false;
 
+    // Search on 'enter' press
+    $("#course").keypress((e) => {
+      if (e.keyCode === 13) {
+        $('#add-course-btn').click();
+      }
+    });
+
     // Called after page loads
     $scope.init = function() {
       $('section.ng-scope').css('margin-top', '0px');
@@ -28,25 +35,25 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
 
       // Generate the time periods starting with Fall 2017
       const today = new Date();
-      let temp = { date: new Date(2017, 7, 15), name: 'Fall' };
+      let temp = { startDate: new Date(2017, 7, 15), endDate: new Date(2018, 0, 1), name: 'Fall' };
       $scope.semesters = [];
       // Loop until present day
-      while (temp.date <= today) {
+      while (temp.startDate <= today) {
+        $scope.semesters.unshift(temp);
+
         if (temp.name === 'Fall') {
           // Fall case
-          $scope.semesters.push(temp);
-          temp = { date: new Date(temp.date.getFullYear() + 1, 0, 1), name: 'Spring' };
-        } else if (temp.name === 'Spring'){
+          temp = { startDate: new Date(temp.startDate.getFullYear() + 1, 0, 1), endDate: new Date(temp.startDate.getFullYear() + 1, 4, 6), name: 'Spring' };
+        } else if (temp.name === 'Spring') {
           // Spring case
-          $scope.semesters.push(temp);
-          temp = { date: new Date(temp.date.getFullYear(), 4, 5), name: 'Summer' };
+          temp = { startDate: new Date(temp.startDate.getFullYear(), 4, 6), endDate: new Date(temp.startDate.getFullYear(), 7, 15), name: 'Summer' };
         } else {
           // Summer case
-          $scope.semesters.push(temp);
-          temp = { date: new Date(temp.date.getFullYear(), 7, 15), name: 'Fall' };
+          temp = { startDate: new Date(temp.startDate.getFullYear(), 7, 15), endDate: new Date(temp.startDate.getFullYear() + 1, 0, 1), name: 'Fall' };
         }
       }
 
+      console.log($scope.semesters);
       // Get all courses in the system
       $scope.courses.getAll()
         .then((results) => {
@@ -56,10 +63,11 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     };
 
     $scope.attemptPopulate = function() {
+      console.log($scope.selectedSemester);
       if ($scope.selectedCourse && $scope.selectedSemester) {
         populateCourse();
       }
-    }
+    };
 
     const populateCourse = function() {
       $scope.sessions.extraCreditByCourse($scope.selectedCourse.name)
@@ -80,6 +88,11 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         });
     };
 
+    $scope.courseModal = function() {
+      $scope.error = '';
+      $('#addCourseModal').modal('show');
+    };
+
     $scope.addCourse = function() {
       if (!alreadyClicked) {
         $scope.error = '';
@@ -90,9 +103,8 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
             $('#addCourseModal').modal('hide');
             $scope.init();
             alreadyClicked = false;
-          }).error((response) => {
-            $('#addCourseModal').modal('hide');
-            $scope.error = response.message;
+          }).error((err) => {
+            $scope.error = 'This course is already in the system!';
             alreadyClicked = false;
           });
         }
@@ -136,7 +148,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     // Declare methods that can be used to access session data
     $scope.sessions = {
       extraCreditByCourse: function(courseName) {
-        return $http.get(window.location.origin + '/api/sessions/course/' + courseName, $scope.header);
+        return $http.put(window.location.origin + '/api/sessions/course/' + courseName, $scope.selectedSemester, $scope.header);
       }
     };
 

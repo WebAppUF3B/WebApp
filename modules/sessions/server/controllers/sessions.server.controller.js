@@ -345,7 +345,7 @@ exports.denyUser = function(req, res) {
     // Otherwise, just update it
     studySession.save();
   }
-  
+
   res.json(studySession);
   return transporter.sendMail(mailOptions);
 };
@@ -354,6 +354,8 @@ exports.denyUser = function(req, res) {
 exports.getExtraCredit = function(req, res) {
   const sessions = req.studySession;
   const users = [];
+
+  console.log(sessions);
 
   // TODO Possibly filter out students based on semester as well
   // Loop through each session
@@ -373,7 +375,11 @@ exports.getExtraCredit = function(req, res) {
 };
 
 exports.extraCreditByCourse = function(req, res, next, name) {
-  Session.find({ 'participants.extraCreditCourse': name })
+  const selectedSemester = req.body;
+  Session.find({ 'participants.extraCreditCourse': name, startTime: {
+    $gte: selectedSemester.startDate,
+    $lt: selectedSemester.endDate
+  } })
     .populate('participants.userID', '-salt -password')
     .exec()
     .then((sessions) => {
@@ -381,6 +387,7 @@ exports.extraCreditByCourse = function(req, res, next, name) {
       next();
     })
     .catch((err) => {
+      console.log(err);
       res.status(400).send(err);
     });
 };
