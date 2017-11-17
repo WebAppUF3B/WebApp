@@ -64,7 +64,7 @@ const researcherPermissions = {
 const facultyPermissions = {
   GET: [
     /^\/api\/sessions\/course\/\w*$/,
-    /^\/api\/courses\/$/,
+    /^\/api\/courses\/faculty\/$/
   ],
   PUT: [
   ],

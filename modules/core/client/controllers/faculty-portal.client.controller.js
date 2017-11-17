@@ -115,7 +115,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     // Declare methods that can be used to access course data
     $scope.courses = {
       getAll: function() {
-        return $http.get(window.location.origin + '/api/courses/', $scope.header);
+        return $http.get(window.location.origin + '/api/courses/faculty/', $scope.header);
       },
     };
 

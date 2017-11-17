@@ -10,6 +10,8 @@ module.exports = function(app) {
   app.route('/api/courses/')
     .get(courses.getAll)
     .post(courses.create);
+  app.route('/api/courses/faculty/')
+      .get(courses.getAll);
   app.route('/api/courses/:courseName');
 
   /*
