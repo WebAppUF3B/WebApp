@@ -4,10 +4,8 @@
 angular.module('core').controller('FacultyPortalController', ['$scope','$http','NgTableParams', 'Authentication',
   function($scope, $http, NgTableParams, Authentication) {
     $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
 
     $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
 
     $scope.header = {
       headers: {
@@ -20,6 +18,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
 
     // Prevent race condition
     let alreadyClicked = false;
+    $scope.currentStudy = {};
 
     // Search on 'enter' press
     $("#course").keypress((e) => {
@@ -53,7 +52,6 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         }
       }
 
-      console.log($scope.semesters);
       // Get all courses in the system
       $scope.courses.getAll()
         .then((results) => {
@@ -63,7 +61,6 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     };
 
     $scope.attemptPopulate = function() {
-      console.log($scope.selectedSemester);
       if ($scope.selectedCourse && $scope.selectedSemester) {
         populateCourse();
       }
@@ -74,7 +71,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.extraCredit.data = results.data;
-          console.log($scope.extracredit);
+          console.log($scope.extraCredit);
 
           $scope.extraCredit = new NgTableParams({
             count: 10,
