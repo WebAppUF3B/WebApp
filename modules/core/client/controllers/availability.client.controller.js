@@ -55,11 +55,13 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         console.log(err);
       });
 
-      $scope.putInDate = [];
-      $scope.interpretCurrentAvailability();
+      //$scope.putInDate = [];
+      //$scope.interpretCurrentAvailability();
 
       $scope.activeDate = null;
       if ($scope.state === 'edit') {
+        $scope.putInDate = [];
+        $scope.interpretCurrentAvailability();
         //const madeUpDate = new Date(2017,10,16,0,0,0,0);//remember month is 0-11, not 1-12
         //const putToUse = madeUpDate.getTime();
         //alert('Manual/Default Entry into putInDate '+madeUpDate);
