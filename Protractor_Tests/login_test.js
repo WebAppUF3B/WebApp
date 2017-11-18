@@ -6,12 +6,9 @@ describe('Log in functionality', function() {
   });
 
   it('should successfully login user as a participant', function() {
-    //element(by.id('Sign In')).click();
-    //element(by.css('[ui-sref="authentication.signin"]')).click(); //Finds sign in button
     element.all(by.css('a[href*="/authentication/signin"]')).click();
     element(by.id('email')).sendKeys('participant@mxiia.com');
     element(by.id('password')).sendKeys('Tester123!');
-    //element(by.name('Sign In')).click();
     browser.actions().sendKeys(protractor.Key.ENTER).perform();
     expect(browser.getCurrentUrl()).toEqual('http://localhost:5000/participant');
     browser.sleep(2000);

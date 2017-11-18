@@ -4,6 +4,7 @@ exports.config = {
   // Capabilities to be passed to the webdriver instance.
   capabilities: {
     'browserName': 'chrome'
+   // 'browserName': 'firefox'
   },
 
   // Framework to use. Jasmine is recommended.
@@ -22,11 +23,12 @@ exports.config = {
 
   // Spec patterns are relative to the current working directory when
   // protractor is called.
-  specs: ['login_test.js'],
+  specs: ['signup_test.js','login_test.js'],
+ // specs: ['facultyportal_test.js'],
 
   // Options to be passed to Jasmine.
   jasmineNodeOpts: {
-    defaultTimeoutInterval: 5000
+    defaultTimeoutInterval: 20000
   }
 
 
