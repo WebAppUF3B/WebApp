@@ -24,12 +24,12 @@
             <button class='btn btn-xs btn-warning' style='margin:5px' ng-click='removeFromSelected(d)'>Remove Day</button>
             <div class='row'ng-repeat="possibility in availability | filter:{unixDate: d}">
               <div class="col-sm-5">
-                <label class='col-sm-5'>Start Time:</label>
-                <select class='col-sm-7' ng-model="possibility.lstartTime" ng-options="times.val as times.show for times in time"></select>
+                <label>Start Time:</label>
+                <select class='form-control full-width' ng-model="possibility.startTime" ng-change='prepEndTime(possibility.startTime)' ng-options="times.val as times.show for times in startTime"></select>
               </div>
               <div class="col-sm-5">
-                <label class='col-sm-5'>End Time:</label>
-                <select class='col-sm-7' ng-model="possibility.lendTime" ng-options="times.val as times.show for times in time"></select>
+                <label>End Time:</label>
+                <select class='form-control full-width' ng-model="possibility.endTime" ng-disabled='!possibility.startTime' ng-options="times.val as times.show for times in endTime"></select>
               </div>
               <div class='col-sm-2'>
                 <button class="btn btn-danger" ng-click='removeEntry(possibility)'>
@@ -37,6 +37,7 @@
                 </button>
               </div>
             </div>
+            <hr>
             <button class='btn btn-xs btn-primary' style='margin:5px' ng-click='addEntry(d)'>Add Time Range</button>
           </div>
         </div>
