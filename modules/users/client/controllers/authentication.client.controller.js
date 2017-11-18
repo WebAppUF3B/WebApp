@@ -109,7 +109,9 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
         localStorage.setItem('authToken', JSON.stringify(response.authToken));
+        $scope.authentication.authToken = response.authToken;
         localStorage.setItem('user', JSON.stringify(response.user));
+        $scope.authentication.user = response.user;
         redirect(response.user);
       }).error((response) => {
         $scope.error = response.message;

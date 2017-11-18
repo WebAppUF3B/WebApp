@@ -19,7 +19,7 @@ module.exports = function(app) {
   app.route('/api/sessions/attend/:sessionId').put(sessions.changeAttendance);
   app.route('/api/sessions/compensate/:sessionId').put(sessions.markCompensated);
   app.route('/api/sessions/denyUser/:sessionId').put(sessions.denyUser);
-  app.route('/api/sessions/course/:courseName').get(sessions.getExtraCredit);
+  app.route('/api/sessions/course/:courseName').put(sessions.getExtraCredit);
   app.route('/api/sessions/:sessionId')
     .get(sessions.get)
     .put(sessions.update)

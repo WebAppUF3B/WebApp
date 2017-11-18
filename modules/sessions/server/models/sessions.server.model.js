@@ -33,10 +33,6 @@ const sessionSchema = new Schema({
     type: Date,
     required: true
   },
-  endTime: {
-    type: Date,
-    required: true
-  },
   completed: {
     type: Boolean
   },

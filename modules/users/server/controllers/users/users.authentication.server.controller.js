@@ -170,7 +170,12 @@ exports.signin = function(req, res, next) {
         _id: user._id,
       };
 
-      const token = jwt.sign(minimalUser, process.env.JWT, {
+      const tokenPayload = {
+        role: user.role,
+        _id: user._id,
+      };
+
+      const token = jwt.sign(tokenPayload, process.env.JWT, {
         expiresIn: '1d'
       });
 

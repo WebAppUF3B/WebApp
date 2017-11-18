@@ -16,7 +16,7 @@
       <ul class="nav navbar-nav">
         <li><a ui-sref="home" ng-show="!authentication.user">Home</a></li>
         <li><a ui-sref="participant-portal" ng-show="authentication.user">Participant</a></li>
-        <li><a ui-sref="researcher-portal" ng-show="authentication.user.role === 'researcher' || authentication.user.role === 'admin'">Researcher</a></li>
+        <li><a ui-sref="researcher-portal" ng-show="authentication.user.role === 'researcher' || authentication.user.role === 'faculty' || authentication.user.role === 'admin'">Researcher</a></li>
         <li><a ui-sref="faculty-portal" ng-show="authentication.user.role === 'faculty' || authentication.user.role === 'admin'">Faculty</a></li>
         <li><a ui-sref="admin-portal" ng-show="authentication.user.role === 'admin'">Admin</a></li>
       </ul>
