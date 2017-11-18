@@ -39,22 +39,11 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         console.log($scope.currentStudy);
         console.log($scope.tempAvailability);
         $scope.prepStartTime();
-      // })
-      // .catch((err) => {
-      //   console.log(err);
-      // });
-
-      //$scope.putInDate = [];
-      //$scope.interpretCurrentAvailability();
 
         $scope.activeDate = null;
         if ($scope.state === 'edit') {
           $scope.putInDate = [];
           $scope.interpretCurrentAvailability();
-          //const madeUpDate = new Date(2017,10,16,0,0,0,0);//remember month is 0-11, not 1-12
-          //const putToUse = madeUpDate.getTime();
-          //alert('Manual/Default Entry into putInDate '+madeUpDate);
-          //$scope.putInDate = [new Date().setHours(0,0,0,0), putToUse, new Date().setHours(48,0,0,0)];
           console.log('Finished Interpret of Passed Param');
           console.log($scope.putInDate);
           console.log($scope.availability);
@@ -66,9 +55,6 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
           $scope.selectedDates = [new Date().setHours(0,0,0,0)];
           console.log('non-edit date');
         }
-        //$scope.prepTime(); might be breaking since it's not in getStudy
-        console.log('Printing out startTimes');
-        console.log($scope.startTime);
         $scope.options = {
           startingDay: 1,
           minDate: new Date(),
@@ -243,7 +229,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
     $scope.removeEntry = function(date) {
       let index = -1;
       console.log(date.$$hashKey);
-    //alert('Removing Entry from date: '+convertedDate);
+      //alert('Removing Entry from date: '+convertedDate);
 
       for (let x = 0; x < $scope.availability.length; x++) {
         if ($scope.availability[x].$$hashKey === date.$$hashKey) {
@@ -276,39 +262,6 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
           unixDate: existingEntry
         });
       }
-      //console.log($scope.time);
     };
-
     init();
-
-    /* Single Session Creation Method
-    $scope.create = function(isValid) {
-      $scope.session.sessStart = new Date (
-        $scope.session.sessionDate.getFullYear(),
-        $scope.session.sessionDate.getMonth(),
-        $scope.session.sessionDate.getDate(),
-        $scope.session.startTime.getHours(),
-        $scope.session.startTime.getMinutes()
-      );
-      $scope.session.sessEnd = new Date (
-        $scope.session.sessionDate.getFullYear(),
-        $scope.session.sessionDate.getMonth(),
-        $scope.session.sessionDate.getDate(),
-        $scope.session.endTime.getHours(),
-        $scope.session.endTime.getMinutes()
-      );
-
-      $http.post('/api/sessions/create/'+$scope.studyId, $scope.session).success((response) => {
-        // If successful we assign the response to the global user model
-        console.log('PV', 'Session Created!');
-        console.log(response);
-        // And redirect to the previous or home page
-        //$state.go('sessions',{ 'studyId': $scope.studyId }); TODO make this go to researcher page, since session management page no longer exists
-      }).error((response) => {
-        $scope.error = response.message;
-        alert(response.message);
-      });
-
-    };
-    */
   }]);
