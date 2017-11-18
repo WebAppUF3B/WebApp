@@ -70,9 +70,13 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/admin/manage-users',
       templateUrl: 'modules/core/client/views/manage-users.client.view.html'
     })
-    .state('manage-user', {
-      url: '/admin/manage-user/:userId',
-      templateUrl: 'modules/core/client/views/admin-manage-user.client.view.html'
+    .state('edit-user', {
+      url: '/admin/manage-users/edit/:userId',
+      templateUrl: 'modules/core/client/views/edit-user.client.view.html'
+    })
+    .state('create-user', {
+      url: '/admin/manage-users/create',
+      templateUrl: 'modules/core/client/views/edit-user.client.view.html'
     })
     .state('cancel', {
       url: '/cancel/:token',

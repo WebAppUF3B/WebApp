@@ -83,6 +83,18 @@ exports.getWaitingUsers = function(req, res) {
       res.status(400).send();
     });
 };
+
+exports.createUser = function(req, res) {
+  console.log('GOT HERE!')
+    .exec()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((err) => {
+      res.status(400).send();
+    });
+};
+
 //*//
 exports.approveUser = function(req, res) {
   const thisUser = req.model;
