@@ -13,7 +13,7 @@
     </div>
   </div>
   <div class='row'>
-    <div class="col-sm-4" uib-datepicker ng-model='activeDate' multi-select='selectedDates' select-range='{{type=="range"}}' datepicker-options='options'></div>
+    <div class="col-sm-4" ng-if='loaded' uib-datepicker ng-model='activeDate' multi-select='selectedDates' select-range='{{type=="range"}}' datepicker-options='options'></div>
     <div class="col-sm-8">
       <!--<h3 class="text-center">Hello World</h3>-->
       <div ng-if='type=="individual"'>
@@ -25,11 +25,11 @@
             <div class='row'ng-repeat="possibility in availability | filter:{unixDate: d}">
               <div class="col-sm-5">
                 <label>Start Time:</label>
-                <select class='form-control full-width' ng-model="possibility.startTime" ng-change='prepEndTime(possibility.startTime)' ng-options="times.val as times.show for times in startTime"></select>
+                <select class='form-control full-width' ng-model="possibility.startTime" ng-change='prepEndTime(possibility)' ng-options="times.val as times.show for times in startTime"></select>
               </div>
               <div class="col-sm-5">
                 <label>End Time:</label>
-                <select class='form-control full-width' ng-model="possibility.endTime" ng-disabled='!possibility.startTime' ng-options="times.val as times.show for times in endTime"></select>
+                <select class='form-control full-width' ng-model="possibility.endTime" ng-disabled='!possibility.startTime' ng-options="times.val as times.show for times in possibility.endTimeList"></select>
               </div>
               <div class='col-sm-2'>
                 <button class="btn btn-danger" ng-click='removeEntry(possibility)'>
