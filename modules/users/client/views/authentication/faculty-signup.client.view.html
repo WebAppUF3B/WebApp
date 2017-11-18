@@ -21,10 +21,44 @@
             </div>
           </div>
           <div class="row">
+            <div class="col-sm-6">
+              <div class="form-group" show-errors>
+                <label for="birthday">Birthday</label>
+                <div class='input-group date'>
+                    <input type='text' id="birthday" name="birthday" ng-model="credentials.birthday" onkeydown="return false" class="form-control" />
+                    <span class="input-group-addon" ng-click="toggleBirthdayFocus()">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group" show-errors>
+                <div id="gender" class="form-group">
+                  <label>Gender</label>
+                  <select name="gender" class="form-control" ng-model="credentials.gender" required>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                    <option value="none">Prefer Not to Disclose</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
             <div class="col-sm-12">
               <div class="form-group" show-errors>
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" class="form-control lowercase" ng-model="credentials.email" placeholder="Email" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="form-group" show-errors>
+                <label for="address">Address</label>
+                <input type="address" id="address" name="address" class="form-control" ng-model="credentials.address" placeholder="Address, City, State, Zipcode" required>
               </div>
             </div>
           </div>
@@ -55,3 +89,14 @@
     </div>
   </div>
 </div>
+
+<script type="text/javascript">
+    var today = Date.now();
+    $(function () {
+        $('#birthday').datetimepicker({
+          format: 'MM/DD/YYYY',
+          viewMode: 'years',
+          maxDate: today,
+        })
+    });
+</script>

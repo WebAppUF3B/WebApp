@@ -72,9 +72,6 @@ exports.facultySignup = function(req, res) {
   const faculty = new User(req.body);
   faculty.role = 'faculty'; //set role to enum 'faculty'
   faculty.adminApproved = false;
-  faculty.birthday = new Date(0);
-  faculty.gender = 'Other';
-  faculty.address = 'No Address';
   faculty.save()
          .then((faculty) => {
            console.log('tw', faculty);
@@ -114,9 +111,6 @@ exports.researcherSignup = function(req, res) {
   const researcher = new User(req.body);
   researcher.role = 'researcher'; //set role to enum 'researcher'
   researcher.adminApproved = false;
-  researcher.birthday = new Date(0);
-  researcher.gender = 'Other';
-  researcher.address = 'No Address';
   researcher.save()
     .then((researcher) => {
       console.log('tw', researcher);
