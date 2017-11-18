@@ -13,6 +13,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         'x-access-token': $scope.authToken
       }
     };
+    $scope.participatedStudies = {};
     $scope.extraCredit = {};
     $scope.newCourse = {};
 
@@ -32,6 +33,41 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
 
+      // Get all courses in the system
+      $scope.courses.getAll()
+        .then((results) => {
+          // Assign results to upcomingSessions.data
+          $scope.allCourses = results.data;
+        });
+    };
+
+    $scope.attemptPopulate = function() {
+      if ($scope.selectedCourse && $scope.selectedSemester) {
+        populateCourse();
+      }
+    };
+
+    const populateCourse = function() {
+      $scope.sessions.extraCreditByCourse($scope.selectedCourse.name)
+        .then((results) => {
+          // Assign results to upcomingSessions.data
+          $scope.participatedStudies.data = results.data;
+          console.log($scope.participatedStudies.data);
+
+          $scope.participatedStudies = new NgTableParams({
+            count: 10,
+            sorting: {
+              studyTitle: 'asc'
+            }
+          }, {
+            counts: [], // hides page sizes
+            dataset: $scope.participatedStudies.data // select data
+          });
+        });
+    };
+
+    // Separate init function to dynamically create semesters
+    $scope.init2 = function() {
       // Generate the time periods starting with Fall 2017
       const today = new Date();
       let temp = { startDate: new Date(2017, 7, 15), endDate: new Date(2018, 0, 1), name: 'Fall' };
@@ -51,45 +87,34 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
           temp = { startDate: new Date(temp.startDate.getFullYear(), 7, 15), endDate: new Date(temp.startDate.getFullYear() + 1, 0, 1), name: 'Fall' };
         }
       }
-
-      // Get all courses in the system
-      $scope.courses.getAll()
-        .then((results) => {
-          // Assign results to upcomingSessions.data
-          $scope.allCourses = results.data;
-        });
     };
 
-    $scope.attemptPopulate = function() {
-      if ($scope.selectedCourse && $scope.selectedSemester) {
-        populateCourse();
-      }
+    // Open the list of students modal
+    $scope.studentModal = function(study) {
+      $scope.currentStudy = study;
+      $scope.extraCredit.data = $scope.currentStudy.list;
+
+      $scope.extraCredit = new NgTableParams({
+        count: 10,
+        sorting: {
+          lastName: 'asc'
+        }
+      }, {
+        counts: [], // hides page sizes
+        dataset: $scope.extraCredit.data // select data
+      });
+
+      $('#studentModal').modal('show');
     };
 
-    const populateCourse = function() {
-      $scope.sessions.extraCreditByCourse($scope.selectedCourse.name)
-        .then((results) => {
-          // Assign results to upcomingSessions.data
-          $scope.extraCredit.data = results.data;
-          console.log($scope.extraCredit);
-
-          $scope.extraCredit = new NgTableParams({
-            count: 10,
-            sorting: {
-              lastName: 'asc'
-            }
-          }, {
-            counts: [], // hides page sizes
-            dataset: $scope.extraCredit.data // select data
-          });
-        });
-    };
-
+    // Open the add course modal
     $scope.courseModal = function() {
       $scope.error = '';
+      $scope.newCourse = {};
       $('#addCourseModal').modal('show');
     };
 
+    // Add the new course code to the database
     $scope.addCourse = function() {
       if (!alreadyClicked) {
         $scope.error = '';
@@ -108,37 +133,46 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       }
     };
 
+    // Export the list of students for canvas
     $scope.exportCSV = function() {
-      const fileName = 'Grades-' + $scope.selectedCourse.name + '.csv';
-      let mimeType = 'text/csv;encoding=utf-8';
-      $scope.extraCredit.data;
-      const data = [['Student']];
-      for (let i = 0; i < $scope.extraCredit.data.length; i++) {
-        const tempArray = ['"' + $scope.extraCredit.data[i].lastName + ', ' + $scope.extraCredit.data[i].firstName + '"'];
+      if (!alreadyClicked) {
+        alreadyClicked = true;
+
+        const fileName = "Grades-" + $scope.currentStudy.studyTitle + '.csv';
+        let mimeType = 'text/csv;encoding=utf-8';
+        //$scope.extraCredit.data
+        let data = [['Student,' , 'ID,' , 'SIS User ID,' , 'SIS Login ID,' , 'Section,' , $scope.newAssignment]];
+        let tempArray = [""];
         data.push(tempArray);
-      }
-      const lineArray = [];
-      data.forEach((infoArray, index) => {
-        const line = infoArray.join('');
-        lineArray.push(line);
-      });
-      const csvContent = lineArray.join('\n');
-      const a = document.createElement('a');
-      mimeType = mimeType || 'application/octet-stream';
-      if (navigator.msSaveBlob) { //IE10
-        navigator.msSaveBlob(new Blob([csvContent], {
-          type: mimeType
-        }), fileName);
-      } else if (URL && 'download' in a) { //html5 A[download]
-        a.href = URL.createObjectURL(new Blob([csvContent], {
-          type: mimeType
-        }));
-        a.setAttribute('download', fileName);
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else {
-        location.href = 'data:application/octet-stream,' + encodeURIComponent(csvContent); //only this mime type is supported
+        for (let i = 0; i < $scope.extraCredit.data.length; i++) {
+          tempArray = ["\"" + $scope.extraCredit.data[i].lastName + ", " + $scope.extraCredit.data[i].firstName + "\""]; //some random ID?
+          data.push(tempArray);
+        }
+        let lineArray = [];
+        data.forEach(function(infoArray, index) {
+          let line = infoArray.join("");
+          lineArray.push(line);
+        });
+        let csvContent = lineArray.join("\n");
+        let a = document.createElement('a');
+        mimeType = mimeType || 'application/octet-stream';
+        if (navigator.msSaveBlob) { //IE10
+          navigator.msSaveBlob(new Blob([csvContent], {
+            type: mimeType
+          }), fileName);
+        } else if (URL && 'download' in a) { //html5 A[download]
+          a.href = URL.createObjectURL(new Blob([csvContent], {
+            type: mimeType
+          }));
+          a.setAttribute('download', fileName);
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        } else {
+          location.href = 'data:application/octet-stream,' + encodeURIComponent(csvContent); //only this mime type is supported
+        }
+        $('#exportModal').modal('hide');
+        alreadyClicked = false;
       }
     };
 
@@ -156,7 +190,8 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
       },
     };
 
-    // Run our init function
+    // Run our init functions
     $scope.init();
+    $scope.init2();
   }
 ]);

@@ -57,7 +57,7 @@
     top: 5px !important;
     right: 5px !important;
   }
-  .session-modal{
+  .session-modal, .table-modal{
     margin-top: 5px !important;
     margin-bottom: 5px !important;
   }
@@ -90,7 +90,7 @@
   .half-width{
     width: 50%;
   }
-  .session-modal{
+  .session-modal, .table-modal{
     margin-top: 60px !important;
   }
   .border-right {
@@ -516,6 +516,10 @@ table.ng-table tbody td, table.ng-table thead th {
 
 .session-modal{
   max-width: 500px;
+}
+
+.table-modal{
+  max-width: 1000px;
 }
 
 .course-modal{
