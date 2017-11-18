@@ -60,6 +60,6 @@ module.exports = function(app) {
   app.route('/api/auth/paypal/callback').get(users.oauthCallback('paypal'));
 
   //new routes
-  app.route('/api/profile/:UserId').get(users.getUser);
-  app.route('/api/profile/:UserId').put(users.update);
+  app.route('/api/profile/').get(users.getUser).put(users.update);
+  //app.route('/api/profile/').put(users.update);
 };

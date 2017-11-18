@@ -17,66 +17,46 @@ var _ = require('lodash'),
  */
 exports.update = function(req, res) {
   // Init Variables
-  let user = req.user;
+  console.log(req.body);
+  const user = req.body;
 
-  console.log(req.user);
+  //console.log(req.user);
   // For security measurement we remove the roles from the req.body object
   delete req.body.role;
 
   if (user) {
-    // user.firstName = req.body.firstName;
-    // user.lastName = req.body.lastName;
-    // user.gender = req.body.gender;
-    // user.updated = Date.now();
-
-    user.save(function(err) {
-      if (err) {
+    User.findById(user._id)
+      .then((userById) => {
+        userById.firstName = user.firstName;
+        userById.lastName = user.lastName;
+        userById.gender = user.gender;
+        userById.address = user.address;
+        userById.updated = Date.now();
+        return userById.save();
+      })
+      .then((result) => {
+        console.log('result here after saving', result);
+        const minimalUser = {
+          firstName: user.firstName,
+          lastName: user.lastName,
+          gender: user.gender,
+          birthday: user.birthday,
+          email: user.email,
+          role: user.role,
+          address: user.address,
+          _id: user._id
+        };
+        res.status(200).send({
+          message: 'Profile updated',
+          user: minimalUser
+        });
+      })
+      .catch((err) => {
         return res.status(400).send({
-          message: errorHandler.getErrorMessage(err)
+          message: 'Update failed. Please contact an admin'
         });
-        //console.log(err);
-        //res.status(400).send(err);
-      } else {
-        req.login(user, function(err) {
-          if(err) {
-            res.status(400).send(err);
-          } else {
-            res.json(user);
-          }
-        });
-      }
-    });
-  } else {
-    res.status(400).send({
-      message: 'User is not signed in'
-    });
+      });
   }
-  // if (user) {
-  //   // Merge existing user
-  //   user = _.extend(user, req.body);
-  //   user.updated = Date.now();
-  //   user.displayName = user.firstName + ' ' + user.lastName;
-  //
-  //   user.save(function (err) {
-  //     if (err) {
-  //       return res.status(400).send({
-  //         message: errorHandler.getErrorMessage(err)
-  //       });
-  //     } else {
-  //       req.login(user, function (err) {
-  //         if (err) {
-  //           res.status(400).send(err);
-  //         } else {
-  //           res.json(user);
-  //         }
-  //       });
-  //     }
-  //   });
-  // } else {
-  //   res.status(400).send({
-  //     message: 'User is not signed in'
-  //   });
-  // }
 };
 
 /**
@@ -132,8 +112,10 @@ exports.me = function (req, res) {
 };
 
 
-exports.getUser = function (req, res) {
+exports.getUser = function(req, res) {
   console.log('hi there');
   console.log(req.params.UserId);
   res.status(200);
+  res.json(req.body);
+
 };
