@@ -345,7 +345,7 @@ exports.denyUser = function(req, res) {
     // Otherwise, just update it
     studySession.save();
   }
-  
+
   res.json(studySession);
   return transporter.sendMail(mailOptions);
 };
@@ -353,27 +353,52 @@ exports.denyUser = function(req, res) {
 /* Get the students who recieved extra */
 exports.getExtraCredit = function(req, res) {
   const sessions = req.studySession;
-  const users = [];
+  const results = [];
 
-  // TODO Possibly filter out students based on semester as well
   // Loop through each session
   sessions.forEach((session) => {
+    let index = results.findIndex(x => x.studyID===session.studyID._id);
+    console.log("Found index: " + index);
+
+    // If the study isn't already in our results, add it
+    if (index === -1) {
+      index = results.length;
+      results.push({ studyID: session.studyID._id, studyTitle: session.studyID.title, list: [] });
+      console.log("Created index: " + index);
+    }
+
     // Loop through each participant of each session
     session.participants.forEach((participant) => {
-      if (participant.attended && !users.find((e) => {
+      if (participant.attended && !results[index].list.find((e) => {
         return e._id == participant.userID._id;
       })) {
-        users.push({ '_id': participant.userID._id, 'firstName': participant.userID.firstName, 'lastName': participant.userID.lastName, 'email': participant.userID.email });
+        results[index].list.push({ '_id': participant.userID._id, 'firstName': participant.userID.firstName, 'lastName': participant.userID.lastName, 'email': participant.userID.email });
       }
     });
   });
 
+  // Remove any studies that students didn't actually complete
+  for (let i = 0; i < results.length; i++) {
+    if (results[i].list.length === 0) {
+      results.splice(i, 1);
+    } else {
+      i++;
+    }
+  }
+
+  console.log(results);
+
   /* send back the list of users as json from the request */
-  res.json(users);
+  res.json(results);
 };
 
 exports.extraCreditByCourse = function(req, res, next, name) {
-  Session.find({ 'participants.extraCreditCourse': name })
+  const selectedSemester = req.body;
+  Session.find({ 'participants.extraCreditCourse': name, startTime: {
+    $gte: selectedSemester.startDate,
+    $lt: selectedSemester.endDate
+  } })
+    .populate('studyID')
     .populate('participants.userID', '-salt -password')
     .exec()
     .then((sessions) => {
@@ -381,6 +406,7 @@ exports.extraCreditByCourse = function(req, res, next, name) {
       next();
     })
     .catch((err) => {
+      console.log(err);
       res.status(400).send(err);
     });
 };
