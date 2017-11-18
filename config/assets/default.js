@@ -20,6 +20,8 @@ module.exports = {
         'public/lib/angular-ui-utils/ui-utils.js',
         'public/lib/angular-bootstrap/ui-bootstrap-tpls.js',
         'public/lib/angular-file-upload/angular-file-upload.js',
+        'public/lib/gm.datepickerMultiSelect/src/gm.datepickerMultiSelect.js',
+        'public/lib/gm.datepickerMultiSelect/dist/gm.datepickerMultiSelect.min.js',
         'public/lib/owasp-password-strength-test/owasp-password-strength-test.js',
         'public/extras/ng-table/ng-table.min.js'
       ],

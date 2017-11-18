@@ -18,11 +18,15 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $scope.pastSessions.data = [];
 
       $scope.user = Authentication.user;
-      console.log($scope.user);
 
-      if (!$scope.user) {
-        $state.go('authentication.signin');
-      }
+      $scope.authToken = Authentication.authToken;
+
+      $scope.header = {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': $scope.authToken
+        }
+      };
 
       $scope.sessions.getUserSessions($scope.user._id)
         .then((results) => {
@@ -36,7 +40,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           $scope.allSessions.forEach((session) => {
             date = new Date(session.startTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+            session.time = `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             // Place session in correct array
             if (date >= today) {
@@ -112,54 +116,8 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
 
     // Declare methods that can be used to access session data
     $scope.sessions = {
-      getAll: function() {
-        return $http.get(window.location.origin + '/api/sessions/')
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
       getUserSessions: function(userId) {
-        return $http.get(window.location.origin + '/api/sessions/user/' + userId)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
-      create: function(newSession) {
-        return $.ajax({
-          url: window.location.origin + '/api/sessions/',
-          type: 'POST',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(newSession)
-        });
-      },
-
-      get: function(id) {
-        return $http.get(window.location.origin + '/api/sessions/' + id)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
-      update: function(id, newSession) {
-        return $.ajax({
-          url: window.location.origin + '/api/sessions/' + id, newSession,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(newSession)
-        });
+        return $http.get(window.location.origin + '/api/sessions/user/' + userId, $scope.header);
       },
 
       cancel: function(id, cancellor) {
@@ -167,6 +125,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           url: window.location.origin + '/api/sessions/' + id,
           type: 'DELETE',
           contentType: 'application/json',
+          headers: { 'x-access-token': $scope.authToken },
           dataType: 'json',
           data: JSON.stringify(cancellor)
         });
