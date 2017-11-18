@@ -261,6 +261,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
           endTime: new Date($scope.tempAvailability[x].endTime),
           unixDate: existingEntry
         });
+        $scope.prepEndTime($scope.availability[x]);
       }
     };
     init();
