@@ -8,11 +8,11 @@
 </div>
 
 -->
-<div class="container inner-container" ng-controller="AdminPortalController">
+<div class="container inner-container" ng-controller="AdminManageUsersController">
 
 <section>
   <div class="page-header">
-    <h1>User: <span ng-bind="currentUser.firstName + currentUser.lastName"></span></h1><!--how do I do a space?-->
+    <h1>User: {{currentUser.firstName}} {{currentUser.lastName}}</h1><!--how do I do a space?-->
   </div>
   <div class="col-md-12">
     <form name="userForm" ng-submit="editUser(userForm.$valid)" novalidate>
