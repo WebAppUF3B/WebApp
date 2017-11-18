@@ -15,23 +15,35 @@ var _ = require('lodash'),
 /**
  * Update user details
  */
-exports.update = function (req, res) {
+exports.update = function(req, res) {
   // Init Variables
   let user = req.user;
 
+  console.log(req.user);
   // For security measurement we remove the roles from the req.body object
-  delete req.body.roles;
+  delete req.body.role;
 
   if (user) {
-    user.firstName = req.body.firstName;
-    user.lastName = req.body.lastName;
-    user.updated = Date.now();
-    user.displayName = user.firstName + ' ' + user.lastName;
-    user.gender = req.body.gender;
+    // user.firstName = req.body.firstName;
+    // user.lastName = req.body.lastName;
+    // user.gender = req.body.gender;
+    // user.updated = Date.now();
+
     user.save(function(err) {
       if (err) {
-        console.log(err);
-        res.status(400).send(err);
+        return res.status(400).send({
+          message: errorHandler.getErrorMessage(err)
+        });
+        //console.log(err);
+        //res.status(400).send(err);
+      } else {
+        req.login(user, function(err) {
+          if(err) {
+            res.status(400).send(err);
+          } else {
+            res.json(user);
+          }
+        });
       }
     });
   } else {

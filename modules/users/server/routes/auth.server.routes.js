@@ -61,5 +61,5 @@ module.exports = function(app) {
 
   //new routes
   app.route('/api/profile/:UserId').get(users.getUser);
-  //app.route('/api/profile/:UserId').put(users.putUser);
+  app.route('/api/profile/:UserId').put(users.update);
 };
