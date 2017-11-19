@@ -13,11 +13,29 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
 
       if ($state.current.name === 'studies.availability-edit') {
         $scope.state = 'edit';
-        $scope.tempAvailability = $stateParams.avail;
-        $scope.currentStudy.duration = $stateParams.durate;
+        if ($stateParams.avail !== null) {
+          localStorage.setItem('avail', JSON.stringify($stateParams.avail));
+          $scope.tempAvailability = $stateParams.avail;
+        } else {
+          console.log('Getting avail from Persistance');
+          console.log(JSON.parse(localStorage.getItem('avail')));
+          $scope.tempAvailability = JSON.parse(localStorage.getItem('avail'));
+          //localStorage.removeItem('avail');
+        }
+        if ($stateParams.durate !== null) {
+          localStorage.setItem('durate', $stateParams.durate);
+          $scope.currentStudy.duration = $stateParams.durate;
+        } else {
+          console.log('Getting durate from Persistance');
+          console.log(localStorage.getItem('durate'));
+          $scope.currentStudy.duration = localStorage.getItem('durate');
+          //localStorage.removeItem('durate');
+        }
         alert('Edit Detected');
         console.log('tempAvailability got');
         console.log($scope.tempAvailability);
+        console.log('Durate got');
+        console.log($scope.currentStudy.duration);
       }
       //alert($scope.studyId);
       $scope.getStudy($scope.studyId)
@@ -207,14 +225,14 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       const endOfDayUnix = new Date(startDate).setHours(23,59);
       const endOfDay = new Date(endOfDayUnix);
       console.log('End of Day: ' +endOfDay);
-      let addMinutes = 0;
-      if ($scope.currentStudy.duration === 15) {
+      let addMinutes = 30;
+      if ($scope.currentStudy.duration === 15 || $scope.currentStudy.duration === '15') {
         addMinutes = 15;
       }
-      if ($scope.currentStudy.duration === 30) {
+      if ($scope.currentStudy.duration === 30 || $scope.currentStudy.duration === '30') {
         addMinutes = 30;
       }
-      if ($scope.currentStudy.duration === 60) {
+      if ($scope.currentStudy.duration === 60 || $scope.currentStudy.duration === '30') {
         addMinutes = 60;
       }
       console.log('Duration: '+addMinutes);
