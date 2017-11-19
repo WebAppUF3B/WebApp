@@ -46,6 +46,15 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
             if (date >= today) {
               $scope.upcomingSessions.data.push(session);
             } else {
+              session.participants.forEach((participant) => {
+                if (participant.userID._id == Authentication.user._id) {
+                  if (participant.attended) {
+                    session.completed = true;
+                  } else {
+                    session.completed = false;
+                  }
+                }
+              });
               $scope.pastSessions.data.push(session);
             }
           });

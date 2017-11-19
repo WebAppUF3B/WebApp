@@ -4,6 +4,7 @@
 angular.module('users').factory('Authentication', ['$window', '$injector',
   function($window) {
 
+    const loading = false;
     const user = JSON.parse(localStorage.getItem('user'));
     const authToken = JSON.parse(localStorage.getItem('authToken'));
 
@@ -15,7 +16,8 @@ angular.module('users').factory('Authentication', ['$window', '$injector',
     return {
       user: user,
       authToken: authToken,
-      logout: logout
+      logout: logout,
+      loading: loading
     };
   }
 ]);
