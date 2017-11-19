@@ -1,6 +1,6 @@
 angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController', ['$scope','$http', '$location', '$state', '$stateParams', '$document',
   function($scope, $http, $location, $state, $stateParams, $document) {
-    $scope.loaded = false;
+    //$scope.loaded = false;
 
     const init = function() {
       $scope.studyId = $stateParams.studyId;
@@ -8,16 +8,16 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       $scope.startTime = [];
       $scope.endTime = [];
       $scope.currentStudy = {};
-      $scope.studySessions = null;
       $scope.error = null;
       $scope.type = 'individual';
 
       if ($state.current.name === 'studies.availability-edit') {
         $scope.state = 'edit';
-      //   $scope.tempAvailability = $stateParams.avail;
+        $scope.tempAvailability = $stateParams.avail;
+        $scope.currentStudy.duration = $stateParams.durate;
         alert('Edit Detected');
-      //   console.log('tempAvailability got');
-      //   console.log($scope.tempAvailability);
+        console.log('tempAvailability got');
+        console.log($scope.tempAvailability);
       }
       //alert($scope.studyId);
       $scope.getStudy($scope.studyId)
@@ -34,41 +34,45 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         $scope.currentStudy.description = results.data.description;
         $scope.currentStudy.researchers = results.data.researchers;
         $scope.currentStudy.availability = [];
-        $scope.tempAvailability = results.data.availability;
+        //$scope.tempAvailability = results.data.availability;
         console.log('From http.get request - availability was left blank on purpose');
         console.log($scope.currentStudy);
-        console.log($scope.tempAvailability);
+        //console.log($scope.tempAvailability);
         $scope.prepStartTime();
-
-        $scope.activeDate = null;
-        if ($scope.state === 'edit') {
-          $scope.putInDate = [];
-          $scope.interpretCurrentAvailability();
-          console.log('Finished Interpret of Passed Param');
-          console.log($scope.putInDate);
-          console.log($scope.availability);
-          $scope.loaded = true;
-          $scope.selectedDates = $scope.putInDate; //able to manipulated via external array first.
-          console.log('edit date');
-        } else {
-          $scope.loaded = true;
-          $scope.selectedDates = [new Date().setHours(0,0,0,0)];
-          console.log('non-edit date');
-        }
-        $scope.options = {
-          startingDay: 1,
-          minDate: new Date(),
-          customClass: function(data) {
-            if ($scope.selectedDates.indexOf(data.date.setHours(0, 0, 0, 0)) > -1) {
-              return 'selected';
-            }
-            return '';
-          }
-        };
       })
       .catch((err) => {
         console.log(err);
       });
+
+      $scope.activeDate = null;
+      if ($scope.state === 'edit') {
+        $scope.putInDate = [];
+        $scope.interpretCurrentAvailability();
+        console.log('Finished Interpret of Passed Param');
+        console.log($scope.putInDate);
+        console.log($scope.availability);
+        //$scope.loaded = true;
+        $scope.selectedDates = $scope.putInDate; //able to manipulated via external array first.
+        console.log('edit date');
+      } else {
+        //$scope.loaded = true;
+        $scope.selectedDates = [new Date().setHours(0,0,0,0)];
+        console.log('non-edit date');
+      }
+      $scope.options = {
+        startingDay: 1,
+        minDate: new Date(),
+        customClass: function(data) {
+          if ($scope.selectedDates.indexOf(data.date.setHours(0, 0, 0, 0)) > -1) {
+            return 'selected';
+          }
+          return '';
+        }
+      };
+      // })
+      // .catch((err) => {
+      //   console.log(err);
+      // });
     };
 
     $scope.removeFromSelected = function(dt) {

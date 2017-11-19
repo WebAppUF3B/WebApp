@@ -54,8 +54,13 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       templateUrl: 'modules/core/client/views/availability.client.view.html'
     })
     .state('studies.availability-edit', {
-      url: '/edit/availability/:studyId',
+      url: '/availability-edit/:studyId',
       templateUrl: 'modules/core/client/views/availability.client.view.html',
+      params: {
+        studyId: null,
+        avail: null,
+        durate: null
+      }
     })
     .state('studies.data', {
       url: '/data/:studyId',
