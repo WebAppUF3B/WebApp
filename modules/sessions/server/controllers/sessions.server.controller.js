@@ -622,16 +622,14 @@ exports.emailReminders = function(req, res) {
             .then(() => {
               // Delete sessions that were cancelled
               if (removeSessions.length > 0) {
-                console.log(removeSessions);
                 Promise.all(removeSessions.map((session) => session.remove()))
                 .then(() => {
-                  console.log("Success");
                   res.status(200).send();
                 });
               } else {
                 res.status(200).send();
               }
-            })
+            });
         } else {
           res.status(200).send();
         }
