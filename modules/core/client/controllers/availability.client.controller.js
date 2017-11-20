@@ -1,6 +1,20 @@
-angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController', ['$scope','$http', '$location', '$state', '$stateParams', '$document',
-  function($scope, $http, $location, $state, $stateParams, $document) {
+angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController',
+['$scope','$http', '$location', '$state', '$stateParams', '$document', 'Authentication',
+  function($scope, $http, $location, $state, $stateParams, $document, Authentication) {
     //$scope.loaded = false;
+
+    $scope.user = Authentication.user;
+    console.log('tw user', $scope.user);
+
+    $scope.authToken = Authentication.authToken;
+    console.log('tw auth token', $scope.authToken);
+
+    $scope.header = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': $scope.authToken
+      }
+    };
 
     const init = function() {
       $scope.studyId = $stateParams.studyId;
@@ -51,6 +65,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
         $scope.currentStudy.description = results.data.description;
         $scope.currentStudy.researchers = results.data.researchers;
+        $scope.currentStudy.requireApproval = results.data.requireApproval;
         $scope.currentStudy.availability = [];
         //$scope.tempAvailability = results.data.availability;
         console.log('From http.get request - availability was left blank on purpose');
@@ -108,7 +123,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
     $scope.sendAvailability = function() {
       alert('Sending Availability');
       console.log('PV', 'Time Duration: '+$scope.currentStudy.duration);
-      //console.log('SessionStart: '+$scope.startTime);
+      console.log($scope.availability);
       for (let x = 0; x<$scope.currentStudy.availability.length; x++) {
         console.log('Timeslot: '+x+' '+$scope.currentStudy.availability[x]);
       }
@@ -141,9 +156,10 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
 
 
       $scope.error = null;
-      $http.put('/api/studies/'+$scope.studyId, $scope.currentStudy).success((response) => {
+      $http.put('/api/studies/'+$scope.studyId, $scope.currentStudy, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
+        console.log(response);
         $state.go('researcher-portal');
       }).error((response) => {
         $scope.error = response.message;
@@ -176,7 +192,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
     };
 
     $scope.getStudy = function(studyId) {
-      return $http.get(window.location.origin + '/api/studies/' + studyId)
+      return $http.get(window.location.origin + '/api/studies/' + studyId, $scope.header)
         .then((results) => {
           return results;
         })
