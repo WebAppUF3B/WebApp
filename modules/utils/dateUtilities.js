@@ -28,5 +28,21 @@ exports.DOWMap = (dowInt) => {
 };
 
 exports.getTimeOfDay = (date) => {
-  return `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+  const hours = date.getHours();
+  const remainingHrs = hours % 12;
+  const minutes = date.getMinutes();
+
+  let units = '';
+
+  switch (remainingHrs) {
+    case 0:
+      if (hours === 0) units = "A.M.";
+      if (hours === 12) units = "P.M.";
+    default:
+      if (hours < 12) units = "A.M.";
+      if (hours > 12) units = "P.M.";
+  }
+
+  return `${remainingHrs === 0 ? 12 : remainingHrs}:${minutes < 10 ? `0${minutes}` : minutes} ${units}`;
 };
+

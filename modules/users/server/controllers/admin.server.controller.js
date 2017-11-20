@@ -90,8 +90,8 @@ exports.approveUser = function(req, res) {
     .then((thisUser) => {
       //if (thisUser.adminApproved = false) {
       const verificationText = `Hello ${thisUser.firstName} ${thisUser.lastName},
-                                \nYour request for ${thisUser.role} access to the Human Centered Computing Research Portal has been approved!
-                                \nYou may now log into the system.`;
+                                \nYour request for ${thisUser.role} privilege has been approved!
+                                \nFeel free to log in now.`;
 
       //established modemailer email transporter object to send email with mailOptions populating mail with link
       const transporter = nodemailer.createTransport({
@@ -123,8 +123,8 @@ exports.denyUser = function(req, res) {
     .then((thisUser) => {
       //if (thisUser.adminApproved = false) {
       const verificationText = `Hello ${thisUser.firstName} ${thisUser.lastName},
-                                \nWe regret to inform you that your request for ${thisUser.role} access to the Human Centered Computing Research Portal has been denied.
-                                \nIf you believe this was done in error, please contact the administrator.`;
+                                \nWe regret to inform you that your request for ${thisUser.role} privilege has been denied.
+                                \nIf you believe this was in error, please contact the administrator.`;
 
       //established modemailer email transporter object to send email with mailOptions populating mail with link
       const transporter = nodemailer.createTransport({

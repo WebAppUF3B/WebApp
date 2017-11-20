@@ -4,18 +4,6 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
 
-      $scope.user = Authentication.user;
-
-      $scope.authToken = Authentication.authToken;
-
-      $scope.header = {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': $scope.authToken
-        }
-      };
-      console.log('header', $scope.header);
-
       $scope.courses.getAll()
         .then((results) => {
           // Assign results to upcomingSessions.data
@@ -31,6 +19,8 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       $scope.hasMonetary = false;
       $scope.hasExtraCredit = false;
       $scope.credentails = null;
+      $scope.user = Authentication.user;
+      console.log($scope.user);
 
       $scope.getAllSessionsByStudyId();
       $scope.myStudySessions = new NgTableParams({
@@ -45,7 +35,7 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
     };
     $scope.getAllSessionsByStudyId = function() {
       console.log($scope.user._id);
-      $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`, $scope.header)
+      $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`)
         .then((results) => {
           $scope.studySessions = results.data.sessions;
           $scope.study = results.data.study;
@@ -70,6 +60,19 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
           console.log(err);
         });
     };
+    // $scope.hoursAndMinutes = function(minutes) {
+    //   const hours = Math.floor(minutes / 60);
+    //   const remainderMins = Math.floor(minutes % 60);
+    //   const hoursUnits = hours === 1 ? 'hour' : 'hours';
+    //   const hoursStr = hours > 0 ? `${hours} ${hoursUnits}` : '';
+    //
+    //   const minutesUnits = remainderMins === 1 ? 'minute' : 'minutes';
+    //   const minutesStr = remainderMins > 0 ? `${remainderMins} ${minutesUnits}` : '';
+    //
+    //   const conjunctionFunction = hoursStr && minutesStr ? ' and ' : '';
+    //
+    //   return `${hoursStr}${conjunctionFunction}${minutesStr}`;
+    // };
 
     $scope.studySignupModal = function(session, index) {
       $scope.currentSession = session;
@@ -99,7 +102,7 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       };
       $scope.credentials.newSession = $scope.currentSession;
 
-      $http.post(window.location.origin + '/api/studySession/signup', $scope.credentials, $scope.header)
+      $http.post(window.location.origin + '/api/studySession/signup', $scope.credentials)
         .then(() => {
           alert(`You are successfully signed up for ${$scope.study.title}!`);
           $('#studySignupModal').modal('hide');
@@ -113,7 +116,7 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
     // Declare methods that can be used to access course data
     $scope.courses = {
       getAll: function() {
-        return $http.get(window.location.origin + '/api/courses/', $scope.header)
+        return $http.get(window.location.origin + '/api/courses/')
           .then((results) => {
             return results;
           })

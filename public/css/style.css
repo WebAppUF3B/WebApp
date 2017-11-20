@@ -57,7 +57,7 @@
     top: 5px !important;
     right: 5px !important;
   }
-  .session-modal, .table-modal{
+  .session-modal{
     margin-top: 5px !important;
     margin-bottom: 5px !important;
   }
@@ -90,7 +90,7 @@
   .half-width{
     width: 50%;
   }
-  .session-modal, .table-modal{
+  .session-modal{
     margin-top: 60px !important;
   }
   .border-right {
@@ -102,9 +102,6 @@
   }
   .expand {
     flex: 1;
-  }
-  .top-divider{
-    display: none;
   }
 }
 
@@ -156,28 +153,6 @@ h2, h3, h4, h5, h6 {
   border-top: 1px solid #9da3bd !important;
   border-bottom: 3px solid #9da3bd !important;
   margin-bottom: 0px !important;
-}
-
-.navbar-nav{
-  margin-top: 0px !important;
-  margin-bottom: 0px !important;
-}
-
-.navbar-toggle {
-  border: 2px solid #9da3bd !important;
-  margin-bottom: 10px !important;
-}
-
-.navbar-toggle .icon-bar {
-  background-color: #9da3bd !important;
-}
-
-.nav>li>a:focus, .nav>li>a:hover {
-  background: none !important;
-}
-
-.nav>li>a:focus, .nav>li>a {
-  font-size: 16px;
 }
 
 .top-logo {
@@ -422,23 +397,14 @@ md-datepicker {
   margin: 0px !important;
 }
 
-.loading-background {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 2000;
-  background:rgba(0,0,0,0.5);
-  display: flex;
+.profile-box{
+  margin-top: 20px;
+  border: 2px solid #c3c3c3;
+  border-radius: 4px;
 }
 
-.loading-image {
-  margin: auto;
-  max-height: 150px;
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
+.profile-box-inner{
+  padding: 15px;
 }
 
 table.ng-table th{
@@ -525,10 +491,6 @@ table.ng-table tbody td, table.ng-table thead th {
 
 .session-modal{
   max-width: 500px;
-}
-
-.table-modal{
-  max-width: 1000px;
 }
 
 .course-modal{
@@ -788,11 +750,6 @@ ul.dropdown-menu{
 .dropdown-tab{
   height: 45px !important;
   line-height: 45px !important;
-  text-align: center;
-}
-
-.dropdown-tab:hover{
-  cursor: pointer;
 }
 
 li.divider{
@@ -806,7 +763,7 @@ li.divider{
 .main-dropdown-toggle{
   height: 100%;
   width: 100%;
-  padding: 12px 15px !important;
+  padding: 15px !important;
   color: #337ab7;
   font-size: 16px;
 }
