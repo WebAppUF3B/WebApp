@@ -47,8 +47,7 @@ const studySchema = new Schema({
     type: Number
   },
   availability: [{
-    startTime: { type: Date },
-    endTime: { type: Date }
+    slot: Date,
   }],
   closed: {
     type: Boolean,
