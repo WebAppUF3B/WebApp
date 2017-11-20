@@ -8,7 +8,8 @@ var path = require('path'),
   mongoose = require('mongoose'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
-  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
+  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+  crypto = require('crypto');
 
 /**
  * Show the current user
@@ -85,16 +86,43 @@ exports.getWaitingUsers = function(req, res) {
 };
 
 exports.createUser = function(req, res) {
-  const user = new User(req.body);
-
-  console.log('GOT HERE!');
-  console.log(req.body);
+  const newUser = req.body;
+  newUser.password = crypto.randomBytes(12).toString('base64');
+  newUser.adminApproved = true;
+  newUser.emailValidated = true;
+  const user = new User(newUser);
+  // Then save the user
   user.save()
-    .then((results) => {
-      res.json(results);
+    .then((user) => {
+      const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/not/yet/working/${user._id}`; //this will be a password reset link
+      const verificationText = `Hello ${user.firstName} ${user.lastName},
+                                \n\nYour account has been created by the administrator
+                                \n\nPlease set a password by clicking this link:\n\n${verificationUri}\n`; //pass a json web token through the url as part of auth
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: user.email,
+        subject: 'HCC Research Pool Account Verification',
+        text: verificationText
+      };
+      return transporter.sendMail(mailOptions);
+    })
+    .then(() => {
+      return res.status(200).send();
     })
     .catch((err) => {
-      res.status(400).send();
+      console.log('Signup Error:\n', err);
+      const errJSON = err.toJSON();
+      if (errJSON.errors && errJSON.errors.email) {
+        errJSON.message = errJSON.errors.email.message;
+      }
+      console.log('SingUp User Error:\n', errJSON);
+      return res.status(400).send(errJSON);
     });
 };
 

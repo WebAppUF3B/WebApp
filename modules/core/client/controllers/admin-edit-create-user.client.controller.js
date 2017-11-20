@@ -84,7 +84,7 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
         $state.go('manage-users', { 'edit-user': response._id });
       }).error((response) => {
         $scope.error = response.message;
-        alert('hi' + response.message);
+        alert(response.message);
       });
     };
 
