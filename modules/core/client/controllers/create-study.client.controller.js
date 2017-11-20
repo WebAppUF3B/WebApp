@@ -42,6 +42,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         $scope.currentStudy.duration = results.data.duration;
         $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
         $scope.currentStudy.description = results.data.description;
+        $scope.currentStudy.availability = results.data.availability;
         $scope.currentStudy.researchers = results.data.researchers;
         //TODO Add researchers (and compensationAmount?)
 
@@ -105,7 +106,9 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       console.log($scope.currentStudy);
 
       $http.put('/api/studies/'+$scope.pass, $scope.currentStudy, $scope.header).success((response) => {
-        $state.go('researcher-portal');
+        console.log('Did the put, here is the return');
+        console.log(response);
+        $state.go('studies.availability-edit', { 'studyId': response._id, 'avail': $scope.currentStudy.availability, 'durate': $scope.currentStudy.duration });
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);
