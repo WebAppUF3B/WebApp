@@ -5,7 +5,8 @@ const mongoose = require('mongoose'),
   Session = mongoose.model('studySession'),
   Study = mongoose.model('Study'),
   nodemailer = require('nodemailer'),
-  dateUtils = require('../../../utils/dateUtilities'),
+  dateUtils = require('../../../utils/server/dateUtilities'),
+  authUtils = require('../../../utils/server/authUtils'),
   studies = require('../../../studies/server/controllers/studies.server.controller.js');
 
 /**
@@ -94,6 +95,14 @@ exports.delete = function(req, res) {
   const researchers = req.studySession.researchers;
   const studyTitle = req.studySession.studyID.title;
 
+  // Don't allow cancellation after the session
+  const now = new Date();
+  const sessionDate = new Date(session.startTime);
+  if (now >= sessionDate) {
+    console.log("Cannot cancel a session that already took place");
+    return res.status(400).send();
+  }
+
   // Established modemailer email transporter object to send email with mailOptions populating mail with link
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -113,7 +122,17 @@ exports.delete = function(req, res) {
       })
       .catch((errs) => {
         console.log('Remove Session Errors:\n', errs);
-        res.status(400).send(err);
+        res.status(400).send(errs);
+      });
+  } else {
+    session.remove()
+      .then(() => {
+        console.log('session removed!');
+        res.json(session);
+      })
+      .catch((errs) => {
+        console.log('Remove Session Errors:\n', errs);
+        res.status(400).send(errs);
       });
   }
 };
@@ -256,30 +275,130 @@ exports.sessionsByUserId = function(req, res, next, id) {
     });
 };
 
+exports.approveUser = function(req, res) {
+  let studySession = req.studySession;
+  const user = req.body;
+
+  studySession.participants.forEach((participant) => {
+    if (String(participant.userID._id) === user.userID._id) {
+      participant.approved = true;
+    }
+  });
+
+  const verificationText = `Hello ${user.userID.firstName} ${user.userID.lastName},
+                            \nYour request to participate in ${studySession.studyID.title} on ${user.sessionDate} at ${user.sessionTime} in ${studySession.studyID.location} has been approved by a researcher!`;
+
+  //established modemailer email transporter object to send email with mailOptions populating mail with link
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+  });
+  const mailOptions = {
+    from: 'no.replyhccresearch@gmail.com',
+    to: user.userID.email,
+    subject: 'HCC Research Pool Account Approval',
+    text: verificationText
+  };
+
+  studySession.save();
+
+  res.json(studySession);
+  return transporter.sendMail(mailOptions);
+};
+
+//*//
+exports.denyUser = function(req, res) {
+  let studySession = req.studySession;
+  const user = req.body;
+  let currIndex = 0;
+  let deleteIndex;
+
+  studySession.participants.forEach((participant) => {
+    if (String(participant.userID._id) === user.userID._id) {
+      deleteIndex = currIndex;
+    }
+    currIndex++;
+  });
+
+  const verificationText = `Hello ${user.userID.firstName} ${user.userID.lastName},
+                            \nYour request to participate in ${studySession.studyID.title} on ${user.sessionDate} at ${user.sessionTime} has been denied by a researcher.
+                            \nPlease contact one of the researchers involved in the study if you think this was done in error.`;
+
+  //established modemailer email transporter object to send email with mailOptions populating mail with link
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+  });
+  const mailOptions = {
+    from: 'no.replyhccresearch@gmail.com',
+    to: user.userID.email,
+    subject: 'HCC Research Pool Account Approval',
+    text: verificationText
+  };
+
+  studySession.participants.splice(deleteIndex, 1);
+
+  if (studySession.participants.length === 0) {
+    // If there are no more participants, remove the session
+    studySession.remove();
+  } else {
+    // Otherwise, just update it
+    studySession.save();
+  }
+
+  res.json(studySession);
+  return transporter.sendMail(mailOptions);
+};
+
 /* Get the students who recieved extra */
 exports.getExtraCredit = function(req, res) {
   const sessions = req.studySession;
-  const users = [];
+  const results = [];
 
-  // TODO Possibly filter out students based on semester as well
   // Loop through each session
   sessions.forEach((session) => {
+    let index = results.findIndex(x => x.studyID===session.studyID._id);
+    console.log("Found index: " + index);
+
+    // If the study isn't already in our results, add it
+    if (index === -1) {
+      index = results.length;
+      results.push({ studyID: session.studyID._id, studyTitle: session.studyID.title, list: [] });
+      console.log("Created index: " + index);
+    }
+
     // Loop through each participant of each session
     session.participants.forEach((participant) => {
-      if (participant.attended && !users.find((e) => {
-        return e._id === participant.userID._id;
+      if (participant.attended && !results[index].list.find((e) => {
+        return e._id == participant.userID._id;
       })) {
-        users.push({ '_id': participant.userID._id, 'firstName': participant.userID.firstName, 'lastName': participant.userID.lastName, 'email': participant.userID.email });
+        results[index].list.push({ '_id': participant.userID._id, 'firstName': participant.userID.firstName, 'lastName': participant.userID.lastName, 'email': participant.userID.email });
       }
     });
   });
 
+  // Remove any studies that students didn't actually complete
+  for (let i = 0; i < results.length; i++) {
+    if (results[i].list.length === 0) {
+      results.splice(i, 1);
+    } else {
+      i++;
+    }
+  }
+
+  console.log(results);
+
   /* send back the list of users as json from the request */
-  res.json(users);
+  res.json(results);
 };
 
 exports.extraCreditByCourse = function(req, res, next, name) {
-  Session.find({ 'participants.extraCreditCourse': name })
+  const selectedSemester = req.body;
+  Session.find({ 'participants.extraCreditCourse': name, startTime: {
+    $gte: selectedSemester.startDate,
+    $lt: selectedSemester.endDate
+  } })
+    .populate('studyID')
     .populate('participants.userID', '-salt -password')
     .exec()
     .then((sessions) => {
@@ -287,6 +406,7 @@ exports.extraCreditByCourse = function(req, res, next, name) {
       next();
     })
     .catch((err) => {
+      console.log(err);
       res.status(400).send(err);
     });
 };
@@ -315,7 +435,7 @@ exports.sessionsByStudyId = function(req, res, next, id) {
       next();
     })
     .catch((err) => {
-      console.log('Get all sessions from a study Error:\n', err);
+      console.log(err);
       res.status(err.code).send(err);
     });
 };
@@ -324,9 +444,11 @@ const generateMailOptions = (effectedUsers, cancellor, studyTitle) => {
   // Email any other participants involved
   const mailOptionArray = [];
   effectedUsers.forEach((affectedUser) => {
-    if (affectedUser.userID._id !== cancellor._id) {
+    if (String(affectedUser.userID._id) !== cancellor._id) {
       const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
-                   \n\nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${studyTitle}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
+                   \nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${studyTitle}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
+
+      console.log(emailBody);
 
       const mailOptions = {
         from: 'no.replyhccresearch@gmail.com',
@@ -409,4 +531,151 @@ const filterAttendedSessions = (sessions, participantId, participantsPerSession)
     }
   });
   return filteredSessions;
+};
+
+/* Send reminder email to all participants who have a session tomorrow */
+exports.emailReminders = function(req, res) {
+  // Verify we're the one's making the request
+  if (req.hostname === 'localhost') {
+    // Get all sessions
+    Session.find()
+      .populate('studyID')
+      .populate('participants.userID', '-salt -password')
+      .populate('researchers.userID', '-salt -password')
+      .exec()
+      .then((sessions) => {
+        // Then see if any sessions are tomorrow
+        const today = new Date();
+        const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+        const mailOptionArray = [];
+        const removeSessions = [];
+
+        sessions.forEach((session) => {
+          const date = new Date(session.startTime);
+          const sessionDate = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+          const sessionTime = `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+
+          if (date.getFullYear() === tomorrow.getFullYear() && date.getMonth() === tomorrow.getMonth() && date.getDate() === tomorrow.getDate()) {
+
+            if (session.participants.length === session.studyID.participantsPerSession) {
+              // If the session has enough participants, send reminder email
+              console.log("Reminder Email");
+              // Set up emails for each participant
+              session.participants.forEach((affectedUser) => {
+                const object = {};
+                object.sessionID = session._id;
+                object.user = {};
+                object.user._id = affectedUser.userID._id;
+                object.user.firstName = affectedUser.userID.firstName;
+                object.user.lastName = affectedUser.userID.lastName;
+
+                // Generate token using object above (needed for cancellation)
+                const token = authUtils.generateCancellationToken(object);
+
+                const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
+                             <br><br>This is a reminder that you are scheduled to participate in "${session.studyID.title}" tomorrow (${sessionDate}) at ${sessionTime} in ${session.studyID.location}.
+                             <br><br>To cancel this session, click <a href="${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/cancel/${token}">here</a>.`;
+
+                console.log(emailBody);
+
+                const mailOptions = {
+                  from: 'no.replyhccresearch@gmail.com',
+                  to: affectedUser.userID.email,
+                  subject: 'Research Study Reminder - ' + sessionDate,
+                  html: emailBody
+                };
+                mailOptionArray.push(mailOptions);
+              });
+            } else {
+              // If the session does not have enough participants, cancel it
+              console.log("Cancellation Email");
+              const users = session.participants.concat(session.researchers);
+
+              // Established modemailer email transporter object to send email with mailOptions populating mail with link
+              users.forEach((affectedUser) => {
+                const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
+                             \nWe regret to inform you that your session for "${session.studyID.title}", which was scheduled for tomorrow (${sessionDate}) at ${sessionTime}, has been cancelled because not enough participants signed up.`;
+
+                console.log(emailBody);
+
+                const mailOptions = {
+                  from: 'no.replyhccresearch@gmail.com',
+                  to: affectedUser.userID.email,
+                  subject: 'Research Session Cancellation - ' + sessionDate,
+                  text: emailBody
+                };
+                mailOptionArray.push(mailOptions);
+                removeSessions.push(session);
+              });
+            }
+          }
+        });
+
+        // Established modemailer email transporter object to send email with mailOptions populating mail with link
+        const transporter = nodemailer.createTransport({
+          service: 'Gmail',
+          auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+        });
+        // Send all emails
+        if (mailOptionArray.length > 0) {
+          Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)))
+            .then(() => {
+              // Delete sessions that were cancelled
+              if (removeSessions.length > 0) {
+                console.log(removeSessions);
+                Promise.all(removeSessions.map((session) => session.remove()))
+                .then(() => {
+                  console.log("Success");
+                  res.status(200).send();
+                });
+              } else {
+                res.status(200).send();
+              }
+            })
+        } else {
+          res.status(200).send();
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        res.status(400).send(err);
+      });
+  } else {
+    console.log("Email reminder accessed from outside the system");
+    res.status(403).send();
+  }
+};
+
+// Parse the token so that the session can be cancelled
+exports.parseToken = function(req, res, next, id) {
+  const token = id;
+  const object = authUtils.parseCancellationToken(token);
+
+  // Parse session ID from token
+  const sessionID = object.sessionID;
+
+  // Parse cancellor object from token
+  const cancellor = object.user;
+
+  // Retrieve that session
+  Session.findById(sessionID)
+    .populate('studyID')
+    .populate('researchers.userID', '-salt -password')
+    .populate('participants.userID', '-salt -password')
+    .exec()
+    .then((session) => {
+      req.studySession = session;
+
+      // Add date and time that are needed for cancellor
+      const date = new Date(session.startTime);
+      cancellor.date = dateUtils.formatMMDDYYYY(date);
+      cancellor.time = dateUtils.getTimeOfDay(date);
+      req.body = cancellor;
+
+      // Proceed to delete function
+      next();
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
 };

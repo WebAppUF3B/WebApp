@@ -58,6 +58,10 @@ const studySchema = new Schema({
     type: Boolean,
     default: false
   },
+  requireApproval: {
+    type: Boolean,
+    default: false
+  },
   createdOn: Date,
   updated: Date
 });

@@ -1,6 +1,20 @@
 //angular.module('core',['gm.datepickerMultiSelect']).controller('SessionController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams',
-angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('SessionController', ['$scope','$http', '$location', '$state', '$stateParams',
-  function($scope, $http, $location, $state, $stateParams) {
+angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('SessionController', ['$scope','$http', '$location', '$state', '$stateParams', 'Authentication',
+  function($scope, $http, $location, $state, $stateParams, Authentication) {
+
+    $scope.user = Authentication.user;
+    console.log('tw user', $scope.user);
+
+    $scope.authToken = Authentication.authToken;
+    console.log('tw auth token', $scope.authToken);
+
+    $scope.header = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': $scope.authToken
+      }
+    };
+
     $scope.activeDate = null;
     $scope.selectedDates = [new Date().setHours(0,0,0,0)];
     $scope.options = {
@@ -13,6 +27,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         return '';
       }
     };
+
     const init = function() {
       $scope.studyId = $stateParams.studyId;
       $scope.studySessions = null;
@@ -35,7 +50,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         $scope.session.endTime.getMinutes()
       );
 
-      $http.post('/api/sessions/create/'+$scope.studyId, $scope.session).success((response) => {
+      $http.post('/api/sessions/create/'+$scope.studyId, $scope.session, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         console.log('PV', 'Session Created!');
         console.log(response);

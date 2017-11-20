@@ -4,9 +4,9 @@ angular.module('users').controller('VerificationController', ['$scope', '$state'
     const verify = function() {
       $scope.error = false;
       // mark verify field for this user as True (don't know if you need all the vars included above, just copied them from authentication controller)
-      const pass = $stateParams.userId;
-      console.log(pass);
-      $http.post('/api/auth/verify/'+pass, $scope.credentials).success((response) => {
+      const userId = $stateParams.userId;
+      console.log(userId);
+      $http.post('/api/auth/verify/'+userId, $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
         $scope.user = response;
       }).error((response) => {

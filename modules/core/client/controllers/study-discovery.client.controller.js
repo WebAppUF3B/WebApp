@@ -1,11 +1,8 @@
 'use strict';
 
 // TODO consider replacing $http requests with factory
-angular.module('core').controller('StudyDiscoveryController', ['$scope','$http','NgTableParams', '$rootScope', 'Authentication',
-  function($scope, $http, NgTableParams, $rootScope, Authentication) {
-
-    // Prevent race conditions
-    const alreadyClicked = false;
+angular.module('core').controller('StudyDiscoveryController', ['$scope','$http','NgTableParams', 'Authentication',
+  function($scope, $http, NgTableParams, Authentication) {
 
     // Called after page loads
     $scope.init = function() {
@@ -16,6 +13,18 @@ angular.module('core').controller('StudyDiscoveryController', ['$scope','$http',
       $scope.filters = {};
 
       $scope.user = Authentication.user;
+      console.log($scope.user);
+
+      $scope.authToken = Authentication.authToken;
+      console.log($scope.authToken);
+
+      $scope.header = {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': $scope.authToken
+        }
+      };
+      console.log('header', $scope.header);
 
       // TODO filter these based on study criteria and use profile
       $scope.studies.getAll()
@@ -103,7 +112,7 @@ angular.module('core').controller('StudyDiscoveryController', ['$scope','$http',
     // Declare methods that can be used to access study data
     $scope.studies = {
       getAll: function() {
-        return $http.get(window.location.origin + '/api/studies/')
+        return $http.get(window.location.origin + '/api/studies/', $scope.header)
           .then((results) => {
             return results;
           })
@@ -111,63 +120,6 @@ angular.module('core').controller('StudyDiscoveryController', ['$scope','$http',
             return err;
           });
       },
-
-      getUserStudies: function(userId) {
-        return $http.get(window.location.origin + '/api/studies/user/' + userId)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
-      create: function(newStudy) {
-        return $.ajax({
-          url: window.location.origin + '/api/studies/',
-          type: 'POST',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(newStudy)
-        });
-      },
-
-      get: function(id) {
-        return $http.get(window.location.origin + '/api/studies/' + id)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
-      update: function(id, newStudy) {
-        return $.ajax({
-          url: window.location.origin + '/api/studies/' + id, newStudy,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(newStudy)
-        });
-      },
-
-      close: function(id, cancellor) {
-        return $.ajax({
-          url: window.location.origin + '/api/studies/close/' + id,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(cancellor)
-        });
-      },
-
-      remove: function(id) {
-        return $.ajax({
-          url: window.location.origin + '/api/studies/remove/' + id,
-          type: 'PUT'
-        });
-      }
     };
 
     // Run our init function

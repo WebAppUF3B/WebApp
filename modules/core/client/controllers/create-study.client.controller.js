@@ -3,8 +3,20 @@
 angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
     /* Get all the listings, then bind it to the scope */
-    $scope.user = Authentication.user;
     $scope.currentStudy = {};
+
+    $scope.user = Authentication.user;
+    console.log('tw user', $scope.user);
+
+    $scope.authToken = Authentication.authToken;
+    console.log('tw auth token', $scope.authToken);
+
+    $scope.header = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': $scope.authToken
+      }
+    };
 
     $document.ready(() => {
       if ($state.current.name === 'studies.edit') {
@@ -27,6 +39,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         $scope.currentStudy.irb = results.data.irb;
         $scope.currentStudy.compensationType = results.data.compensationType;
         $scope.currentStudy.maxParticipants = results.data.maxParticipants;
+        $scope.currentStudy.requireApproval = results.data.requireApproval;
         $scope.currentStudy.satisfactoryNumber = results.data.satisfactoryNumber;
         $scope.currentStudy.duration = results.data.duration;
         $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
@@ -54,7 +67,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
     };
 
     $scope.getStudy = function(studyId) {
-      return $http.get(window.location.origin + '/api/studies/' + studyId)
+      return $http.get(window.location.origin + '/api/studies/' + studyId, $scope.header)
         .then((results) => {
           return results;
         })
@@ -74,7 +87,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         return false;
       }
 
-      $http.post('/api/studies/', $scope.currentStudy).success((response) => {
+      $http.post('/api/studies/', $scope.currentStudy, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
         $state.go('studies.availability', { 'studyId': response._id });

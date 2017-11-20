@@ -9,7 +9,8 @@ const path = require('path'),
   passport = require('passport'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
-  utils = require('../../../../utils/stringUtils');
+  jwt = require('jsonwebtoken'),
+  utils = require('../../../../utils/server/stringUtils');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
@@ -33,7 +34,7 @@ exports.signup = function(req, res) {
   // Then save the user
   user.save()
       .then((user) => {
-        const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${user._id}`;
+        const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/authentication/verify/${user._id}`;
         const verificationText = `Hello ${user.firstName} ${user.lastName},
                                   \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
 
@@ -71,9 +72,6 @@ exports.facultySignup = function(req, res) {
   const faculty = new User(req.body);
   faculty.role = 'faculty'; //set role to enum 'faculty'
   faculty.adminApproved = false;
-  faculty.birthday = new Date(0);
-  faculty.gender = 'Other';
-  faculty.address = 'No Address';
   faculty.save()
          .then((faculty) => {
            console.log('tw', faculty);
@@ -113,9 +111,6 @@ exports.researcherSignup = function(req, res) {
   const researcher = new User(req.body);
   researcher.role = 'researcher'; //set role to enum 'researcher'
   researcher.adminApproved = false;
-  researcher.birthday = new Date(0);
-  researcher.gender = 'Other';
-  researcher.address = 'No Address';
   researcher.save()
     .then((researcher) => {
       console.log('tw', researcher);
@@ -154,58 +149,39 @@ exports.researcherSignup = function(req, res) {
  * Signin after passport authentication
  */
 exports.signin = function(req, res, next) {
-  const signInErr = {
-    message: 'Invalid email or password',
-    code: 400
-  };
+  passport.authenticate('local', (err, user, info) => {
+    if (err || !user) {
+      res.status(400).send(info);
+    } else {
 
-  const notVerifiedErr = {
-    message: 'Email has not been verified',
-    code: 400
-  };
+      const minimalUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        gender: user.gender,
+        birthday: user.birthday,
+        email: user.email,
+        role: user.role,
+        _id: user._id,
+      };
 
-  const notAdminApproved = {
-    message: 'Researchers and Faculty members require admin approval before log in.',
-    code: 400
-  };
+      const tokenPayload = {
+        role: user.role,
+        _id: user._id,
+      };
 
-  User.findOne({ email: req.body.email })
-      .then((user) => {
-        if (!user) {
-          throw signInErr;
-        }
-
-        if ((user.role === 'researcher' || user.role === 'faculty') && !user.adminApproved) {
-          throw notAdminApproved;
-        }
-
-        if (!user.emailValidated) {
-          throw notVerifiedErr;
-        }
-
-
-        if (!user.authenticate(req.body.password)) {
-          throw signInErr;
-        }
-
-        console.log('authentication worked');
-        const minimalUser = {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          gender: user.gender,
-          birthday: user.birthday,
-          email: user.email,
-          role: user.role,
-          _id: user._id
-        };
-
-        console.log('minimal user info:\n', minimalUser);
-        return res.status(200).send(minimalUser);
-      })
-      .catch((err) => {
-        console.log('Signin Error:\n', err.message);
-        return res.status(err.code).send(err);
+      const token = jwt.sign(tokenPayload, process.env.JWT, {
+        expiresIn: '1d'
       });
+
+      req.login(user, (err) => {
+        if (err) {
+          res.status(400).send(err);
+        } else {
+          res.json({ authToken: token, user: minimalUser });
+        }
+      });
+    }
+  })(req, res, next);
 };
 
 /**
@@ -244,6 +220,7 @@ exports.verify = function(req, res) {
       thisUser = user;
       if (thisUser === null) throw noUserErr;
       if (thisUser.emailValidated) throw alreadyVerifiedErr;
+      console.log("NOOOO");
       thisUser.emailValidated = true;
       return user.save();
     })
@@ -277,7 +254,7 @@ exports.verify = function(req, res) {
     })
     .catch((err) => {
       console.log('Verify email Error:\n', err);
-      return res.status(err.code).send(err);
+      return res.status(400).send(err);
     });
 };
 
@@ -436,13 +413,4 @@ exports.removeOAuthProvider = function(req, res, next) {
       return res.json(user);
     });
   });
-};
-
-
-const gatherErrors = (validationResults) => {
-
-  //TODO: TwF, server side validation for user here.
-
-  return validationResults;
-
 };
