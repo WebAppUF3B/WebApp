@@ -76,15 +76,15 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
         $scope.error = 'Please fill in all required fields.';
         return false;
       }
-
+      console.log($scope.currentUser);
       $http.post('/api/admin/createUser', $scope.currentUser, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
         console.log(response._id);
-        $state.go('studies.availability', { 'studyId': response._id });
+        $state.go('manage-users', { 'edit-user': response._id });
       }).error((response) => {
         $scope.error = response.message;
-        alert(response.message);
+        alert('hi' + response.message);
       });
     };
 

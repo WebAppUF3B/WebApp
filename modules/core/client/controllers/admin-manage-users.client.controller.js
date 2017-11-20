@@ -18,6 +18,10 @@ angular.module('core').controller('AdminManageUsersController', ['$scope', '$htt
       }
     };
 
+    $scope.filters = {};
+    $('section.ng-scope').css('margin-top', '0px');
+    $('section.ng-scope').css('margin-bottom', '0px');
+
     const init = () => {
       //console.log($stateParams.userId);
       $scope.currentUser = {};
@@ -80,6 +84,58 @@ angular.module('core').controller('AdminManageUsersController', ['$scope', '$htt
       })
       .catch((err) => {
         return err;
+      });
+    };
+
+    $scope.search = function() {
+      $scope.searchQuery = $scope.searchText;
+      console.log('ok');
+    };
+
+    // Toggle filter area open or closed
+    $scope.expandFilters = function() {
+      $('.filter-area').slideToggle();
+    };
+
+    // Check and see if any filters are applied
+    $scope.checkFilters = function() {
+      if ($scope.filters.role) {
+        $('.clear-filters-btn').show();
+      } else {
+        $('.clear-filters-btn').hide();
+      }
+      $scope.reloadTable();
+    };
+
+    // Remove table filters
+    $scope.clearFilters = function() {
+      $scope.filters = '';
+      $('.clear-filters-btn').hide();
+      $scope.reloadTable();
+    };
+
+    // Search table
+    $scope.search = function() {
+      $scope.searchQuery = $scope.searchText;
+    };
+
+    // Search on 'enter' press
+    $("#search").keypress((e) => {
+      if (e.keyCode === 13) {
+        $('#search-btn').click();
+      }
+    });
+
+    $scope.reloadTable = function() {
+      $scope.allUsersTable = new NgTableParams({
+        count: 10,
+        sorting: {
+          title: 'asc'
+        },
+        filter: $scope.filters
+      }, {
+        counts: [], // hides page sizes
+        dataset: $scope.allUsers // select data
       });
     };
 

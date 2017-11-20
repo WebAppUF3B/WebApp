@@ -18,8 +18,7 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
       }
     };
     const init = () => {
-      $('section.ng-scope').css('margin-top', '0px');
-      $('section.ng-scope').css('margin-bottom', '0px');
+
 
       $scope.admin.getWaitingUsers()
         .then((results) => {
@@ -59,7 +58,7 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
       if (!alreadyClicked) {
         $scope.error = '';
         alreadyClicked = true;
-        console.log('Approved!');
+//        console.log('Approved!');
         $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, $scope.header)
           .then(() => {
             // Reinitialize table
@@ -79,7 +78,7 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
       if (!alreadyClicked) {
         $scope.error = '';
         alreadyClicked = true;
-        console.log('DENIED!');
+//        console.log('DENIED!');
         $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, $scope.header)
           .then(() => {
             // Reinitialize table

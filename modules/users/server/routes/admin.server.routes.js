@@ -25,8 +25,8 @@ module.exports = function(app) {
   app.route('/api/admin/editUser/:userId')
     .get(admin.getUser)
     .put(admin.editUser);
-  app.route('api/admin/createUser')
-    .put(admin.createUser);
+  app.route('/api/admin/createUser')
+    .post(admin.createUser);
 
   // Single user routes
   app.route('/api/users/:userId')

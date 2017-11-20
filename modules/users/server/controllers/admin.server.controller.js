@@ -85,8 +85,11 @@ exports.getWaitingUsers = function(req, res) {
 };
 
 exports.createUser = function(req, res) {
-  console.log('GOT HERE!')
-    .exec()
+  const user = new User(req.body);
+
+  console.log('GOT HERE!');
+  console.log(req.body);
+  user.save()
     .then((results) => {
       res.json(results);
     })
@@ -272,16 +275,3 @@ exports.editUser = function(req, res) {
     return res.status(err.code).send(err);
   });
 };
-
-/*
-exports.getWaitingUsers = function(req, res) {
-  User.find({ emailValidated: true, adminApproved: false }, '-salt -password')
-    .exec()
-    .then((results) => {
-      res.json(results);
-    })
-    .catch((err) => {
-      res.status(400).send();
-    });
-};
-*/
