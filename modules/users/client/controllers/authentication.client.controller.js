@@ -8,8 +8,6 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
     $scope.error = $location.search().err;
 
     function init() {
-      $scope.credentials = {};
-      $scope.focus = false;
       if ($scope.authentication.user) {
         if ($scope.authentication.user.role === 'participant') {
           $state.go('participant-portal');
@@ -51,7 +49,6 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
     $scope.facultySignup = function(isValid) {
       $scope.error = null;
-      $scope.credentials.birthday = $('#birthday').val();
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
@@ -71,7 +68,6 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
 
     $scope.researcherSignup = function(isValid) {
       $scope.error = null;
-      $scope.credentials.birthday = $('#birthday').val();
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
@@ -89,32 +85,19 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
       });
     };
 
-    $scope.toggleBirthdayFocus = function() {
-      $scope.focus = !$scope.focus;
-      if ($scope.focus) $('#birthday').focus();
-      else $('#birthday').blur();
-    };
-
-    $('#birthday').focus(() => {
-      $scope.focus = true;
-    });
-
     $scope.signin = function(isValid) {
       $scope.error = null;
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
-        $scope.error = 'Please enter your username and password.';
+
         return false;
       }
 
       $scope.credentials.email = $scope.credentials.email.toLowerCase();
 
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
-        localStorage.setItem('authToken', JSON.stringify(response.authToken));
-        $scope.authentication.authToken = response.authToken;
-        localStorage.setItem('user', JSON.stringify(response.user));
-        $scope.authentication.user = response.user;
-        redirect(response.user);
+        localStorage.setItem('user', JSON.stringify(response));
+        redirect(response);
       }).error((response) => {
         $scope.error = response.message;
       });

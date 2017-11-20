@@ -7,35 +7,30 @@
   </div>
 
   <div class="row">
-    <div class="col-sm-10 col-sm-offset-1">
-      <a class="btn btn-orange mobile-full-width float-right no-margin-bottom phone-top-margin" ng-click='courseModal()'>Add a New Course</a>
-    </div>
-  </div>
-
-  <div class="row">
-    <h2 class="text-center">Extra Credit</h2>
-  </div>
-
-  <div class="row small-top-margin">
     <div class="col-md-3 col-md-offset-3 col-sm-4 col-sm-offset-2">
-      <select class="form-control" ng-model="selectedCourse" ng-options="course as course.name for course in allCourses track by course.name" ng-change="attemptPopulate()">
+      <select class="form-control top-margin" ng-model="selectedCourse" ng-options="course as course.name for course in allCourses track by course.name" ng-change="populateCourse()">
         <option value="" disabled selected>Select a Course</option>
       </select>
     </div>
-    <div class="col-md-3 col-sm-4 phone-top-margin">
-      <select class="form-control" ng-model="selectedSemester" ng-options="semester as semester.name + ' ' + semester.startDate.getFullYear() for semester in semesters" ng-change="attemptPopulate()">
-        <option value="" disabled selected>Select a Semester</option>
-      </select>
+    <div class="col-md-3 col-sm-4">
+      <a class="btn btn-primary full-width top-margin" data-target="#addCourseModal" data-toggle="modal">Add a New Course</a>
     </div>
   </div>
 
   <div class="row">
     <div class="col-sm-10 col-sm-offset-1">
-      <table ng-table="participatedStudies" class="table table-hover small-top-margin entries-selectable" show-filter="false">
-        <tr ng-repeat="study in participatedStudies.data">
-          <td title="'Studies Students Have Participated In'" filter="{'studyTitle': 'text'}" sortable="'studyTitle'" ng-attr-title="{{null}}" ng-click="studentModal(study)" class="text-center">{{study.studyTitle}}</td>
+      <table ng-table="extraCredit" class="table table-hover small-top-margin" show-filter="false">
+        <tr ng-repeat="participant in extraCredit.data">
+          <td title="'Name'" filter="{'lastName': 'text'}" sortable="'lastName'" ng-attr-title="{{null}}">{{participant.firstName}} {{participant.lastName}}</td>
+          <td title="'Email'" filter="{'email': 'text'}" sortable="'email'" ng-attr-title="{{null}}">{{participant.email}}</td>
         </tr>
       </table>
+    </div>
+  </div>
+
+  <div class="row" ng-show="extraCredit.data.length">
+    <div class="col-sm-2 col-sm-offset-5">
+      <a class="btn btn-orange full-width small-top-margin" ng-click="exportCSV()">Export</a>
     </div>
   </div>
 
@@ -64,7 +59,7 @@
           </div>
           <div class="row">
             <div class="col-sm-12">
-              <a id='add-course-btn' class="btn btn-primary full-width top-margin" ng-click="addCourse()">Add Course</a>
+              <a class="btn btn-primary full-width top-margin" ng-click="addCourse()">Add Course</a>
             </div>
           </div>
           <div class="row" ng-show='error'>
@@ -77,40 +72,5 @@
     </div>
   </div>
   <!-- End Add Course Modal -->
-
-  <!-- Student Modal -->
-  <div id="studentModal" class="modal" role="dialog">
-    <div class="modal-dialog table-modal">
-
-      <!-- Modal content-->
-      <div class="modal-content">
-        <div class="modal-header">
-          <div class="row">
-            <div class="col-xs-8 col-xs-offset-2 text-center">
-              <h3 class="no-margin"><strong>Students that Participated in "{{currentStudy.studyTitle}}"</strong></h3>
-            </div>
-            <div class="col-xs-2">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-          </div>
-        </div>
-        <div class="pane">
-          <table ng-table="extraCredit" class="table table-hover small-top-margin" show-filter="false">
-            <tr ng-repeat="participant in extraCredit.data">
-              <td title="'Name'" filter="{'lastName': 'text'}" sortable="'lastName'" ng-attr-title="{{null}}">{{participant.firstName}} {{participant.lastName}}</td>
-              <td title="'Email'" filter="{'email': 'text'}" sortable="'email'" ng-attr-title="{{null}}">{{participant.email}}</td>
-            </tr>
-          </table>
-          <div class="row pad-top">
-            <div class="col-sm-6 col-sm-offset-3">
-              <a class="btn btn-primary full-width" ng-click="exportCSV()">Export</a>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- End Student Modal -->
 
 </div>

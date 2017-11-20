@@ -18,12 +18,6 @@ exports.renderServerError = function (req, res) {
   });
 };
 
-exports.renderUnauthorizedError = function (req, res) {
-  res.status(403).render('modules/core/server/views/403.server.view.html', {
-    error: 'Oops! Something went wrong...'
-  });
-};
-
 /**
  * Render the server not found responses
  * Performs content-negotiation on the Accept HTTP header
