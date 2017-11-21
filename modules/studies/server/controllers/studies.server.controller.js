@@ -2,7 +2,8 @@
 
 /* Dependencies */
 const mongoose = require('mongoose'),
-  Study = mongoose.model('Study');
+  Study = mongoose.model('Study'),
+  User = mongoose.model('User');
 
 /**
  * Backend functions for CRUD operations on course collection
@@ -166,6 +167,19 @@ exports.modifyCount = function(id, attended) {
         return err;
       });
   });
+};
+
+exports.listResearchers = function(req, res) {
+  console.log('HELLO RESEARCHERS');
+  User.find({ role: { $ne: 'participant' } })
+    .then((arrayOfAllResearchers) => {
+      console.log('Meow Researchers');
+      console.log(arrayOfAllResearchers);
+      res.json(arrayOfAllResearchers);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 /*
