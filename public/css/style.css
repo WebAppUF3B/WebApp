@@ -815,3 +815,7 @@ li.divider{
   cursor: pointer !important;
   color: #23527c;
 }
+
+.dropdown-toggle.ng-binding.btn{
+  color: #333 !important
+}
