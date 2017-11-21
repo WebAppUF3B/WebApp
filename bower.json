@@ -19,7 +19,8 @@
     "angular-material": "^1.1.5",
     "components-font-awesome": "^4.7.0",
     "gm.datepickerMultiSelect": "gm.datepicker-multi-select#^1.0.10",
-    "angular-sanitize": "^1.6.6"
+    "angular-sanitize": "^1.6.6",
+    "angularjs-dropdown-multiselect": "^1.11.8"
   },
   "resolutions": {
     "angular": "~1.3",

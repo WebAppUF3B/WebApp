@@ -56,6 +56,7 @@ exports.update = function(req, res) {
   study.maxParticipantsPerSession = req.body.maxParticipantsPerSession;
   study.description = req.body.description;
   study.researchers = req.body.researchers;
+  study.requireApproval = req.body.requireApproval;
 
   // console.log('hello world');
   // console.log(req.body.title+'\n\n\n');

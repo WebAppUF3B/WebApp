@@ -12,6 +12,8 @@ module.exports = {
       js: [
         'public/lib/angular/angular.js',
         'public/lib/angular-aria/angular-aria.js',
+        'public/lib/angularjs-dropdown-multiselect/dist/angularjs-dropdown-multiselect.min.js',
+        'public/lib/angularjs-dropdown-multiselect/src/angularjs-dropdown-multiselect.js',
         'public/lib/angular-material/angular-material.js',
         'public/lib/angular-resource/angular-resource.js',
         'public/lib/angular-animate/angular-animate.js',

@@ -1,7 +1,10 @@
 'use strict';
-
-angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
+angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
+// angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
+//   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
+// angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication', 'angularjs-dropdown-multiselect',
+//   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication, angularjs-dropdown-multiselect) {
     /* Get all the listings, then bind it to the scope */
     $scope.currentStudy = {};
 
@@ -20,35 +23,72 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
 
     $document.ready(() => {
       if ($state.current.name === 'studies.edit') {
-        $scope.init();
+        $scope.state = 'edit';
       }
     });
 
 
     $scope.init = function() {
-      $scope.state = 'edit';
       $scope.pass = $stateParams.studyId;
 
-      $scope.getStudy($scope.pass)
-      .then((results) => {
-        console.log(results);
-        $scope.currentStudy.title = results.data.title;
-        $scope.currentStudy.location = results.data.location;
-        $scope.currentStudy.irb = results.data.irb;
-        $scope.currentStudy.compensationType = results.data.compensationType;
-        $scope.currentStudy.maxParticipants = results.data.maxParticipants;
-        $scope.currentStudy.requireApproval = results.data.requireApproval;
-        $scope.currentStudy.satisfactoryNumber = results.data.satisfactoryNumber;
-        $scope.currentStudy.duration = results.data.duration;
-        $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
-        $scope.currentStudy.description = results.data.description;
-        $scope.currentStudy.researchers = results.data.researchers;
-        //TODO Add researchers (and compensationAmount?)
+      if ($state.current.name === 'studies.edit') {
+        $scope.getStudy($scope.pass)
+        .then((results) => {
+          console.log(results);
+          $scope.currentStudy.title = results.data.title;
+          $scope.currentStudy.location = results.data.location;
+          $scope.currentStudy.irb = results.data.irb;
+          $scope.currentStudy.compensationType = results.data.compensationType;
+          $scope.currentStudy.maxParticipants = results.data.maxParticipants;
+          $scope.currentStudy.requireApproval = results.data.requireApproval;
+          $scope.currentStudy.satisfactoryNumber = results.data.satisfactoryNumber;
+          $scope.currentStudy.duration = results.data.duration;
+          $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
+          $scope.currentStudy.description = results.data.description;
+          $scope.currentStudy.researchers = results.data.researchers;
+          //TODO Add researchers (and compensationAmount?)
 
-      })
-      .catch((err) => {
-        console.log(err);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      }
+
+      //test out multipicker
+      $scope.example13model = [];
+      $scope.example13data = [
+        { id: 1, label: 'David' },
+        { id: 2, label: 'Jhon' },
+        { id: 3, label: 'Lisa' },
+        { id: 4, label: 'Nicole' },
+        { id: 5, label: 'Danny' }
+      ];
+      $scope.example13settings = {
+        smartButtonMaxItems: 3,
+        smartButtonTextConverter: function(itemText, originalItem) {
+          if (itemText === 'Jhon') {
+            return 'Jhonny!';
+          }
+          return itemText;
+        }
+      };
+
+      $scope.example13data.push({
+        id: 6,
+        label: 'Perry'
       });
+
+      console.log('Added Perry, is it there?');
+      console.log($scope.example13data);
+      console.log($scope.user);
+
+      $scope.example13data.push({
+        id: $scope.user._id,
+        label: $scope.user.firstName+' '+$scope.user.lastName
+      });
+
+      console.log('Added User, is it there?');
+      console.log($scope.example13data);
 
     };
 
@@ -111,5 +151,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         alert(response.message);
       });
     };
+
+    $scope.init();
   }
 ]);
