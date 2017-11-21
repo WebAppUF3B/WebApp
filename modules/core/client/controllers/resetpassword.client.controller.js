@@ -1,7 +1,29 @@
+/*
+token for reset password on new user created by admin must be generated at new user creation time
+  this needs a function in authUtils
+
+the userPolicyUtils must allow /forgot-password to be public, but reset-password to require a token
+
+forgot password will generate a token on emailing the user and send them to a link that asks for new password
+
+process for admin created user
+  user created with fake password
+  jwt generated as email is sent
+  link in email will contain user id and jwt
+  on reset page, jwt parsed out and verified
+  if jwt is correct, new password written to database (and salted and all that)
+
+process for forgot password
+  user types in email
+    200 returned regardless
+  if email exists for a user, an email will be sent
+    at email send time, jwt also generated
+  reset password link sent to user
+*/
 'use strict';
 
-angular.module('core').controller('AdminEditCreateController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication',
-  function($scope, $rootScope, NgTableParams, $http, $state, $stateParams, $document, Authentication) {
+angular.module('core').controller('ResetPasswordController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
+  function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
     /* Get all the listings, then bind it to the scope */
     $scope.currentUser = {};
 
@@ -11,6 +33,13 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
     $scope.authToken = Authentication.authToken;
     console.log('tw auth token', $scope.authToken);
 
+    $scope.isLoggedIn = 0;
+
+    if ($scope.user !== null) {
+      $scope.isLoggedIn = 1;
+    }
+    console.log($scope.isLoggedIn);
+
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
@@ -19,19 +48,19 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
     };
 
     $document.ready(() => {
-      if ($state.current.name === 'edit-user') {
+      if ($state.current.name === 'reset-password') {
         $scope.init();
       }
     });
 
 
     $scope.init = function() {
-      $scope.state = 'edit';
+      $scope.state = 'reset';
       $scope.pass = $stateParams.UserId;
 
       $scope.getUser()
       .then((results) => {
-        //console.log(results); //THIS LINE IS CURSED! IT RETURNS A 400 FROM AN ENTIRELY DIFFERENT CONTROLLER
+        //console.log(results);
         $scope.currentUser.firstName = results.data.firstName;
         $scope.currentUser.lastName = results.data.lastName;
         $scope.currentUser.email = results.data.email;
@@ -67,40 +96,6 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
       })
       .catch((err) => {
         return err;
-      });
-    };
-
-    $scope.create = function(isValid) {
-      if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'userForm');
-        $scope.error = 'Please fill in all required fields.';
-        return false;
-      }
-      console.log($scope.currentUser);
-      $http.post('/api/admin/createUser', $scope.currentUser, $scope.header).success((response) => {
-        // If successful we assign the response to the global user model
-        // And redirect to the previous or home page
-        console.log(response._id);
-        $state.go('manage-users', { 'edit-user': response._id });
-      }).error((response) => {
-        $scope.error = response.message;
-        alert(response.message);
-      });
-    };
-
-
-    $scope.update = function(isValid) {
-      if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'userForm');
-        $scope.error = 'Please fill in all required fields.';
-        return false;
-      }
-
-      console.log($scope.currentUser);
-      $http.put('/api/admin/editUser/' + $stateParams.userId, $scope.currentUser, $scope.header).success((response) => {
-        $state.go('manage-users');
-      }).error((response) => {
-        $scope.error = response.message;
       });
     };
 

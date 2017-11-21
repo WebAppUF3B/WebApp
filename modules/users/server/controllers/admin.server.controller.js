@@ -90,11 +90,14 @@ exports.createUser = function(req, res) {
   newUser.password = crypto.randomBytes(12).toString('base64');
   newUser.adminApproved = true;
   newUser.emailValidated = true;
+  const token = 0; //generate me pls
+  //must generate jwt then embed in url on email
   const user = new User(newUser);
   // Then save the user
   user.save()
     .then((user) => {
-      const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/not/yet/working/${user._id}`; //this will be a password reset link
+      
+      const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/not/yet/working/${user._id}/${token}`; //this will be a password reset link
       const verificationText = `Hello ${user.firstName} ${user.lastName},
                                 \n\nYour account has been created by the administrator
                                 \n\nPlease set a password by clicking this link:\n\n${verificationUri}\n`; //pass a json web token through the url as part of auth

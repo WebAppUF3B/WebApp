@@ -120,6 +120,16 @@ exports.parseCancellationToken = function(token) {
   return object;
 };
 
+exports.generateResetPasswordToken = function(object) {
+  const token = jwt.sign(object, process.env.JWT);
+  return token;
+};
+
+exports.pareseResetPasswordToken = function(token) {
+  const object = jwt.verify(token, process.env.JWT);
+  return object;
+};
+
 exports.secureCommonRoutes = secureCommonRoutes;
 exports.hostRoutes = hostRoutes;
 exports.roles = {
