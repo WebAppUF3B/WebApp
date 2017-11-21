@@ -72,6 +72,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         console.log($scope.currentStudy);
         //console.log($scope.tempAvailability);
         $scope.prepStartTime();
+
       })
       .catch((err) => {
         console.log(err);
@@ -202,6 +203,8 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
     };
 
     $scope.prepStartTime = function() {
+      console.log('PrepTime $scope.availability');
+      console.log($scope.availability);
       if ($scope.currentStudy.duration === 15) {
         for (let hour = 0; hour <= 23; hour++) {
           for (let minute = 0; minute <= 3; minute++) {
@@ -230,6 +233,8 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
           $scope.startTime.push(obj);
         }
       }
+      console.log('PrepTime $scope.startTime');
+      console.log($scope.startTime);
     };
 
     $scope.prepEndTime = function(possibility) {
@@ -262,6 +267,10 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       }
       console.log('Here is finished endTime');
       console.log(possibility.endTimeList);
+      //console.log('For curiousity here is possibility.endTime');
+      //console.log(possibility.endTime);
+      //console.log('Does possibility.endTime exist in endTimeList?');
+      //console.log(possibility.endTimeList.indexOf(possibility.endTime));
     };
 
     $scope.removeEntry = function(date) {
