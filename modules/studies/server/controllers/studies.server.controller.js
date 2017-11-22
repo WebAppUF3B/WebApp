@@ -58,6 +58,7 @@ exports.update = function(req, res) {
   study.description = req.body.description;
   study.researchers = req.body.researchers;
   study.requireApproval = req.body.requireApproval;
+  study.compensationAmount = req.body.compensationAmount;
 
   // console.log('hello world');
   // console.log(req.body.title+'\n\n\n');

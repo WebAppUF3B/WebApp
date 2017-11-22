@@ -48,7 +48,7 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
           $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
           $scope.currentStudy.description = results.data.description;
           $scope.currentStudy.researchers = results.data.researchers;
-          //TODO Add researchers (and compensationAmount?)
+          $scope.currentStudy.compensationAmount = results.data.compensationAmount;
 
           //get researchers to pick from
           $scope.getResearchers()
