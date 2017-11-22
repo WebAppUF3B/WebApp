@@ -58,35 +58,35 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
             $scope.researchers = results.data;
 
             //test out multipicker
-            $scope.example13model = [
+            $scope.researchermodel = [
               //proof of concept, putting in data will instantiate dropdown
               //{ id: 1, label: 'David' }
             ];
-            $scope.example13data = [];
+            $scope.researcherdata = [];
 
             for (let x = 0; x<$scope.researchers.length; x++) {
-              $scope.example13data.push({
+              $scope.researcherdata.push({
                 id: $scope.researchers[x]._id,
                 label: $scope.researchers[x].firstName+' '+$scope.researchers[x].lastName
               });
             }
 
             console.log('Completed Researcher Drop Down Population');
-            console.log($scope.example13data);
+            console.log($scope.researcherdata);
 
             if ($scope.state === 'edit') {
               console.log('See if everything is kosher for edit researchers');
-              console.log($scope.example13data);
+              console.log($scope.researcherdata);
               console.log($scope.currentStudy.researchers);
               // console.log('Now see if indexOf will work for subfields');
               // console.log($scope.researchers.indexOf($scope.currentStudy.researchers[0]._id));
               //it doesn't work for subfields
-              console.log('Find out index of matching to populate example13model');
+              console.log('Find out index of matching to populate researchermodel');
               for (let x = 0; x<$scope.currentStudy.researchers.length; x++) {
                 const indexOfExistingResearcherInData = $scope.findIndex($scope.currentStudy.researchers[x].userID);
                 console.log('In loop, found index, it is:');
                 console.log(indexOfExistingResearcherInData);
-                $scope.example13model.push($scope.example13data[indexOfExistingResearcherInData]);
+                $scope.researchermodel.push($scope.researcherdata[indexOfExistingResearcherInData]);
               }
             }
 
@@ -107,21 +107,21 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
           $scope.researchers = results.data;
 
           //test out multipicker
-          $scope.example13model = [
+          $scope.researchermodel = [
             //proof of concept, putting in data will instantiate dropdown
             //{ id: 1, label: 'David' }
           ];
-          $scope.example13data = [];
+          $scope.researcherdata = [];
 
           for (let x = 0; x<$scope.researchers.length; x++) {
-            $scope.example13data.push({
+            $scope.researcherdata.push({
               id: $scope.researchers[x]._id,
               label: $scope.researchers[x].firstName+' '+$scope.researchers[x].lastName
             });
           }
 
           console.log('Completed Researcher Drop Down Population');
-          console.log($scope.example13data);
+          console.log($scope.researcherdata);
 
         })
         .catch((err) => {
@@ -129,7 +129,7 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
         });
       }
 
-      $scope.example13settings = {
+      $scope.researchersettings = {
         smartButtonMaxItems: 5,
         enableSearch: true,
         smartButtonTextConverter: function(itemText, originalItem) {
@@ -178,9 +178,9 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
       $scope.currentStudy.researchers = [];
       //$scope.currentStudy.researchers.push({ 'userID': $scope.user._id });
       console.log('What will be ACTUALLY pushed is:');
-      for (let x = 0; x<$scope.example13model.length; x++) {
-        //console.log($scope.example13model[x].id);
-        $scope.currentStudy.researchers.push({ 'userID': $scope.example13model[x].id });
+      for (let x = 0; x<$scope.researchermodel.length; x++) {
+        //console.log($scope.researchermodel[x].id);
+        $scope.currentStudy.researchers.push({ 'userID': $scope.researchermodel[x].id });
       }
 
       if (!isValid) {
@@ -203,9 +203,9 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
 
     $scope.update = function(isValid) {
       $scope.currentStudy.researchers = [];
-      for (let x = 0; x<$scope.example13model.length; x++) {
-        //console.log($scope.example13model[x].id);
-        $scope.currentStudy.researchers.push({ 'userID': $scope.example13model[x].id });
+      for (let x = 0; x<$scope.researchermodel.length; x++) {
+        //console.log($scope.researchermodel[x].id);
+        $scope.currentStudy.researchers.push({ 'userID': $scope.researchermodel[x].id });
       }
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
@@ -224,8 +224,8 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
     };
 
     $scope.findIndex = function(researchIdInQuestion) {
-      for (let x = 0; x<$scope.example13data.length; x++) {
-        if ($scope.example13data[x].id === researchIdInQuestion) {
+      for (let x = 0; x<$scope.researcherdata.length; x++) {
+        if ($scope.researcherdata[x].id === researchIdInQuestion) {
           return x;
         }
       }
