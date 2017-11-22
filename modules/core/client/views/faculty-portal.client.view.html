@@ -7,8 +7,8 @@
   </div>
 
   <div class="row">
-    <div class="col-sm-10 col-sm-offset-1">
-      <a class="btn btn-orange mobile-full-width float-right no-margin-bottom phone-top-margin" ng-click='courseModal()'>Add a New Course</a>
+    <div class="col-sm-10 col-sm-offset-1" >
+      <a id="addCourseButton" class="btn btn-orange mobile-full-width float-right no-margin-bottom phone-top-margin"  ng-click='courseModal()'>Add a New Course</a>
     </div>
   </div>
 
@@ -48,7 +48,7 @@
         <div class="modal-header">
           <div class="row">
             <div class="col-xs-8 col-xs-offset-2 text-center">
-              <h3 class="no-margin"><strong>Add New Course</strong></h3>
+              <h3 class="no-margin" id='addCourse'><strong>Add New Course</strong></h3>
             </div>
             <div class="col-xs-2">
               <button type="button" class="close" data-dismiss="modal">&times;</button>

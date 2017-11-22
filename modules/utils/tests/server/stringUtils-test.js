@@ -1,4 +1,4 @@
-const stringUtils = require('../../stringUtils');
+const stringUtils = require('../../server/stringUtils');
 const assert = require('assert');
 
 describe('GIVEN String, RETURN STRING IN TITLE CASE', () => {
