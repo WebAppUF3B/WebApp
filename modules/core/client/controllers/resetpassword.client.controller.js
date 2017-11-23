@@ -79,12 +79,14 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
     $scope.submit = function(isValid) {
       $scope.error = null;
       console.log(isValid);
-      if ($scope.state === 'edit') {
-        console.log('edit');
-        $scope.update(isValid);
+      if ($scope.state === 'reset') {
+        console.log('reset');
+        console.log(isValid);
+        //$scope.update(isValid);
       } else {
-        console.log('create');
-        $scope.create(isValid);
+        console.log('forgot');
+        console.log(isValid);
+        //$scope.create(isValid);
       }
     };
 
@@ -98,6 +100,18 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
         return err;
       });
     };
+/*
+    $http.post(`${window.location.origin}/api/password/reset/${token}`, $scope.header)
+      .catch((err) => {
+        $scope.error = true;
+        console.log(err);
+      });
 
+    $http.post(`${window.location.origin}/api/password/forgot/`, $scope.header)
+      .catch((err) => {
+        $scope.error = true;
+        console.log(err);
+      });
+*/
   }
 ]);

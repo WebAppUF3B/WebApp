@@ -79,7 +79,7 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       templateUrl: 'modules/core/client/views/edit-user.client.view.html'
     })
     .state('reset-password', {
-      url: '/reset-password',
+      url: '/reset-password/:token',
       templateUrl: 'modules/core/client/views/reset-password.client.view.html'
     })
     .state('forgot-password', {
