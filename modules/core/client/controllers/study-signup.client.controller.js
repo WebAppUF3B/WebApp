@@ -14,11 +14,8 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
           'x-access-token': $scope.authToken
         }
       };
-      console.log('header', $scope.header);
-
       $scope.courses.getAll()
         .then((results) => {
-          // Assign results to upcomingSessions.data
           $scope.allCourses = results.data;
         });
 
@@ -32,35 +29,6 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       $scope.credentials = null;
 
       $scope.getAllSessionsByStudyId()
-        .then(() => {
-          console.log($scope.study.participantsPerSession);
-          // Populate partial table if sessions require multiple participants
-          if ($scope.study.participantsPerSession > 1) {
-            $scope.partialSessionsTable = new NgTableParams({
-              count: 10,
-              sorting: {
-                startTime: 'asc'
-              }
-            }, {
-              counts: [], // hides page sizes
-              dataset: $scope.partialSessions // select data
-            });
-          }
-
-          $scope.emptySessionsTable = new NgTableParams({
-            count: 10,
-            sorting: {
-              startTime: 'asc'
-            }
-          }, {
-            counts: [], // hides page sizes
-            dataset: $scope.emptySessions // select data
-          });
-        });
-    };
-    $scope.getAllSessionsByStudyId = function() {
-      console.log($scope.user._id);
-      return $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`, $scope.header)
         .then((results) => {
           $scope.partialSessions = results.data.partialSessions;
           $scope.emptySessions = results.data.emptySessions;
@@ -78,13 +46,38 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
                 break;
             }
           });
-          console.log('tw get data');
-          console.log('tw study\n', $scope.study);
-          console.log('tw sessions\n', $scope.studySessions);
         })
         .catch((err) => {
           console.log(err);
+        })
+        .then(() => {
+          console.log($scope.study.participantsPerSession);
+          // Populate partial table if sessions require multiple participants
+          if ($scope.study.participantsPerSession > 1) {
+            $scope.partialSessionsTable = new NgTableParams({
+              count: 10,
+              sorting: {
+                startTime: 'desc'
+              }
+            }, {
+              counts: [], // hides page sizes
+              dataset: $scope.partialSessions // select data
+            });
+          }
+
+          $scope.emptySessionsTable = new NgTableParams({
+            count: 10,
+            sorting: {
+              startTime: 'desc'
+            }
+          }, {
+            counts: [], // hides page sizes
+            dataset: $scope.emptySessions // select data
+          });
         });
+    };
+    $scope.getAllSessionsByStudyId = () => {
+      return $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`, $scope.header);
     };
 
     $scope.studySignupModal = function(session, index) {

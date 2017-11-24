@@ -34,8 +34,74 @@ exports.allSessionsFromStudy = function(req, res) {
 
 exports.allSessionsForSignup = function(req, res) {
   const study = req.study;
-  const sessions = getMinimalSessions(filterAttendedSessions(req.allSessionsByStudyId, req.userId, study.participantsPerSession));
-  res.status(200).send({ study: study, sessions: sessions });
+  const timeSlots = study.availability;
+
+  const emptySessions = [];
+  const partialSessions = [];
+  const _24Hours = 60 * 60 * 24 * 1000;
+
+  timeSlots.forEach((slot) => {
+    // Object.keys(slot).forEach(key => {
+    //   console.log('tw key and value\n', key, slot[key]);
+    // });
+
+    const startTime = new Date(slot._doc.startTime);
+    const endTime = new Date(slot._doc.endTime);
+    const totalTimePeriod = dateUtils.differenceInMins(startTime, endTime);
+    const studyDuration = study.duration;
+    const studyDurationMs = studyDuration * 60 * 1000;
+    let baseStartTime = startTime.getTime();
+    if (baseStartTime < Date.now() - _24Hours) {
+      return;
+    }
+    const numOfStudySessions = totalTimePeriod / studyDuration;
+    console.log('tw num of sessions', numOfStudySessions);
+    console.log('tw totalTimePeriod', totalTimePeriod);
+    console.log('tw studyDuration', studyDuration);
+    for (let i = 0; i < numOfStudySessions; i++) {
+      baseStartTime = studyDurationMs + baseStartTime;
+
+      let taken = false;
+      if (slot.existingStudySessions) {
+        taken = slot.existingStudySessions.some((existingStudySession) => {
+          if (existingStudySession.startTime === baseStartTime) return true;
+        });
+      }
+
+      if (taken) return;
+
+      console.log(typeof baseStartTime, parseInt(baseStartTime, 10));
+      const newStartTime = new Date(baseStartTime);
+      const newSession = {
+        dow: dateUtils.DOWMap(newStartTime.getDay()),
+        date: dateUtils.formatMMDDYYYY(newStartTime),
+        time: dateUtils.getTimeOfDay(newStartTime),
+        startTime: newStartTime,
+        currentParticipants: 0
+      };
+      emptySessions.push(newSession);
+    }
+
+
+    if (slot.existingStudySessions) {
+      slot.existingStudySessions.forEach((existingStudySession) => {
+        if (existingStudySession.participants.length < study.participantsPerSession) {
+          const minimalExistingSession = {
+            id: existingStudySession._id,
+            date: dateUtils.formatMMDDYYYY(existingStudySession.startTime),
+            dow: dateUtils.DOWMap(existingStudySession.startTime.getDay()),
+            startTime: dateUtils.getTimeOfDay(existingStudySession.startTime)
+          };
+          partialSessions.push(minimalExistingSession);
+        }
+      });
+    }
+
+  });
+
+  console.log('tw emptySessions\n', emptySessions);
+  console.log('tw partialSessions\n', partialSessions);
+  res.status(200).send({ study: study, emptySessions: emptySessions, partialSessions: partialSessions });
 };
 
 /* Create a session */
@@ -414,11 +480,6 @@ exports.extraCreditByCourse = function(req, res, next, name) {
 exports.sessionsByStudyId = function(req, res, next, id) {
   const _id = mongoose.Types.ObjectId(id);
 
-  const noSessionsAvailableErr = {
-    code: 404,
-    message: 'There are no sessions available for this study'
-  };
-
   const studyNotFound = {
     code: 404,
     message: 'There is a problem with this study.'
@@ -428,7 +489,6 @@ exports.sessionsByStudyId = function(req, res, next, id) {
     .then((results) => {
       const sessions = results[0];
       const study = results[1];
-      // if (!sessions || sessions.length === 0) throw noSessionsAvailableErr;
       if (!study) throw studyNotFound;
       req.allSessionsByStudyId = sessions;
       req.study = study;
@@ -503,7 +563,7 @@ const getMinimalSessions = (sessions) => {
   sessions.forEach((session) => {
     const startTime = new Date(session.startTime);
     const endTime = new Date(session.endTime);
-    const duration = dateUtils.differenceInSeconds(startTime, endTime);
+    const duration = dateUtils.differenceInMins(startTime, endTime);
     const minimalSession = {
       id: session._id,
       date: dateUtils.formatMMDDYYYY(startTime),
