@@ -27,12 +27,14 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
       $scope.hasMonetary = false;
       $scope.hasExtraCredit = false;
       $scope.credentials = null;
+      $scope.multipleParticipants = null;
 
       $scope.getAllSessionsByStudyId()
         .then((results) => {
           $scope.partialSessions = results.data.partialSessions;
           $scope.emptySessions = results.data.emptySessions;
           $scope.study = results.data.study;
+          $scope.hasPartialSessions = $scope.partialSessions.length > 0;
 
           if ($scope.study.closed) $state.go('forbidden');
 
@@ -47,23 +49,17 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
             }
           });
         })
-        .catch((err) => {
-          console.log(err);
-        })
         .then(() => {
-          console.log($scope.study.participantsPerSession);
           // Populate partial table if sessions require multiple participants
-          if ($scope.study.participantsPerSession > 1) {
-            $scope.partialSessionsTable = new NgTableParams({
-              count: 10,
-              sorting: {
-                startTime: 'desc'
-              }
-            }, {
-              counts: [], // hides page sizes
-              dataset: $scope.partialSessions // select data
-            });
-          }
+          $scope.partialSessionsTable = new NgTableParams({
+            count: 10,
+            sorting: {
+              startTime: 'desc'
+            }
+          }, {
+            dataset: $scope.partialSessions, // select data
+            counts: [], // hides page sizes
+          });
 
           $scope.emptySessionsTable = new NgTableParams({
             count: 10,
@@ -71,9 +67,12 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
               startTime: 'desc'
             }
           }, {
+            dataset: $scope.emptySessions, // select data
             counts: [], // hides page sizes
-            dataset: $scope.emptySessions // select data
           });
+        })
+        .catch((err) => {
+          console.log(err);
         });
     };
     $scope.getAllSessionsByStudyId = () => {
@@ -106,8 +105,10 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
         lastName: $scope.user.lastName,
         email: $scope.user.email,
       };
-      $scope.credentials.newSession = $scope.currentSession;
-
+      $scope.credentials.signupSession = {
+        _id: $scope.currentSession._id,
+        startTime: $scope.currentSession.startTime
+      };
       $http.post(window.location.origin + '/api/studySession/signup', $scope.credentials, $scope.header)
         .then(() => {
           alert(`You are successfully signed up for ${$scope.study.title}!`);

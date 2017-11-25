@@ -41,9 +41,13 @@ exports.allSessionsForSignup = function(req, res) {
   const _24Hours = 60 * 60 * 24 * 1000;
 
   timeSlots.forEach((slot) => {
+
+    // TODO: figure out why slot doesn't have the correct keys. use _doc to access the needed fields
     // Object.keys(slot).forEach(key => {
     //   console.log('tw key and value\n', key, slot[key]);
     // });
+
+    const existingStudySessions = slot._doc.existingStudySessions;
 
     const startTime = new Date(slot._doc.startTime);
     const endTime = new Date(slot._doc.endTime);
@@ -55,50 +59,52 @@ exports.allSessionsForSignup = function(req, res) {
       return;
     }
     const numOfStudySessions = totalTimePeriod / studyDuration;
-    console.log('tw num of sessions', numOfStudySessions);
-    console.log('tw totalTimePeriod', totalTimePeriod);
-    console.log('tw studyDuration', studyDuration);
+
     for (let i = 0; i < numOfStudySessions; i++) {
       baseStartTime = studyDurationMs + baseStartTime;
 
-      let taken = false;
-      if (slot.existingStudySessions) {
-        taken = slot.existingStudySessions.some((existingStudySession) => {
-          if (existingStudySession.startTime === baseStartTime) return true;
-        });
-      }
+      const taken = existingStudySessions.some((existingStudySession) => {
+        const existingDate = new Date(existingStudySession.startTime);
+        if (existingDate.getTime() === baseStartTime) return true;
+      });
 
-      if (taken) return;
+      if (taken) continue;
 
-      console.log(typeof baseStartTime, parseInt(baseStartTime, 10));
       const newStartTime = new Date(baseStartTime);
       const newSession = {
         dow: dateUtils.DOWMap(newStartTime.getDay()),
         date: dateUtils.formatMMDDYYYY(newStartTime),
         time: dateUtils.getTimeOfDay(newStartTime),
         startTime: newStartTime,
-        currentParticipants: 0
+        currentParticipants: 0,
       };
       emptySessions.push(newSession);
     }
 
 
-    if (slot.existingStudySessions) {
-      slot.existingStudySessions.forEach((existingStudySession) => {
-        if (existingStudySession.participants.length < study.participantsPerSession) {
-          const minimalExistingSession = {
-            id: existingStudySession._id,
-            date: dateUtils.formatMMDDYYYY(existingStudySession.startTime),
-            dow: dateUtils.DOWMap(existingStudySession.startTime.getDay()),
-            startTime: dateUtils.getTimeOfDay(existingStudySession.startTime)
-          };
-          partialSessions.push(minimalExistingSession);
-        }
-      });
-    }
+    existingStudySessions.forEach((existingStudySession) => {
+      if (existingStudySession && existingStudySession.participants) {
+        const attended = existingStudySession.participants.some((participant) => {
+          console.log('tw existing participant vs this participant', participant.userID, req.userId, String(participant.userID) === req.userId);
+          if (String(participant.userID) === req.userId) return true;
+        });
+
+        if (attended) return;
+      }
+      if (existingStudySession.participants && existingStudySession.participants.length < study.participantsPerSession) {
+        const minimalExistingSession = {
+          _id: existingStudySession._id,
+          date: dateUtils.formatMMDDYYYY(existingStudySession.startTime),
+          dow: dateUtils.DOWMap(existingStudySession.startTime.getDay()),
+          startTime: existingStudySession.startTime,
+          time: dateUtils.getTimeOfDay(existingStudySession.startTime),
+          currentParticipants: existingStudySession.participants.length,
+        };
+        partialSessions.push(minimalExistingSession);
+      }
+    });
 
   });
-
   console.log('tw emptySessions\n', emptySessions);
   console.log('tw partialSessions\n', partialSessions);
   res.status(200).send({ study: study, emptySessions: emptySessions, partialSessions: partialSessions });
@@ -251,8 +257,7 @@ exports.markCompensated = function(req, res) {
 
 exports.sessionSignup = function(req, res) {
   const study = req.body.study;
-  const newSession = req.body.newSession;
-  const sessionId = mongoose.Types.ObjectId(req.body.sessionId);
+  const signupSession = req.body.signupSession;
   const singingUser = req.body.user;
   const compensationType = req.body.compensation;
   const classCode = req.body.classCode;
@@ -264,47 +269,92 @@ exports.sessionSignup = function(req, res) {
 
   let mailOptionArray = [];
 
+  const newParticipant = {
+    userID: mongoose.Types.ObjectId(singingUser._id),
+    attended: false,
+    compensationType: compensationType,
+    extraCreditCourse: classCode,
+    compensationGiven: false
+  };
+
   const invalidSessionErr = {
     message: 'There is a problem with this session, please contact an admin.',
     code: 400
   };
 
-  Session.findById(sessionId)
-    .populate('participants.userID', '-salt -password')
-    .populate('researchers.userID', '-salt -password')
-    .exec(function(err, session) { // eslint-disable-line
-      if (!session) throw invalidSessionErr;
-      if (err) {
-        console.log('exec err', err);
-        throw err;
-      }
-      const newParticipant = {
-        userID: mongoose.Types.ObjectId(singingUser._id),
-        attended: false,
-        compensationType: compensationType,
-        extraCreditCourse: classCode,
-        compensationGiven: false
-      };
+  console.log('tw signupSession', signupSession);
+  if (signupSession._id) {
+    Session.findById(signupSession._id)
+      .populate('participants.userID', '-salt -password')
+      .populate('researchers.userID', '-salt -password')
+      .exec(function (err, session) { // eslint-disable-line
+        if (!session) throw invalidSessionErr;
+        if (err) {
+          console.log('exec err', err);
+          throw err;
+        }
 
-      session.participants.push(newParticipant);
+        session.participants.push(newParticipant);
 
-      mailOptionArray = generateMailOptionsForSignup(session.researchers, singingUser, newSession, study.title, study.location);
-      session.save()
-        .then(() => {
-          return Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)));
-        })
-        .then(() => {
-          res.status(200).send();
-        })
-        .catch((err) => {
-          console.log('Session Signup Err:\n', err);
-          if (err.code && err.message) {
-            res.status(err.code).send(err.message);
-          } else {
-            res.status(500).send();
+        mailOptionArray = generateMailOptionsForSignup(session.researchers, singingUser, signupSession.startTime, study.title, study.location);
+        session.save()
+          .then(() => {
+            return Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)));
+          })
+          .then(() => {
+            res.status(200).send();
+          })
+          .catch((err) => {
+            console.log('Session Signup Err:\n', err);
+            if (err.code && err.message) {
+              res.status(err.code).send(err.message);
+            } else {
+              res.status(500).send();
+            }
+          });
+      });
+  } else {
+    const newSessionBody = {
+      participants: [newParticipant],
+      studyID: study._id,
+      researchers: study.researchers,
+      startTime: signupSession.startTime
+    };
+
+    const newSession = new Session(newSessionBody);
+
+    Promise.all([newSession.save(), Study.findById(study._id)])
+      .then((results) => {
+        const queriedStudy = results[1];
+
+        queriedStudy.availability.some((slot) => {
+          const studyStartTime = new Date(slot.startTime);
+          const newStartTime = new Date(newSession.startTime);
+          const studyEndTime = new Date(slot.endTime);
+          console.log('in range', studyStartTime <= newStartTime &&
+            newStartTime <= studyEndTime);
+          if (studyStartTime <= newStartTime &&
+            newStartTime <= studyEndTime) {
+            console.log(slot.existingStudySessions);
+            slot.existingStudySessions.push(newSession._id);
+            console.log(slot.existingStudySessions);
+            return true;
           }
         });
-    });
+
+        console.log('study before save', queriedStudy);
+
+        return queriedStudy.save();
+      })
+      .then((result) => {
+        console.log('study after save', result);
+        res.status(200).send();
+      })
+      .catch((err) => {
+        console.log('new session signup error:\n', err);
+        res.status(500).send();
+      });
+  }
 };
 
 /*
@@ -332,6 +382,7 @@ exports.sessionsByUserId = function(req, res, next, id) {
     .populate('participants.userID', '-salt -password')
     .exec()
     .then((sessions) => {
+      req.userId = id;
       req.studySession = sessions;
       req.userId = id;
       next();
@@ -342,7 +393,7 @@ exports.sessionsByUserId = function(req, res, next, id) {
 };
 
 exports.approveUser = function(req, res) {
-  let studySession = req.studySession;
+  const studySession = req.studySession;
   const user = req.body;
 
   studySession.participants.forEach((participant) => {
@@ -372,9 +423,8 @@ exports.approveUser = function(req, res) {
   return transporter.sendMail(mailOptions);
 };
 
-//*//
 exports.denyUser = function(req, res) {
-  let studySession = req.studySession;
+  const studySession = req.studySession;
   const user = req.body;
   let currIndex = 0;
   let deleteIndex;
@@ -421,22 +471,20 @@ exports.getExtraCredit = function(req, res) {
   const sessions = req.studySession;
   const results = [];
 
-  // Loop through each session
   sessions.forEach((session) => {
-    let index = results.findIndex(x => x.studyID===session.studyID._id);
+    let index = results.findIndex(x => x.studyID === session.studyID._id);
     console.log("Found index: " + index);
 
-    // If the study isn't already in our results, add it
-    if (index === -1) {
+    const notFound = index === -1;
+    if (notFound) {
       index = results.length;
       results.push({ studyID: session.studyID._id, studyTitle: session.studyID.title, list: [] });
       console.log("Created index: " + index);
     }
 
-    // Loop through each participant of each session
     session.participants.forEach((participant) => {
       if (participant.attended && !results[index].list.find((e) => {
-        return e._id == participant.userID._id;
+        return e._id === String(participant.userID._id);
       })) {
         results[index].list.push({ '_id': participant.userID._id, 'firstName': participant.userID.firstName, 'lastName': participant.userID.lastName, 'email': participant.userID.email });
       }
@@ -485,7 +533,8 @@ exports.sessionsByStudyId = function(req, res, next, id) {
     message: 'There is a problem with this study.'
   };
 
-  Promise.all([Session.find({ studyID: _id }).populate('participants.userID', '-salt -password'), Study.findById(id)])
+  Promise.all([Session.find({ studyID: _id }).populate('participants.userID', '-salt -password'),
+    Study.findById(id).populate('researchers.userID availability.existingStudySessions', '-salt -password')])
     .then((results) => {
       const sessions = results[0];
       const study = results[1];
@@ -522,12 +571,15 @@ const generateMailOptions = (effectedUsers, cancellor, studyTitle) => {
   return mailOptionArray;
 };
 
-const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, studyTitle, studyLocation) => {
+const generateMailOptionsForSignup = (effectedUsers, signingUser, sessionTime, studyTitle, studyLocation) => {
   // Email any other participants involved
   const mailOptionArray = [];
+  const sessionDate = new Date(sessionTime);
+  const sessionTimeOfDay = dateUtils.getTimeOfDay(sessionDate);
+  const sessionMMDDYY = dateUtils.formatMMDDYYYY(sessionDate);
 
   const signingUserMsg = `Hello ${signingUser.firstName} ${signingUser.lastName},
-                   \nYou have signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime} located at ${studyLocation}.`;
+                   \nYou have signed up for "${studyTitle}" on ${sessionMMDDYY} at ${sessionTimeOfDay} located at ${studyLocation}.`;
 
   const signingUserOptions = {
     from: 'no.replyhccresearch@gmail.com',
@@ -542,7 +594,7 @@ const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, st
     const affectedUser = populatedUser.userID;
     if (affectedUser !== null && affectedUser.email) {
       const emailBody = `Hello ${affectedUser.firstName} ${affectedUser.lastName},
-                   \n${signingUser.firstName} ${signingUser.lastName} has signed up for "${studyTitle}" on ${newSession.date} at ${newSession.startTime} located at ${studyLocation}.`;
+                   \n${signingUser.firstName} ${signingUser.lastName} has signed up for "${studyTitle}" on ${sessionMMDDYY} at ${sessionTimeOfDay} located at ${studyLocation}.`;
 
       const mailOptions = {
         from: 'no.replyhccresearch@gmail.com',
@@ -554,43 +606,6 @@ const generateMailOptionsForSignup = (effectedUsers, signingUser, newSession, st
     }
   });
   return mailOptionArray;
-};
-
-const getMinimalSessions = (sessions) => {
-  if (!sessions || sessions.length === 0) return;
-  const minimalSessions = [];
-
-  sessions.forEach((session) => {
-    const startTime = new Date(session.startTime);
-    const endTime = new Date(session.endTime);
-    const duration = dateUtils.differenceInMins(startTime, endTime);
-    const minimalSession = {
-      id: session._id,
-      date: dateUtils.formatMMDDYYYY(startTime),
-      dow: dateUtils.DOWMap(startTime.getDay()),
-      duration: duration,
-      startTime: dateUtils.getTimeOfDay(startTime)
-    };
-    minimalSessions.push(minimalSession);
-  });
-  return minimalSessions;
-};
-
-const filterAttendedSessions = (sessions, participantId, participantsPerSession) => {
-  if (!sessions || sessions.length === 0) return;
-  const today = Date.now();
-  const filteredSessions = [];
-  sessions.forEach((session) => {
-    const startDate = new Date(session.startTime);
-    if (session.participants.length >= participantsPerSession || startDate < today) return;
-    const attended = session.participants.some((participant) => {
-      if (String(participant.userID) === participantId) return true;
-    });
-    if (!attended) {
-      filteredSessions.push(session);
-    }
-  });
-  return filteredSessions;
 };
 
 /* Send reminder email to all participants who have a session tomorrow */

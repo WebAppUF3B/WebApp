@@ -29,6 +29,6 @@ exports.DOWMap = (dowInt) => {
 
 exports.getTimeOfDay = (date) => {
   return `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:` +
-  `${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()}` +
+  `${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ` +
   `${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 };
