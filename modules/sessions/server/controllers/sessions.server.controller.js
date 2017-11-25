@@ -38,7 +38,6 @@ exports.allSessionsForSignup = function(req, res) {
 
   const emptySessions = [];
   const partialSessions = [];
-  const _24Hours = 60 * 60 * 24 * 1000;
 
   timeSlots.forEach((slot) => {
 
@@ -55,13 +54,14 @@ exports.allSessionsForSignup = function(req, res) {
     const studyDuration = study.duration;
     const studyDurationMs = studyDuration * 60 * 1000;
     let baseStartTime = startTime.getTime();
-    if (baseStartTime < Date.now() - _24Hours) {
-      return;
-    }
+    const today = Date.now();
     const numOfStudySessions = totalTimePeriod / studyDuration;
+    if (endTime < today) return;
 
     for (let i = 0; i < numOfStudySessions; i++) {
       baseStartTime = studyDurationMs + baseStartTime;
+
+      if (baseStartTime < today) continue;
 
       const taken = existingStudySessions.some((existingStudySession) => {
         const existingDate = new Date(existingStudySession.startTime);
@@ -81,7 +81,6 @@ exports.allSessionsForSignup = function(req, res) {
       emptySessions.push(newSession);
     }
 
-
     existingStudySessions.forEach((existingStudySession) => {
       if (existingStudySession && existingStudySession.participants) {
         const attended = existingStudySession.participants.some((participant) => {
@@ -90,7 +89,10 @@ exports.allSessionsForSignup = function(req, res) {
 
         if (attended) return;
       }
-      if (existingStudySession.participants && existingStudySession.participants.length < study.participantsPerSession) {
+
+      if (existingStudySession.startTime.getTime() > today &&
+          existingStudySession.participants &&
+          existingStudySession.participants.length < study.participantsPerSession) {
         const minimalExistingSession = {
           _id: existingStudySession._id,
           date: dateUtils.formatMMDDYYYY(existingStudySession.startTime),
@@ -102,10 +104,7 @@ exports.allSessionsForSignup = function(req, res) {
         partialSessions.push(minimalExistingSession);
       }
     });
-
   });
-  console.log('emptySessions\n', emptySessions);
-  console.log('partialSessions\n', partialSessions);
   res.status(200).send({ study: study, emptySessions: emptySessions, partialSessions: partialSessions });
 };
 
