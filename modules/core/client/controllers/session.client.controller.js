@@ -1,4 +1,3 @@
-//angular.module('core',['gm.datepickerMultiSelect']).controller('SessionController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams',
 angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('SessionController', ['$scope','$http', '$location', '$state', '$stateParams', 'Authentication',
   function($scope, $http, $location, $state, $stateParams, Authentication) {
 
