@@ -1,6 +1,7 @@
 // Routes that are used by host and require special access
 const hostRoutes = [
-  '/api/sessions/reminderEmails'
+  /^\/api\/sessions\/emailReminders$/,
+  /^\/api\/sessions\/cancel\/.*$/
 ];
 
 const secureCommonRoutes = [
@@ -110,6 +111,7 @@ const admin = {
   permissions: [facultyPermissions, researcherPermissions, participantPermissions, adminPermissions]
 };
 
+<<<<<<< HEAD
 exports.generateCancellationToken = function(object) {
   const token = jwt.sign(object, process.env.JWT);
   return token;
@@ -130,6 +132,8 @@ exports.pareseResetPasswordToken = function(token) {
   return object;
 };
 
+=======
+>>>>>>> origin/develop
 exports.secureCommonRoutes = secureCommonRoutes;
 exports.hostRoutes = hostRoutes;
 exports.roles = {

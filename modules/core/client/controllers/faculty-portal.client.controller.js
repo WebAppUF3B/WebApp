@@ -7,6 +7,8 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
 
     $scope.authToken = Authentication.authToken;
 
+    $scope.loading = Authentication.loading;
+
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
@@ -30,6 +32,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
 
     // Called after page loads
     $scope.init = function() {
+      console.log($scope.loading);
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
 

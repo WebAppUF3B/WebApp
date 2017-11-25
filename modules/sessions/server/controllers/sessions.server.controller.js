@@ -99,7 +99,7 @@ exports.delete = function(req, res) {
   const now = new Date();
   const sessionDate = new Date(session.startTime);
   if (now >= sessionDate) {
-    console.log("Cannot cancel the day before");
+    console.log("Cannot cancel a session that already took place");
     return res.status(400).send();
   }
 
@@ -541,12 +541,14 @@ exports.emailReminders = function(req, res) {
     Session.find()
       .populate('studyID')
       .populate('participants.userID', '-salt -password')
+      .populate('researchers.userID', '-salt -password')
       .exec()
       .then((sessions) => {
         // Then see if any sessions are tomorrow
         const today = new Date();
         const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
         const mailOptionArray = [];
+        const removeSessions = [];
 
         sessions.forEach((session) => {
           const date = new Date(session.startTime);
@@ -555,30 +557,57 @@ exports.emailReminders = function(req, res) {
 
           if (date.getFullYear() === tomorrow.getFullYear() && date.getMonth() === tomorrow.getMonth() && date.getDate() === tomorrow.getDate()) {
 
-            // Set up emails for each participant
-            session.participants.forEach((affectedUser) => {
-              const object = {};
-              object.sessionID = session._id;
-              object.user = {};
-              object.user._id = affectedUser.userID._id;
-              object.user.firstName = affectedUser.userID.firstName;
-              object.user.lastName = affectedUser.userID.lastName;
+            if (session.participants.length === session.studyID.participantsPerSession) {
+              // If the session has enough participants, send reminder email
+              console.log("Reminder Email");
+              // Set up emails for each participant
+              session.participants.forEach((affectedUser) => {
+                const object = {};
+                object.sessionID = session._id;
+                object.user = {};
+                object.user._id = affectedUser.userID._id;
+                object.user.firstName = affectedUser.userID.firstName;
+                object.user.lastName = affectedUser.userID.lastName;
 
-              // Generate token using object above (needed for cancellation)
-              const token = authUtils.generateCancellationToken(object);
+                // Generate token using object above (needed for cancellation)
+                const token = authUtils.generateCancellationToken(object);
 
-              const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
-                           <br><br>This is a reminder that you are scheduled to participate in "${session.studyID.title}" tomorrow (${sessionDate}) at ${sessionTime} in ${session.studyID.location}.
-                           <br><br>To cancel this session, click <a href="${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/cancel/${token}">here</a>.`;
+                const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
+                             <br><br>This is a reminder that you are scheduled to participate in "${session.studyID.title}" tomorrow (${sessionDate}) at ${sessionTime} in ${session.studyID.location}.
+                             <br><br>To cancel this session, click <a href="${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/cancel/${token}">here</a>.`;
 
-              const mailOptions = {
-                from: 'no.replyhccresearch@gmail.com',
-                to: affectedUser.userID.email,
-                subject: 'Research Study Reminder - ' + sessionDate,
-                html: emailBody
-              };
-              mailOptionArray.push(mailOptions);
-            });
+                console.log(emailBody);
+
+                const mailOptions = {
+                  from: 'no.replyhccresearch@gmail.com',
+                  to: affectedUser.userID.email,
+                  subject: 'Research Study Reminder - ' + sessionDate,
+                  html: emailBody
+                };
+                mailOptionArray.push(mailOptions);
+              });
+            } else {
+              // If the session does not have enough participants, cancel it
+              console.log("Cancellation Email");
+              const users = session.participants.concat(session.researchers);
+
+              // Established modemailer email transporter object to send email with mailOptions populating mail with link
+              users.forEach((affectedUser) => {
+                const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
+                             \nWe regret to inform you that your session for "${session.studyID.title}", which was scheduled for tomorrow (${sessionDate}) at ${sessionTime}, has been cancelled because not enough participants signed up.`;
+
+                console.log(emailBody);
+
+                const mailOptions = {
+                  from: 'no.replyhccresearch@gmail.com',
+                  to: affectedUser.userID.email,
+                  subject: 'Research Session Cancellation - ' + sessionDate,
+                  text: emailBody
+                };
+                mailOptionArray.push(mailOptions);
+                removeSessions.push(session);
+              });
+            }
           }
         });
 
@@ -591,10 +620,17 @@ exports.emailReminders = function(req, res) {
         if (mailOptionArray.length > 0) {
           Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)))
             .then(() => {
-              res.status(200).send();
+              // Delete sessions that were cancelled
+              if (removeSessions.length > 0) {
+                Promise.all(removeSessions.map((session) => session.remove()))
+                .then(() => {
+                  res.status(200).send();
+                });
+              } else {
+                res.status(200).send();
+              }
             });
-        }
-        else{
+        } else {
           res.status(200).send();
         }
       })
