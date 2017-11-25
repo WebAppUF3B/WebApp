@@ -8,11 +8,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
     let alreadyClicked = false;
 
     $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
-
     $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
-
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
@@ -285,8 +281,10 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
           })
           .catch((err) => {
             $scope.error = true;
-            console.log(err);
+            console.log('error deleting session', err);
             alreadyClicked = false;
+            $scope.init();
+            $('#cancelModal').modal('hide');
           });
       }
     };

@@ -85,7 +85,6 @@ exports.allSessionsForSignup = function(req, res) {
     existingStudySessions.forEach((existingStudySession) => {
       if (existingStudySession && existingStudySession.participants) {
         const attended = existingStudySession.participants.some((participant) => {
-          console.log('tw existing participant vs this participant', participant.userID, req.userId, String(participant.userID) === req.userId);
           if (String(participant.userID) === req.userId) return true;
         });
 
@@ -105,8 +104,8 @@ exports.allSessionsForSignup = function(req, res) {
     });
 
   });
-  console.log('tw emptySessions\n', emptySessions);
-  console.log('tw partialSessions\n', partialSessions);
+  console.log('emptySessions\n', emptySessions);
+  console.log('partialSessions\n', partialSessions);
   res.status(200).send({ study: study, emptySessions: emptySessions, partialSessions: partialSessions });
 };
 
@@ -161,11 +160,16 @@ exports.update = function(req, res) {
 /* Delete a session */
 exports.delete = function(req, res) {
   const session = req.studySession;
+
+  if (!session) {
+    return res.status(200).send();
+  }
   // Grab user object that's placed into body for delete
   const cancellor = req.body;
   const participants = req.studySession.participants;
   const researchers = req.studySession.researchers;
   const studyTitle = req.studySession.studyID.title;
+  const studyId = req.studySession.studyID._id;
 
   // Don't allow cancellation after the session
   const now = new Date();
@@ -183,24 +187,58 @@ exports.delete = function(req, res) {
   const mailOptionArray = generateMailOptions(participants.concat(researchers), cancellor, studyTitle);
 
   if (mailOptionArray.length > 0) {
-    Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)))
-      .then(() => {
-        console.log('emails sent!');
+    Study.findById(studyId)
+      .then((study) => {
+        study.availability.some((slot) => {
+          const removedFromStudy = slot.existingStudySessions.some((existingSessionId) => {
+            console.log('existing id vs this id', existingSessionId, session._id, String(existingSessionId) === String(session._id));
+            const index = slot.existingStudySessions.indexOf(existingSessionId);
+            slot.existingStudySessions.splice(index, 1);
+            if (String(existingSessionId) === String(session._id)) return true;
+          });
+          if (removedFromStudy) return true;
+        });
+
+        return study.save();
+      })
+      .then((savedStudy) => {
+        return Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)));
+      })
+      .then((emailsSent) => {
+        console.log('emails sent\n', emailsSent);
         return session.remove();
       })
       .then(() => {
         console.log('session removed!');
-        res.json(session);
+        res.status(200).send(session);
       })
       .catch((errs) => {
         console.log('Remove Session Errors:\n', errs);
         res.status(400).send(errs);
       });
   } else {
-    session.remove()
+    Study.findById(studyId)
+      .then((study) => {
+        study.availability.some((slot) => {
+          const removedFromStudy = slot.existingStudySessions.some((existingSessionId) => {
+            console.log('existing id vs this id', existingSessionId, session._id, String(existingSessionId) === String(session._id));
+            if (String(existingSessionId) === String(session._id)) {
+              const index = slot.existingStudySessions.indexOf(existingSessionId);
+              slot.existingStudySessions.splice(index, 1);
+              return true;
+            }
+          });
+          if (removedFromStudy) return true;
+        });
+
+        return study.save();
+      })
+      .then((savedStudy) => {
+        return session.remove();
+      })
       .then(() => {
         console.log('session removed!');
-        res.json(session);
+        res.status(200).send(session);
       })
       .catch((errs) => {
         console.log('Remove Session Errors:\n', errs);
@@ -282,7 +320,6 @@ exports.sessionSignup = function(req, res) {
     code: 400
   };
 
-  console.log('tw signupSession', signupSession);
   if (signupSession._id) {
     Session.findById(signupSession._id)
       .populate('participants.userID', '-salt -password')
