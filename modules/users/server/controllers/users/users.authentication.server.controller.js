@@ -74,7 +74,6 @@ exports.facultySignup = function(req, res) {
   faculty.adminApproved = false;
   faculty.save()
          .then((faculty) => {
-           console.log('tw', faculty);
            const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${faculty._id}`;
            const verificationText = `Hello ${faculty.firstName} ${faculty.lastName},
                                      \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
@@ -113,7 +112,6 @@ exports.researcherSignup = function(req, res) {
   researcher.adminApproved = false;
   researcher.save()
     .then((researcher) => {
-      console.log('tw', researcher);
       const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${researcher._id}`;
       const verificationText = `Hello ${researcher.firstName} ${researcher.lastName},
                                      \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;

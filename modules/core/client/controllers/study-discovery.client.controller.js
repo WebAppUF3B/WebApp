@@ -24,8 +24,6 @@ angular.module('core').controller('StudyDiscoveryController', ['$scope','$http',
           'x-access-token': $scope.authToken
         }
       };
-      console.log('header', $scope.header);
-
       // TODO filter these based on study criteria and use profile
       $scope.studies.getAll()
         .then((results) => {

@@ -1,5 +1,5 @@
-angular.module('core').controller('StudySignupController', ['$scope','$http','NgTableParams', '$location', '$state', 'Authentication',
-  function($scope, $http, NgTableParams, $location, $state, Authentication) {
+angular.module('core').controller('StudySignupController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams', 'Authentication',
+  function($scope, $http, NgTableParams, $location, $state, $stateParams, Authentication) {
     const init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
@@ -14,41 +14,27 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
           'x-access-token': $scope.authToken
         }
       };
-      console.log('header', $scope.header);
-
       $scope.courses.getAll()
         .then((results) => {
-          // Assign results to upcomingSessions.data
           $scope.allCourses = results.data;
         });
 
-      const url = $location.absUrl().split('/');
-      $scope.studyId = url[url.length -1];
+      $scope.studyId = $stateParams.studyId;
       $scope.studySessions = null;
       $scope.study = null;
       $scope.error = null;
       $scope.currentSession = null;
       $scope.hasMonetary = false;
       $scope.hasExtraCredit = false;
-      $scope.credentails = null;
+      $scope.credentials = null;
+      $scope.multipleParticipants = null;
 
-      $scope.getAllSessionsByStudyId();
-      $scope.myStudySessions = new NgTableParams({
-        count: 10,
-        sorting: {
-          title: 'asc'
-        }
-      }, {
-        counts: [], // hides page sizes
-        dataset: $scope.studySessions // select data
-      });
-    };
-    $scope.getAllSessionsByStudyId = function() {
-      console.log($scope.user._id);
-      $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`, $scope.header)
+      $scope.getAllSessionsByStudyId()
         .then((results) => {
-          $scope.studySessions = results.data.sessions;
+          $scope.partialSessions = results.data.partialSessions;
+          $scope.emptySessions = results.data.emptySessions;
           $scope.study = results.data.study;
+          $scope.hasPartialSessions = $scope.partialSessions.length > 0;
 
           if ($scope.study.closed) $state.go('forbidden');
 
@@ -62,13 +48,35 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
                 break;
             }
           });
-          console.log('tw get data');
-          console.log('tw study\n', $scope.study);
-          console.log('tw sessions\n', $scope.studySessions);
+        })
+        .then(() => {
+          // Populate partial table if sessions require multiple participants
+          $scope.partialSessionsTable = new NgTableParams({
+            count: 10,
+            sorting: {
+              startTime: 'desc'
+            }
+          }, {
+            dataset: $scope.partialSessions, // select data
+            counts: [], // hides page sizes
+          });
+
+          $scope.emptySessionsTable = new NgTableParams({
+            count: 10,
+            sorting: {
+              startTime: 'desc'
+            }
+          }, {
+            dataset: $scope.emptySessions, // select data
+            counts: [], // hides page sizes
+          });
         })
         .catch((err) => {
           console.log(err);
         });
+    };
+    $scope.getAllSessionsByStudyId = () => {
+      return $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`, $scope.header);
     };
 
     $scope.studySignupModal = function(session, index) {
@@ -97,8 +105,10 @@ angular.module('core').controller('StudySignupController', ['$scope','$http','Ng
         lastName: $scope.user.lastName,
         email: $scope.user.email,
       };
-      $scope.credentials.newSession = $scope.currentSession;
-
+      $scope.credentials.signupSession = {
+        _id: $scope.currentSession._id,
+        startTime: $scope.currentSession.startTime
+      };
       $http.post(window.location.origin + '/api/studySession/signup', $scope.credentials, $scope.header)
         .then(() => {
           alert(`You are successfully signed up for ${$scope.study.title}!`);
