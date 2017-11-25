@@ -56,23 +56,7 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
 
     $scope.init = function() {
       $scope.state = 'reset';
-      $scope.pass = $stateParams.UserId;
-
-      $scope.getUser()
-      .then((results) => {
-        //console.log(results);
-        $scope.currentUser.firstName = results.data.firstName;
-        $scope.currentUser.lastName = results.data.lastName;
-        $scope.currentUser.email = results.data.email;
-        $scope.currentUser.birthday = results.data.birthday;
-        $scope.currentUser.address = results.data.address;
-        $scope.currentUser.gender = results.data.gender;
-        $scope.currentUser.role = results.data.role;
-        $scope.currentUser.position = results.data.position;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      $scope.pass = $stateParams.email;
 
     };
 
@@ -90,9 +74,9 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
       }
     };
 
-    $scope.getUser = function() {
+    $scope.forgotPassword = function() {
       //console.log($stateParams.userId);
-      return $http.get(window.location.origin + '/api/admin/editUser/' + $stateParams.userId, $scope.header)
+      return $http.get(window.location.origin + '/api/password/forgotPassword/' + $stateParams.email, $scope.header)
       .then((results) => {
         return results;
       })

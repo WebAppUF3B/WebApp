@@ -1,264 +1,297 @@
+/*~*/
 'use strict';
 
 /**
  * Module dependencies.
- * needed functions
-    * find user by email (returns 200 regardless of success)
-    * change password (should check tokens)
-    * forgot (finds by email then sends email with generated token in link)
-    * validate reset token
  */
-
-  var path = require('path'),
-    mongoose = require('mongoose'),
-    User = mongoose.model('User'),
-    nodemailer = require('nodemailer'),
-    errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
-    crypto = require('crypto');
+var path = require('path'),
+  mongoose = require('mongoose'),
+  User = mongoose.model('User'),
+  nodemailer = require('nodemailer'),
+  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
+  crypto = require('crypto');
 
 /**
- * Forgot for reset password (forgot POST)
+ * Show the current user
  */
-exports.forgot = function (req, res, next) {
-  async.waterfall([
-    // Generate random token
-    function (done) {
-      crypto.randomBytes(20, function (err, buffer) {
-        var token = buffer.toString('hex');
-        done(err, token);
-      });
-    },
-    // Lookup user by username
-    function (token, done) {
-      if (req.body.username) {
-        User.findOne({
-          username: req.body.username.toLowerCase()
-        }, '-salt -password', function (err, user) {
-          if (!user) {
-            return res.status(400).send({
-              message: 'No account with that username has been found'
-            });
-          } else if (user.provider !== 'local') {
-            return res.status(400).send({
-              message: 'It seems like you signed up using your ' + user.provider + ' account'
-            });
-          } else {
-            user.resetPasswordToken = token;
-            user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+exports.read = function (req, res) {
+  res.json(req.model);
+};
 
-            user.save(function (err) {
-              done(err, token, user);
-            });
-          }
-        });
-      } else {
-        return res.status(400).send({
-          message: 'Username field must not be blank'
-        });
-      }
-    },
-    function (token, user, done) {
+/**
+ * Update a User
+ */
+exports.update = function (req, res) {
+  var user = req.model;
 
-      var httpTransport = 'http://';
-      if (config.secure && config.secure.ssl === true) {
-        httpTransport = 'https://';
-      }
-      res.render(path.resolve('modules/users/server/templates/reset-password-email'), {
-        name: user.displayName,
-        appName: config.app.title,
-        url: httpTransport + req.headers.host + '/api/auth/reset/' + token
-      }, function (err, emailHTML) {
-        done(err, emailHTML, user);
-      });
-    },
-    // If valid email, send reset email using service
-    function (emailHTML, user, done) {
-      var mailOptions = {
-        to: user.email,
-        from: config.mailer.from,
-        subject: 'Password Reset',
-        html: emailHTML
-      };
-      smtpTransport.sendMail(mailOptions, function (err) {
-        if (!err) {
-          res.send({
-            message: 'An email has been sent to the provided email with further instructions.'
-          });
-        } else {
-          return res.status(400).send({
-            message: 'Failure sending email'
-          });
-        }
+  //For security purposes only merge these parameters
+  user.firstName = req.body.firstName;
+  user.lastName = req.body.lastName;
+  user.displayName = user.firstName + ' ' + user.lastName;
+  user.role = req.body.role;
 
-        done(err);
-      });
-    }
-  ], function (err) {
+  user.save(function (err) {
     if (err) {
-      return next(err);
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
     }
+
+    res.json(user);
   });
 };
 
 /**
- * Reset password GET from email token
+ * Delete a user
  */
-exports.validateResetToken = function (req, res) {
-  User.findOne({
-    resetPasswordToken: req.params.token,
-    resetPasswordExpires: {
-      $gt: Date.now()
-    }
-  }, function (err, user) {
-    if (!user) {
-      return res.redirect('/password/reset/invalid');
+exports.delete = function (req, res) {
+  var user = req.model;
+
+  user.remove(function (err) {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
     }
 
-    res.redirect('/password/reset/' + req.params.token);
+    res.json(user);
   });
 };
 
 /**
- * Reset password POST from email token
+ * List of Users
  */
-exports.reset = function (req, res, next) {
-  // Init Variables
-  var passwordDetails = req.body;
-  var message = null;
 
-  async.waterfall([
+//*//
+exports.forgotPassword = function(req, res) {
+  User.find({ email: req.body.email }, '-salt -password')
+    .exec()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((err) => {
+      res.status(400).send();
+    });
+};
 
-    function (done) {
-      User.findOne({
-        resetPasswordToken: req.params.token,
-        resetPasswordExpires: {
-          $gt: Date.now()
-        }
-      }, function (err, user) {
-        if (!err && user) {
-          if (passwordDetails.newPassword === passwordDetails.verifyPassword) {
-            user.password = passwordDetails.newPassword;
-            user.resetPasswordToken = undefined;
-            user.resetPasswordExpires = undefined;
+exports.createUser = function(req, res) {
+  const newUser = req.body;
+  newUser.password = crypto.randomBytes(12).toString('base64');
+  newUser.adminApproved = true;
+  newUser.emailValidated = true;
+  const token = 0; //generate me pls
+  //must generate jwt then embed in url on email
+  const user = new User(newUser);
+  // Then save the user
+  user.save()
+    .then((user) => {
 
-            user.save(function (err) {
-              if (err) {
-                return res.status(400).send({
-                  message: errorHandler.getErrorMessage(err)
-                });
-              } else {
-                req.login(user, function (err) {
-                  if (err) {
-                    res.status(400).send(err);
-                  } else {
-                    // Remove sensitive data before return authenticated user
-                    user.password = undefined;
-                    user.salt = undefined;
+      const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/not/yet/working/${user._id}/${token}`; //this will be a password reset link
+      const verificationText = `Hello ${user.firstName} ${user.lastName},
+                                \n\nYour account has been created by the administrator
+                                \n\nPlease set a password by clicking this link:\n\n${verificationUri}\n`; //pass a json web token through the url as part of auth
 
-                    res.json(user);
-
-                    done(err, user);
-                  }
-                });
-              }
-            });
-          } else {
-            return res.status(400).send({
-              message: 'Passwords do not match'
-            });
-          }
-        } else {
-          return res.status(400).send({
-            message: 'Password reset token is invalid or has expired.'
-          });
-        }
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
       });
-    },
-    function (user, done) {
-      res.render('modules/users/server/templates/reset-password-confirm-email', {
-        name: user.displayName,
-        appName: config.app.title
-      }, function (err, emailHTML) {
-        done(err, emailHTML, user);
-      });
-    },
-    // If valid email, send reset email using service
-    function (emailHTML, user, done) {
-      var mailOptions = {
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
         to: user.email,
-        from: config.mailer.from,
-        subject: 'Your password has been changed',
-        html: emailHTML
+        subject: 'HCC Research Pool Account Verification',
+        text: verificationText
+      };
+      return transporter.sendMail(mailOptions);
+    })
+    .then(() => {
+      return res.status(200).send();
+    })
+    .catch((err) => {
+      console.log('Signup Error:\n', err);
+      const errJSON = err.toJSON();
+      if (errJSON.errors && errJSON.errors.email) {
+        errJSON.message = errJSON.errors.email.message;
+      }
+      console.log('SingUp User Error:\n', errJSON);
+      return res.status(400).send(errJSON);
+    });
+};
+
+//*//
+exports.approveUser = function(req, res) {
+  const thisUser = req.model;
+
+  User.findById(thisUser.id)
+    .then((thisUser) => {
+      //if (thisUser.adminApproved = false) {
+      const verificationText = `Hello ${thisUser.firstName} ${thisUser.lastName},
+                                \nYour request for ${thisUser.role} access to the Human Centered Computing Research Portal has been approved!
+                                \nYou may now log into the system.`;
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: thisUser.email,
+        subject: 'HCC Research Pool Account Approval',
+        text: verificationText
       };
 
-      smtpTransport.sendMail(mailOptions, function (err) {
-        done(err, 'done');
+      thisUser.adminApproved = true;
+      thisUser.save();
+      res.json(thisUser);
+      return transporter.sendMail(mailOptions);
+
+    });
+
+
+};
+
+//*//
+exports.denyUser = function(req, res) {
+  const thisUser = req.model;
+
+  User.findById(thisUser.id)
+    .then((thisUser) => {
+      //if (thisUser.adminApproved = false) {
+      const verificationText = `Hello ${thisUser.firstName} ${thisUser.lastName},
+                                \nWe regret to inform you that your request for ${thisUser.role} access to the Human Centered Computing Research Portal has been denied.
+                                \nIf you believe this was done in error, please contact the administrator.`;
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
       });
-    }
-  ], function (err) {
-    if (err) {
-      return next(err);
-    }
-  });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: thisUser.email,
+        subject: 'HCC Research Pool Account Denial',
+        text: verificationText
+      };
+
+      thisUser.remove();
+      res.json(thisUser);
+      return transporter.sendMail(mailOptions);
+
+    });
+
+
 };
 
 /**
- * Change Password
+ * User middleware
  */
-exports.changePassword = function (req, res, next) {
-  // Init Variables
-  var passwordDetails = req.body;
-  var message = null;
-
-  if (req.user) {
-    if (passwordDetails.newPassword) {
-      User.findById(req.user.id, function (err, user) {
-        if (!err && user) {
-          if (user.authenticate(passwordDetails.currentPassword)) {
-            if (passwordDetails.newPassword === passwordDetails.verifyPassword) {
-              user.password = passwordDetails.newPassword;
-
-              user.save(function (err) {
-                if (err) {
-                  return res.status(400).send({
-                    message: errorHandler.getErrorMessage(err)
-                  });
-                } else {
-                  req.login(user, function (err) {
-                    if (err) {
-                      res.status(400).send(err);
-                    } else {
-                      res.send({
-                        message: 'Password changed successfully'
-                      });
-                    }
-                  });
-                }
-              });
-            } else {
-              res.status(400).send({
-                message: 'Passwords do not match'
-              });
-            }
-          } else {
-            res.status(400).send({
-              message: 'Current password is incorrect'
-            });
-          }
-        } else {
-          res.status(400).send({
-            message: 'User is not found'
-          });
-        }
-      });
-    } else {
-      res.status(400).send({
-        message: 'Please provide a new password'
-      });
-    }
-  } else {
-    res.status(400).send({
-      message: 'User is not signed in'
+exports.userByID = function(req, res, next, id) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).send({
+      message: 'User  invalid'
     });
   }
+
+  User.findById(id, '-salt -password').exec(function(err, user) {
+    if (err) {
+      return next(err);
+    } else if (!user) {
+      return next(new Error('Failed to load user ' + id));
+    }
+
+    req.model = user;
+    next();
+  });
+};
+
+/* Retreive all the Users */
+exports.getAllUsers = function(req, res) {
+  User.find({}, '-salt -password')
+  .then((results) => {
+    console.log(results);
+    res.json(results);
+  })
+  .catch((err) => {
+    console.log('get all users error:\n', err);
+    return res.status(err.code).send(err);
+  });
+};
+
+exports.getUser = function(req, res) {
+  const thisUser = req.model;
+
+  User.findById(thisUser.id, '-salt -password')
+  .then((results) => {
+    console.log(results);
+    return res.status(200).json(thisUser);
+  })
+  .catch((err) => {
+    console.log('get user error:\n', err);
+    return res.status(err.code).send(err);
+  });
+};
+
+exports.editUser = function(req, res) {
+  const theUser = req.body; //the data from the form
+  const original = req.model; //data from db
+  User.findById(original.id, '-salt -password')
+  .then((results) => {
+    //there's probably a better way to do this but this way does work...
+    if (theUser.gender !== original.gender) {
+      if (theUser.gender === '') {
+        console.log('gender can\'t be empty');
+      } else {
+        original.gender = theUser.gender;
+      }
+    }
+    if (theUser.address !== original.address) {
+      if (theUser.address === '') {
+        console.log('address can\'t be empty');
+      } else {
+        original.address = theUser.address;
+      }
+    }
+    if (theUser.birthday !== original.birthday) {
+      if (theUser.birthday === '') {
+        console.log('birthday can\'t be empty');
+      } else {
+        original.birthday = theUser.birthday;
+      }
+    }
+    if (theUser.role !== original.role) {
+      if (theUser.role === '') {
+        console.log('role can\'t be empty');
+      } else {
+        original.role = theUser.role;
+      }
+    }
+    if (theUser.email !== original.email) {
+      if (theUser.email === '') {
+        console.log('email can\'t be empty');
+      } else {
+        original.email = theUser.email;
+      }
+    }
+    if (theUser.firstName !== original.firstName) {
+      if (theUser.firstName === '') {
+        console.log('firstName can\'t be empty');
+      } else {
+        original.firstName = theUser.firstName;
+      }
+    }
+    if (theUser.lastName !== original.lastName) {
+      if (theUser.lastName === '') {
+        console.log('lastName can\'t be empty');
+      } else {
+        original.lastName = theUser.lastName;
+      }
+    }
+    original.save();
+    return res.status(200).json(original);
+  })
+  .catch((err) => {
+    console.log('edit user error: \n', err);
+    return res.status(err.code).send(err);
+  });
 };
