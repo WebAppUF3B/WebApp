@@ -1,19 +1,13 @@
 'use strict';
 angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
-// angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
-//   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
-// angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication', 'angularjs-dropdown-multiselect',
-//   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication, angularjs-dropdown-multiselect) {
     /* Get all the listings, then bind it to the scope */
     $scope.currentStudy = {};
     $scope.researchers = [];
 
     $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
 
     $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
 
     $scope.header = {
       headers: {
@@ -28,6 +22,19 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
       }
     });
 
+    const sortResearchers = function(a,b) {
+      if (a.lastName < b.lastName)
+        return -1;
+      if (a.lastName > b.lastName)
+        return 1;
+      if (a.lastName === b.lastName) {
+        if (a.firstName < b.firstName)
+          return -1;
+        if (a.firstName > b.firstName)
+          return 1;
+      }
+      return 0;
+    };
 
     $scope.init = function() {
       $scope.pass = $stateParams.studyId;
@@ -35,8 +42,6 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
       if ($state.current.name === 'studies.edit') {
         $scope.getStudy($scope.pass)
         .then((results) => {
-          console.log('Got Current Study!');
-          console.log(results);
           $scope.currentStudy.title = results.data.title;
           $scope.currentStudy.location = results.data.location;
           $scope.currentStudy.irb = results.data.irb;
@@ -56,36 +61,29 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
             console.log('Got list of Researchers!');
             console.log(results.data);
             $scope.researchers = results.data;
+            $scope.researchers.sort(sortResearchers);
+
+            for (let i = 0; i < $scope.researchers.length; i++) {
+              if ($scope.researchers[i]._id == $scope.user._id) {
+                $scope.researchers.splice(i,1);
+                break;
+              }
+            }
 
             //researcher multipicker
-            $scope.researchermodel = [
-              //proof of concept, putting in data will instantiate dropdown
-              //{ id: 1, label: 'David' }
-            ];
+            $scope.researchermodel = [];
             $scope.researcherdata = [];
 
             for (let x = 0; x<$scope.researchers.length; x++) {
               $scope.researcherdata.push({
                 id: $scope.researchers[x]._id,
-                label: $scope.researchers[x].firstName+' '+$scope.researchers[x].lastName
+                label: $scope.researchers[x].firstName+' '+$scope.researchers[x].lastName+' - '+$scope.researchers[x].position
               });
             }
 
-            console.log('Completed Researcher Drop Down Population');
-            console.log($scope.researcherdata);
-
-            if ($scope.state === 'edit') {
-              console.log('See if everything is kosher for edit researchers');
-              console.log($scope.researcherdata);
-              console.log($scope.currentStudy.researchers);
-              // console.log('Now see if indexOf will work for subfields');
-              // console.log($scope.researchers.indexOf($scope.currentStudy.researchers[0]._id));
-              //it doesn't work for subfields
-              console.log('Find out index of matching to populate researchermodel');
-              for (let x = 0; x<$scope.currentStudy.researchers.length; x++) {
+            for (let x = 0; x<$scope.currentStudy.researchers.length; x++) {
+              if ($scope.currentStudy.researchers[x].userID != $scope.user._id) {
                 const indexOfExistingResearcherInData = $scope.findIndex($scope.currentStudy.researchers[x].userID);
-                console.log('In loop, found index, it is:');
-                console.log(indexOfExistingResearcherInData);
                 $scope.researchermodel.push($scope.researcherdata[indexOfExistingResearcherInData]);
               }
             }
@@ -95,10 +93,7 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
             console.log(err);
           });
 
-          $scope.compensatemodel = [
-            //proof of concept, putting in data will instantiate dropdown
-            //{ id: 1, label: 'David' }
-          ];
+          $scope.compensatemodel = [];
           $scope.compensatedata = [
             { id: 1, label: 'Extra Credit' },
             { id: 2, label: 'Monetary' }
@@ -121,13 +116,10 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
         });
       } else {
 
-        $scope.compensatemodel = [
-          //proof of concept, putting in data will instantiate dropdown
-          //{ id: 1, label: 'David' }
-        ];
+        $scope.compensatemodel = [];
         $scope.compensatedata = [
           { id: 1, label: 'Extra Credit' },
-          { id: 0, label: 'Monetary' }
+          { id: 2, label: 'Monetary' }
         ];
 
         //get researchers to pick from
@@ -136,23 +128,25 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
           console.log('Got list of Researchers!');
           console.log(results.data);
           $scope.researchers = results.data;
+          $scope.researchers.sort(sortResearchers);
 
-          //research multipicker
-          $scope.researchermodel = [
-            //proof of concept, putting in data will instantiate dropdown
-            //{ id: 1, label: 'David' }
-          ];
+          for (let i = 0; i < $scope.researchers.length; i++) {
+            if ($scope.researchers[i]._id == $scope.user._id) {
+              $scope.researchers.splice(i,1);
+              break;
+            }
+          }
+
+          //researcher multipicker
+          $scope.researchermodel = [];
           $scope.researcherdata = [];
 
           for (let x = 0; x<$scope.researchers.length; x++) {
             $scope.researcherdata.push({
               id: $scope.researchers[x]._id,
-              label: $scope.researchers[x].firstName+' '+$scope.researchers[x].lastName
+              label: $scope.researchers[x].firstName+' '+$scope.researchers[x].lastName+' - '+$scope.researchers[x].position
             });
           }
-
-          console.log('Completed Researcher Drop Down Population');
-          console.log($scope.researcherdata);
 
         })
         .catch((err) => {
@@ -161,8 +155,9 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
       }
 
       $scope.researchersettings = {
-        smartButtonMaxItems: 5,
+        smartButtonMaxItems: 1,
         enableSearch: true,
+        buttonClasses: 'form-control',
         smartButtonTextConverter: function(itemText, originalItem) {
           if (itemText === 'Jhon') {
             return 'Jhonny!';
@@ -172,17 +167,15 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
       };
 
       $scope.compensatesettings = {
-        smartButtonMaxItems: 2
+        smartButtonMaxItems: 2,
+        buttonClasses: 'form-control needs-validation'
       };
     };
 
     $scope.submit = function(isValid) {
-      console.log(isValid);
       if ($scope.state === 'edit') {
-        console.log('update');
         $scope.update(isValid);
       } else {
-        console.log('create');
         $scope.create(isValid);
       }
     };
@@ -198,7 +191,6 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
     };
 
     $scope.getResearchers = function() {
-      console.log('Asking for researchers');
       return $http.get(window.location.origin + '/api/studies/research/', $scope.header)
       .then((results) => {
         return results;
@@ -210,60 +202,72 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
 
     $scope.create = function(isValid) {
       $scope.error = null;
+      $('.needs-validation').removeClass('highlight-error');
+
+      if (!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'studyForm');
+        $scope.error = 'Please fill in all required fields.';
+        if ($scope.compensatemodel.length === 0) $('.needs-validation').addClass('highlight-error');
+        return false;
+      }
+
       $scope.currentStudy.researchers = [];
-      //$scope.currentStudy.researchers.push({ 'userID': $scope.user._id });
-      console.log('What will be ACTUALLY pushed is:');
+      $scope.currentStudy.researchers.push({ 'userID': $scope.user._id });
       for (let x = 0; x<$scope.researchermodel.length; x++) {
-        //console.log($scope.researchermodel[x].id);
         $scope.currentStudy.researchers.push({ 'userID': $scope.researchermodel[x].id });
       }
 
       $scope.currentStudy.compensationType = [];
-      if ($scope.compensatemodel.length === 2) {
+      if ($scope.compensatemodel.length === 0) {
+        $scope.error = 'Please fill in all required fields.';
+        $('.needs-validation').addClass('highlight-error');
+        return false;
+      } else if ($scope.compensatemodel.length === 2) {
         $scope.currentStudy.compensationType.push('extraCredit');
         $scope.currentStudy.compensationType.push('monetary');
       } else {
-        console.log('Here is compensatemodel before send off');
-        console.log($scope.compensatemodel);
         if ($scope.compensatemodel[0].id === 1) {
           $scope.currentStudy.compensationType.push('extraCredit');
         } else {
           $scope.currentStudy.compensationType.push('monetary');
         }
-      }
-
-      if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'userForm');
-        alert('Invalid JSON');
-        return false;
       }
 
       $http.post('/api/studies/', $scope.currentStudy, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
-        console.log(response._id);
-        //$state.go('studies.availability', { 'studyId': response._id });
         $state.go('researcher-portal');
       }).error((response) => {
-        $scope.error = response.message;
-        alert(response.message);
+        $scope.error = 'There was a problem creating your study, please contact the admin.';
       });
     };
 
     $scope.update = function(isValid) {
+      $scope.error = null;
+      $('.needs-validation').removeClass('highlight-error');
+
+      if (!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'studyForm');
+        $scope.error = 'Please fill in all required fields.';
+        if ($scope.compensatemodel.length === 0) $('.needs-validation').addClass('highlight-error');
+        return false;
+      }
+
       $scope.currentStudy.researchers = [];
+      $scope.currentStudy.researchers.push({ 'userID': $scope.user._id });
       for (let x = 0; x<$scope.researchermodel.length; x++) {
-        //console.log($scope.researchermodel[x].id);
         $scope.currentStudy.researchers.push({ 'userID': $scope.researchermodel[x].id });
       }
 
       $scope.currentStudy.compensationType = [];
-      if ($scope.compensatemodel.length === 2) {
+      if ($scope.compensatemodel.length === 0) {
+        $scope.error = 'Please fill in all required fields.';
+        $('.needs-validation').addClass('highlight-error');
+        return false;
+      } else if ($scope.compensatemodel.length === 2) {
         $scope.currentStudy.compensationType.push('extraCredit');
         $scope.currentStudy.compensationType.push('monetary');
       } else {
-        console.log('Here is compensatemodel before send off');
-        console.log($scope.compensatemodel);
         if ($scope.compensatemodel[0].id === 1) {
           $scope.currentStudy.compensationType.push('extraCredit');
         } else {
@@ -271,19 +275,10 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
         }
       }
 
-      if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'userForm');
-        alert('Invalid JSON');
-        return false;
-      }
-
-      console.log($scope.currentStudy);
-
       $http.put('/api/studies/'+$scope.pass, $scope.currentStudy, $scope.header).success((response) => {
         $state.go('researcher-portal');
       }).error((response) => {
-        $scope.error = response.message;
-        alert(response.message);
+        $scope.error = 'There was a problem updating your study, please contact the admin.';
       });
     };
 

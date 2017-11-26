@@ -172,7 +172,7 @@ exports.modifyCount = function(id, attended) {
 
 exports.listResearchers = function(req, res) {
   console.log('HELLO RESEARCHERS');
-  User.find({ role: { $ne: 'participant' } })
+  User.find({ role: { $ne: 'participant' } }, '-salt -password')
     .then((arrayOfAllResearchers) => {
       console.log('Meow Researchers');
       console.log(arrayOfAllResearchers);
