@@ -24,7 +24,7 @@ const participantPermissions = {
     /^\/api\/studies\/$/,
   ],
   PUT: [
-
+    /^\/api\/profile\/$/
   ],
   POST: [
     /^\/api\/studySession\/signup$/

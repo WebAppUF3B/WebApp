@@ -23,4 +23,6 @@ module.exports = function(app) {
 
   app.route('/api/auth/verify/:id').post(users.verify);
 
+  app.route('/api/profile/')
+  .put(users.update);
 };

@@ -4,6 +4,15 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
   function($scope, $http, $location, Users, Authentication) {
     const user = Authentication.user;
     console.log('user before', user);
+    $scope.user = Authentication.user;
+    $scope.authToken = Authentication.authToken;
+    $scope.loading = Authentication.loading;
+    $scope.header = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': $scope.authToken
+      }
+    };
     $scope.copiedUser = $.extend({}, Authentication.user);
     // Update a user profile
     console.log('View here', $scope.copiedUser);
@@ -34,7 +43,7 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
       $scope.success = true;
       //Authentication.user = response;
       //$http.get(window.location.origin + '/api/profile/' + id);
-      $http.put(window.location.origin + '/api/profile/', $scope.copiedUser)
+      $http.put(window.location.origin + '/api/profile/', $scope.copiedUser, $scope.header)
         .then((result) => {
           console.log('result in client controller:\n', result.data.user);
           const resultedUser = result.data.user;
