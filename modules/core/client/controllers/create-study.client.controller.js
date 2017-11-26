@@ -96,7 +96,7 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
       $http.put('/api/studies/'+$scope.pass, $scope.currentStudy).success((response) => {
         console.log('Did the put, here is the return');
         console.log(response);
-        $state.go('studies.availability-edit', { 'studyId': response._id, 'avail': $scope.currentStudy.availability, 'durate': $scope.currentStudy.duration });
+        $state.go('studies.availability-edit', { 'studyId': response._id });
       }).error((response) => {
         $scope.error = response.message;
         alert(response.message);
