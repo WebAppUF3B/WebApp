@@ -2,6 +2,8 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
 ['$scope','$http', '$location', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $http, $location, $state, $stateParams, $document, Authentication) {
 
+    //$scope.copyExist = true;
+
     $scope.user = Authentication.user;
     console.log('tw user', $scope.user);
 
@@ -33,7 +35,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
           if ($scope.selectedDates.indexOf(data.date.setHours(0, 0, 0, 0)) > -1) {
             return 'selected';
           }
-          console.log("Running");
+          console.log('Running');
           return '';
         }
       };
@@ -90,26 +92,31 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
 
     $scope.sendAvailability = function() {
       for (let x = 0; x < $scope.availability.length; x++) {
-        const convertedUnix = new Date($scope.availability[x].unixDate);
-        const startTimeArray = $scope.availability[x].startTime.split(':');
-        const endTimeArray = $scope.availability[x].endTime.split(':');
 
-        $scope.currentStudy.availability.push({
-          startTime: new Date(
-            convertedUnix.getFullYear(),
-            convertedUnix.getMonth(),
-            convertedUnix.getDate(),
-            startTimeArray[0],
-            startTimeArray[1]
-          ),
-          endTime: new Date(
-            convertedUnix.getFullYear(),
-            convertedUnix.getMonth(),
-            convertedUnix.getDate(),
-            endTimeArray[0],
-            endTimeArray[1]
-          )
-        });
+        if ($scope.availability[x].startTime === null || $scope.availability[x].endTime === null) {
+          continue;
+        } else {
+          const convertedUnix = new Date($scope.availability[x].unixDate);
+          const startTimeArray = $scope.availability[x].startTime.split(':');
+          const endTimeArray = $scope.availability[x].endTime.split(':');
+
+          $scope.currentStudy.availability.push({
+            startTime: new Date(
+              convertedUnix.getFullYear(),
+              convertedUnix.getMonth(),
+              convertedUnix.getDate(),
+              startTimeArray[0],
+              startTimeArray[1]
+            ),
+            endTime: new Date(
+              convertedUnix.getFullYear(),
+              convertedUnix.getMonth(),
+              convertedUnix.getDate(),
+              endTimeArray[0],
+              endTimeArray[1]
+            )
+          });
+        }
       }
 
       $scope.error = null;
@@ -213,6 +220,45 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       const lastTimeUnix = nextTime.getTime();
       const lastObj = { val: nextTime.getHours() + ':' + nextTime.getMinutes(), show: moment(lastTimeUnix).format('hh:mm A') };
       possibility.endTimeList.push(lastObj);
+    };
+
+    $scope.copyToTemp = function(date) {
+      $scope.copyTemp = [];
+      console.log('copyExist to date:');
+      console.log(date);
+
+      for (let x = 0; x<$scope.availability.length; x++) {
+        if (date === $scope.availability[x].unixDate) {
+          $scope.copyTemp.push({
+            copyStart: $scope.availability[x].startTime,
+            copyEnd: $scope.availability[x].endTime
+          });
+        }
+      }
+
+      console.log('finished populating copyExist');
+      console.log($scope.copyTemp);
+    };
+
+    $scope.pasteToDay = function(date) {
+
+      for (let x = 0; x<$scope.availability.length; x++) {
+        if ($scope.availability[x].unixDate === date) {
+          $scope.availability.splice(x,1);
+        }
+      }
+
+      console.log('copyExist to date:');
+      console.log(date);
+
+      for (let x = 0; x<$scope.copyTemp.length; x++) {
+        $scope.availability.push({
+          startTime: $scope.copyTemp[x].copyStart,
+          endTime: $scope.copyTemp[x].copyEnd,
+          unixDate: date
+        });
+        $scope.prepEndTime($scope.availability[$scope.availability.length-1]);
+      }
     };
 
     $scope.removeEntry = function(date) {

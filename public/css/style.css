@@ -109,6 +109,9 @@
   .uib-month button{
     padding: 5px 2px;
   }
+  .hidden.tablet-show{
+    display: inline-block !important;
+  }
 }
 
 /* For Tablet/Desktop */
@@ -149,7 +152,13 @@
 
 /* For Desktop Only */
 @media (min-width: 992px) {
-
+  .reduce-pad{
+    padding-left: 3px !important;
+    padding-right: 3px !important;
+  }
+  .reduce-left-pad{
+    padding-left: 3px !important;
+  }
 }
 
 html {

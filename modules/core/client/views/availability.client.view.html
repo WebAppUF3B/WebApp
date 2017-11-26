@@ -26,11 +26,17 @@
                 <p class="note" style="margin:10px" ng-if="selectedDates.length === 0">Please select a day</p>
                 <div ng-repeat='d in selectedDates | orderBy'>
                   <div class="row phone-bottom-margin">
-                    <div class="col-sm-7 small-bottom-margin">
+                    <div class="col-md-6 small-bottom-margin">
                       <h4 class="no-margin-top">{{d | date : 'fullDate'}}</h4>
                     </div>
-                    <div class="col-sm-5">
-                      <button class='btn full-width btn-red no-margin' ng-click='removeFromSelected(d)'>Remove Day</button>
+                    <div class="col-md-2 reduce-pad small-bottom-margin">
+                      <button class='btn full-width btn-red no-margin' ng-click='removeFromSelected(d)'>Remove <span class='hidden tablet-show'>Day</span></button>
+                    </div>
+                    <div class="col-md-2 reduce-pad small-bottom-margin">
+                      <button class='btn full-width btn-orange no-margin' ng-click='copyToTemp(d)'>Copy <span class='hidden tablet-show'>Timeslots</span></button>
+                    </div>
+                    <div class="col-md-2 reduce-left-pad small-bottom-margin">
+                      <button class='btn full-width btn-green no-margin' ng-click='pasteToDay(d)' ng-if='copyTemp'>Paste <span class='hidden tablet-show'>Timeslots</span></button>
                     </div>
                   </div>
                   <div ng-repeat="possibility in availability | filter:{unixDate: d}">
