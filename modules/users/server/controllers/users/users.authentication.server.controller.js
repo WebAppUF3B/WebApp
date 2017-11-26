@@ -285,11 +285,18 @@ exports.forgotPassword = function(req, res) {
     });
 };
 exports.resetPassword = function(req, res) {
-  console.log('ok u reset');
-  console.log(req.header)
-  //User.find({ email: req.body.email }, '-salt -password')
+  const newPassword = req.body.confirmNewPassword;
+  const token = req.body.token;
+  const fromToken = authUtils.parseResetPasswordToken(token);
+
+  User.find({ email: fromToken.email }, '-salt -password')
     .then((results) => {
-      res.json(results);
+      const thisUser = results[0];
+      thisUser.password = newPassword;
+      return thisUser.save();
+    })
+    .then(() => {
+      return res.status(200);
     })
     .catch((err) => {
       res.status(400).send();

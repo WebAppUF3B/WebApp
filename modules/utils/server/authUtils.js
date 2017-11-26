@@ -66,7 +66,7 @@ exports.generateResetPasswordToken = function(object) {
   return token;
 };
 
-exports.pareseResetPasswordToken = function(token) {
+exports.parseResetPasswordToken = function(token) {
   const object = jwt.verify(token, process.env.JWT);
   console.log('\n\password reset token');
   console.log(object);

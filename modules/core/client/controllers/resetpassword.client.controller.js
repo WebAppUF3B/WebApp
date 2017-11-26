@@ -65,17 +65,11 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
     };
 
     $scope.resetPassword = function(isValid) {
-      $scope.thetoken = $stateParams.token;
-      $scope.header = {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-access-token': $scope.thetoken
-        }
-      };
+      $scope.credentials.token = $stateParams.token;
       //$scope.credentials.confirmNewPassword
-      return $http.post(window.location.origin + '/api/password/reset', $scope.credentials.confirmNewPassword, $scope.header)
+      return $http.post(window.location.origin + '/api/password/reset', $scope.credentials)
       .then((results) => {
-        //$state.go(authentication.signin);
+        $state.go(authentication.signin);
       })
       .catch((err) => {
         return err;
