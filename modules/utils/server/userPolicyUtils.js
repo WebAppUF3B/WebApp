@@ -1,9 +1,9 @@
 // Routes that are used by host and require special access
 const hostRoutes = [
   /^\/api\/sessions\/emailReminders$/,
-  /^\/api\/sessions\/cancel\/.*$/,
-  /^\api\/password\/forgot\/.*$/,
-  /^\api\/password\/reset$/
+  /^\/api\/sessions\/cancel\/.*$/
+  // /^\api\/password\/forgot\/.*$/,
+  // /^\api\/password\/reset$/
 ];
 
 const secureCommonRoutes = [
@@ -111,26 +111,6 @@ const faculty = {
 
 const admin = {
   permissions: [facultyPermissions, researcherPermissions, participantPermissions, adminPermissions]
-};
-
-exports.generateCancellationToken = function(object) {
-  const token = jwt.sign(object, process.env.JWT);
-  return token;
-};
-
-exports.parseCancellationToken = function(token) {
-  const object = jwt.verify(token, process.env.JWT);
-  return object;
-};
-
-exports.generateResetPasswordToken = function(object) {
-  const token = jwt.sign(object, process.env.JWT);
-  return token;
-};
-
-exports.pareseResetPasswordToken = function(token) {
-  const object = jwt.verify(token, process.env.JWT);
-  return object;
 };
 
 exports.secureCommonRoutes = secureCommonRoutes;

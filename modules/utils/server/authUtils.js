@@ -56,7 +56,19 @@ exports.generateCancellationToken = function(object) {
 
 exports.parseCancellationToken = function(token) {
   const object = jwt.verify(token, process.env.JWT);
-  console.log("\n\nCancellation token");
+  console.log('\n\nCancellation token');
+  console.log(object);
+  return object;
+};
+
+exports.generateResetPasswordToken = function(object) {
+  const token = jwt.sign(object, process.env.JWT);
+  return token;
+};
+
+exports.pareseResetPasswordToken = function(token) {
+  const object = jwt.verify(token, process.env.JWT);
+  console.log('\n\password reset token');
   console.log(object);
   return object;
 };

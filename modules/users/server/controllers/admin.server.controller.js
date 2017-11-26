@@ -9,7 +9,8 @@ var path = require('path'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller')),
-  crypto = require('crypto');
+  crypto = require('crypto'),
+  authUtils = require('../../../utils/server/authUtils');
 
 /**
  * Show the current user
@@ -90,14 +91,18 @@ exports.createUser = function(req, res) {
   newUser.password = crypto.randomBytes(12).toString('base64');
   newUser.adminApproved = true;
   newUser.emailValidated = true;
-  const token = 0; //generate me pls
+  if (newUser.role === 'faculty') {
+    newUser.position = 'Faculty';
+  }
+   //generate me pls
   //must generate jwt then embed in url on email
   const user = new User(newUser);
+  const token = authUtils.generateResetPasswordToken(user.email);
   // Then save the user
   user.save()
     .then((user) => {
 
-      const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/not/yet/working/${user._id}/${token}`; //this will be a password reset link
+      const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/reset-password/${token}`; //this will be a password reset link
       const verificationText = `Hello ${user.firstName} ${user.lastName},
                                 \n\nYour account has been created by the administrator
                                 \n\nPlease set a password by clicking this link:\n\n${verificationUri}\n`; //pass a json web token through the url as part of auth

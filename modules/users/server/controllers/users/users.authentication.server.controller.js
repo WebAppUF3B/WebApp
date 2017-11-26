@@ -10,7 +10,8 @@ const path = require('path'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
   jwt = require('jsonwebtoken'),
-  utils = require('../../../../utils/server/stringUtils');
+  utils = require('../../../../utils/server/stringUtils'),
+  authUtils = require('../../../../utils/server/authUtils');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
@@ -276,7 +277,6 @@ exports.forgotPassword = function(req, res) {
   console.log('ok u forgot');
   console.log(req.body)
   //User.find({ email: req.body.email }, '-salt -password')
-    .exec()
     .then((results) => {
       res.json(results);
     })
@@ -286,9 +286,8 @@ exports.forgotPassword = function(req, res) {
 };
 exports.resetPassword = function(req, res) {
   console.log('ok u reset');
-  console.log(req.body)
+  console.log(req.header)
   //User.find({ email: req.body.email }, '-salt -password')
-    .exec()
     .then((results) => {
       res.json(results);
     })
@@ -437,4 +436,25 @@ exports.removeOAuthProvider = function(req, res, next) {
       return res.json(user);
     });
   });
+};
+
+exports.parseToken = function(req, res, next, id) {
+  const token = id;
+  const object = authUtils.pareseResetPasswordToken(token);
+
+  // Parse user ID from token
+  const userID = object.userID;
+
+  // Retrieve that session
+  User.findById(userID)
+    .exec()
+    .then((results) => {
+      console.log(userID);
+
+      // Proceed to delete function
+      next();
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
 };

@@ -22,23 +22,17 @@ process for forgot password
 */
 'use strict';
 
-angular.module('core').controller('ResetPasswordController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
-  function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
+angular.module('core').controller('ResetPasswordController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication',
+  function($scope, $rootScope, NgTableParams, $http, $state, $stateParams, $document, Authentication) {
     /* Get all the listings, then bind it to the scope */
     $scope.currentUser = {};
+    $scope.confirmNewPassword = null;
 
     $scope.user = Authentication.user;
     console.log('tw user', $scope.user);
 
     $scope.authToken = Authentication.authToken;
     console.log('tw auth token', $scope.authToken);
-
-    $scope.isLoggedIn = 0;
-
-    if ($scope.user !== null) {
-      $scope.isLoggedIn = 1;
-    }
-    console.log($scope.isLoggedIn);
 
     $scope.header = {
       headers: {
@@ -48,16 +42,12 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
     };
 
     $document.ready(() => {
-      if ($state.current.name === 'reset-password') {
-        $scope.init();
-      }
+      $scope.init();
     });
 
 
     $scope.init = function() {
-      $scope.state = 'reset';
       $scope.pass = $stateParams.email;
-
     };
 
     $scope.submit = function(isValid) {
@@ -73,6 +63,25 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
         //$scope.create(isValid);
       }
     };
+
+    $scope.resetPassword = function(isValid) {
+      $scope.thetoken = $stateParams.token;
+      $scope.header = {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': $scope.thetoken
+        }
+      };
+      //$scope.credentials.confirmNewPassword
+      return $http.post(window.location.origin + '/api/password/reset', $scope.credentials.confirmNewPassword, $scope.header)
+      .then((results) => {
+        //$state.go(authentication.signin);
+      })
+      .catch((err) => {
+        return err;
+      });
+    };
+
 
     $scope.forgotPassword = function() {
       //console.log($stateParams.userId);

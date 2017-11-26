@@ -33,8 +33,13 @@
           </div>
         </div>
         <div class="form-group" show-errors>
-          <label for="gender">Gender</label>
-          <input type="text" id="gender" name="gender" class="form-control" ng-model="currentUser.gender" placeholder="Unknown" required />
+          <label for="gender">Gender</label> <!-- male, female, other, prefer not to disclose -->
+          <select type="text" id="gender" name="gender" class="form-control" ng-model="currentUser.gender" placeholder="Unknown" required>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+            <option value="none">Prefer Not to Disclose</option>
+          </select>
           <div ng-messages="userForm.gender.$error" role="alert">
             <p class="help-block error-text" ng-message="required">Gender is required.</p>
           </div>
@@ -72,7 +77,7 @@
             <p class="help-block error-text" ng-message="required">Role is required.</p>
           </div>
         </div>
-        <div class="form-group" show-errors>
+        <div ng-if="currentUser.role !== 'participant' && currentUser.role !== 'faculty'" class="form-group" show-errors>
           <label for="position">Position</label>
           <select type="text" id="position" name="position" class="form-control" ng-model="currentUser.position" placeholder="">
             <option value="Undergraduate Student">Undergraduate Student</option>
