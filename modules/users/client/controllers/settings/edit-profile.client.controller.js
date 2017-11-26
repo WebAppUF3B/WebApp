@@ -32,7 +32,8 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
       //$http.get(window.location.origin + '/api/profile/' + id);
       $http.put(window.location.origin + '/api/profile/', $scope.user)
         .then((result) => {
-          ;
+          //console.log('result in client controller:\n', $scope.user);
+          Authentication.user = $scope.user;
         });
     };
   }

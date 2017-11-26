@@ -35,7 +35,7 @@ exports.update = function(req, res) {
         return userById.save();
       })
       .then((result) => {
-        console.log('result here after saving', result);
+        //console.log('result here after saving', result);
         const minimalUser = {
           firstName: user.firstName,
           lastName: user.lastName,
@@ -46,6 +46,7 @@ exports.update = function(req, res) {
           address: user.address,
           _id: user._id
         };
+        //Authentication.user = user;
         res.status(200).send({
           message: 'Profile updated',
           user: minimalUser
