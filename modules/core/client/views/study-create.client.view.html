@@ -59,18 +59,17 @@
             </div>
             <div class="col-sm-6">
               <div class="form-group" show-errors>
-                <div id="compensation" class="form-group">
                   <label>Compensation</label>
-                  <select name="compensation" class="form-control" ng-model="currentStudy.compensationType" required>
+                  <div ng-dropdown-multiselect="" options="compensatedata" selected-model="compensatemodel" extra-settings="compensatesettings"></div>
+                  <!-- <select name="compensation" class="form-control" ng-model="currentStudy.compensationType" required>
                     <option value="extraCredit">Extra Credit</option>
                     <option value="monetary">Monetary</option>
-                  </select>
+                  </select> -->
                   <!--
                   <div ng-messages="userForm.gender.$error" role="alert">
                     <p class="help-block error-text" ng-message="required">picking an option required.</p>
                   </div>
                 -->
-                </div>
               </div>
             </div>
           </div>
@@ -79,7 +78,7 @@
               <div class="form-group" ng-show='currentStudy.compensationType==="monetary"'>
                 <label>Monetary Compensation Amount (USD)</label>
                 <div id="compensationAmount" class="compensationAmount">
-                  <input type="number" id="compensationAmount" name="compensationAmount" class="form-control" ng-model="currentStudy.compensationAmount" placeholder="0.00" required>
+                  <input type="number" id="compensationAmount" name="compensationAmount" class="form-control" ng-model="currentStudy.compensationAmount" placeholder="0.00">
                 </div>
               </div>
             </div>
@@ -141,7 +140,6 @@
           <div class="row">
             <div class="col-sm-12">
               <label for="researchers">Add Other Researchers</label>
-              <!--TODO Find a way to gather Researchers to choose from for multiple researchers owning the study - also, add a field for an array of Researchers for owning the study in the schema-->
               <div ng-dropdown-multiselect="" options="researcherdata" selected-model="researchermodel" extra-settings="researchersettings"></div>
             </div>
           </div>

@@ -57,7 +57,7 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
             console.log(results.data);
             $scope.researchers = results.data;
 
-            //test out multipicker
+            //researcher multipicker
             $scope.researchermodel = [
               //proof of concept, putting in data will instantiate dropdown
               //{ id: 1, label: 'David' }
@@ -94,11 +94,42 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
           .catch((err) => {
             console.log(err);
           });
+
+          $scope.compensatemodel = [
+            //proof of concept, putting in data will instantiate dropdown
+            //{ id: 1, label: 'David' }
+          ];
+          $scope.compensatedata = [
+            { id: 1, label: 'Extra Credit' },
+            { id: 2, label: 'Monetary' }
+          ];
+
+          if ($scope.currentStudy.compensationType.length === 2) {
+            $scope.compensatemodel.push({ id: 1, label: 'Extra Credit' });
+            $scope.compensatemodel.push({ id: 2, label: 'Monetary' });
+          } else {
+            if ($scope.currentStudy.compensationType[0] === 'extraCredit') {
+              $scope.compensatemodel.push({ id: 1, label: 'Extra Credit' });
+            } else {
+              $scope.compensatemodel.push({ id: 2, label: 'Monetary' });
+            }
+          }
+
         })
         .catch((err) => {
           console.log(err);
         });
       } else {
+
+        $scope.compensatemodel = [
+          //proof of concept, putting in data will instantiate dropdown
+          //{ id: 1, label: 'David' }
+        ];
+        $scope.compensatedata = [
+          { id: 1, label: 'Extra Credit' },
+          { id: 0, label: 'Monetary' }
+        ];
+
         //get researchers to pick from
         $scope.getResearchers()
         .then((results) => {
@@ -106,7 +137,7 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
           console.log(results.data);
           $scope.researchers = results.data;
 
-          //test out multipicker
+          //research multipicker
           $scope.researchermodel = [
             //proof of concept, putting in data will instantiate dropdown
             //{ id: 1, label: 'David' }
@@ -138,6 +169,10 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
           }
           return itemText;
         }
+      };
+
+      $scope.compensatesettings = {
+        smartButtonMaxItems: 2
       };
     };
 
@@ -183,6 +218,20 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
         $scope.currentStudy.researchers.push({ 'userID': $scope.researchermodel[x].id });
       }
 
+      $scope.currentStudy.compensationType = [];
+      if ($scope.compensatemodel.length === 2) {
+        $scope.currentStudy.compensationType.push('extraCredit');
+        $scope.currentStudy.compensationType.push('monetary');
+      } else {
+        console.log('Here is compensatemodel before send off');
+        console.log($scope.compensatemodel);
+        if ($scope.compensatemodel[0].id === 1) {
+          $scope.currentStudy.compensationType.push('extraCredit');
+        } else {
+          $scope.currentStudy.compensationType.push('monetary');
+        }
+      }
+
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         alert('Invalid JSON');
@@ -207,6 +256,21 @@ angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('Stu
         //console.log($scope.researchermodel[x].id);
         $scope.currentStudy.researchers.push({ 'userID': $scope.researchermodel[x].id });
       }
+
+      $scope.currentStudy.compensationType = [];
+      if ($scope.compensatemodel.length === 2) {
+        $scope.currentStudy.compensationType.push('extraCredit');
+        $scope.currentStudy.compensationType.push('monetary');
+      } else {
+        console.log('Here is compensatemodel before send off');
+        console.log($scope.compensatemodel);
+        if ($scope.compensatemodel[0].id === 1) {
+          $scope.currentStudy.compensationType.push('extraCredit');
+        } else {
+          $scope.currentStudy.compensationType.push('monetary');
+        }
+      }
+
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         alert('Invalid JSON');
