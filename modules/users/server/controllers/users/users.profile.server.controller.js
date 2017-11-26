@@ -17,7 +17,7 @@ var _ = require('lodash'),
  */
 exports.update = function(req, res) {
   // Init Variables
-  console.log(req.body);
+  //console.log(req.body);
   const user = req.body;
 
   //console.log(req.user);
@@ -28,7 +28,7 @@ exports.update = function(req, res) {
     //console.log('user here');
     User.findById(user._id)
       .then((userById) => {
-        console.log('user here', userById);
+        //console.log('user here', userById);
         userById.firstName = user.firstName;
         userById.lastName = user.lastName;
         userById.gender = user.gender;
@@ -36,12 +36,12 @@ exports.update = function(req, res) {
         userById.position = user.position;
         userById.birthday = user.birthday;
         userById.updated = Date.now();
-        console.log('user updated  here', userById);
+        //console.log('user updated  here', userById);
 
         return userById.save();
       })
       .then((result) => {
-        console.log('result here after saving', result);
+        //console.log('result here after saving', result);
         const minimalUser = {
           firstName: result.firstName,
           lastName: result.lastName,

@@ -5,10 +5,7 @@ const hostRoutes = [
 ];
 
 const secureCommonRoutes = [
-  '/settings',
-  '/profile',
-  '/accounts',
-  '/picture',
+  '/api/profile',
   '/api/studies',
   '/api/studySessions',
   '/api/courses',
