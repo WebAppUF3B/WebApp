@@ -220,7 +220,6 @@ exports.verify = function(req, res) {
       thisUser = user;
       if (thisUser === null) throw noUserErr;
       if (thisUser.emailValidated) throw alreadyVerifiedErr;
-      console.log("NOOOO");
       thisUser.emailValidated = true;
       return user.save();
     })
@@ -271,6 +270,31 @@ exports.oauthCall = function(strategy, scope) {
     // Authenticate
     passport.authenticate(strategy, scope)(req, res, next);
   };
+};
+
+exports.forgotPassword = function(req, res) {
+  console.log('ok u forgot');
+  console.log(req.body)
+  //User.find({ email: req.body.email }, '-salt -password')
+    .exec()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((err) => {
+      res.status(400).send();
+    });
+};
+exports.resetPassword = function(req, res) {
+  console.log('ok u reset');
+  console.log(req.body)
+  //User.find({ email: req.body.email }, '-salt -password')
+    .exec()
+    .then((results) => {
+      res.json(results);
+    })
+    .catch((err) => {
+      res.status(400).send();
+    });
 };
 
 /**

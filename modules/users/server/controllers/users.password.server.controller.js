@@ -64,7 +64,9 @@ exports.delete = function (req, res) {
 
 //*//
 exports.forgotPassword = function(req, res) {
-  User.find({ email: req.body.email }, '-salt -password')
+  console.log('ok u forgot');
+  console.log(req.body)
+  //User.find({ email: req.body.email }, '-salt -password')
     .exec()
     .then((results) => {
       res.json(results);
@@ -217,7 +219,17 @@ exports.getAllUsers = function(req, res) {
     return res.status(err.code).send(err);
   });
 };
-
+exports.findByEmail = function(req, res) {
+  User.find({ email: req.body.email }, '-salt -password') //needs to be checked
+  .then((results) => {
+    console.log(results);
+    res.json(results);
+  })
+  .catch((err) => {
+    console.log('get all users error:\n', err);
+    return res.status(err.code).send(err);
+  });
+};
 exports.getUser = function(req, res) {
   const thisUser = req.model;
 

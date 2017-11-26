@@ -96,7 +96,7 @@ exports.createUser = function(req, res) {
   // Then save the user
   user.save()
     .then((user) => {
-      
+
       const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/not/yet/working/${user._id}/${token}`; //this will be a password reset link
       const verificationText = `Hello ${user.firstName} ${user.lastName},
                                 \n\nYour account has been created by the administrator
@@ -297,6 +297,9 @@ exports.editUser = function(req, res) {
       } else {
         original.lastName = theUser.lastName;
       }
+    }
+    if (theUser.position !== original.position) {
+      original.position = theUser.position;
     }
     original.save();
     return res.status(200).json(original);
