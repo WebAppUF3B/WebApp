@@ -7,6 +7,19 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
     // Prevent race conditions
     let alreadyClicked = false;
 
+    $scope.user = Authentication.user;
+    console.log('tw user', $scope.user);
+
+    $scope.authToken = Authentication.authToken;
+    console.log('tw auth token', $scope.authToken);
+
+    $scope.header = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': $scope.authToken
+      }
+    };
+
     // Called after page loads
     $scope.init = function() {
       $scope.filters = {};
@@ -20,9 +33,6 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       $scope.awaitingCompensation.data = [];
       $scope.compensated = {};
       $scope.compensated.data = [];
-
-      $scope.user = Authentication.user;
-      console.log($scope.user);
 
       $scope.studies.getUserStudies($scope.user._id)
         .then((results) => {
@@ -65,7 +75,7 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
               $scope.allSessions.forEach((session) => {
                 date = new Date(session.startTime);
                 session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-                session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+                session.time = `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
                 // Place session in correct array
                 if (session.participants.length !== 0) {
@@ -318,60 +328,14 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
 
     // Declare methods that can be used to access session data
     $scope.sessions = {
-      getAll: function() {
-        return $http.get(window.location.origin + '/api/sessions/')
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
       getUserSessions: function(userId) {
-        return $http.get(window.location.origin + '/api/sessions/user/' + userId)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $http.get(window.location.origin + '/api/sessions/user/' + userId, $scope.header);
       },
-
-      create: function(newSession) {
-        return $.ajax({
-          url: window.location.origin + '/api/sessions/',
-          type: 'POST',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(newSession)
-        });
-      },
-
-      get: function(id) {
-        return $http.get(window.location.origin + '/api/sessions/' + id)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
-      update: function(id, newSession) {
-        return $.ajax({
-          url: window.location.origin + '/api/sessions/' + id, newSession,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(newSession)
-        });
-      },
-
       cancel: function(id, cancellor) {
         return $.ajax({
           url: window.location.origin + '/api/sessions/' + id,
           type: 'DELETE',
+          headers: { 'x-access-token': $scope.authToken },
           contentType: 'application/json',
           dataType: 'json',
           data: JSON.stringify(cancellor)
@@ -379,93 +343,25 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
       },
 
       attend: function(id, change) {
-        return $.ajax({
-          url: window.location.origin + '/api/sessions/attend/' + id,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(change)
-        });
+        return $http.put(window.location.origin + '/api/sessions/attend/' + id, change, $scope.header);
       },
 
       compensate: function(id, user) {
-        return $.ajax({
-          url: window.location.origin + '/api/sessions/compensate/' + id,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(user)
-        });
+        return $http.put(window.location.origin + '/api/sessions/compensate/' + id, user, $scope.header);
       }
     };
 
     // Declare methods that can be used to access session data
     $scope.studies = {
-      getAll: function() {
-        return $http.get(window.location.origin + '/api/studies/')
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
       getUserStudies: function(userId) {
-        return $http.get(window.location.origin + '/api/studies/user/' + userId)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
+        return $http.get(window.location.origin + '/api/studies/user/' + userId, $scope.header);
       },
-
-      create: function(newStudy) {
-        return $.ajax({
-          url: window.location.origin + '/api/studies/',
-          type: 'POST',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(newStudy)
-        });
-      },
-
-      get: function(id) {
-        return $http.get(window.location.origin + '/api/studies/' + id)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-
-      update: function(id, newStudy) {
-        return $.ajax({
-          url: window.location.origin + '/api/studies/' + id, newStudy,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(newStudy)
-        });
-      },
-
       close: function(id, cancellor) {
-        return $.ajax({
-          url: window.location.origin + '/api/studies/close/' + id,
-          type: 'PUT',
-          contentType: 'application/json',
-          dataType: 'json',
-          data: JSON.stringify(cancellor)
-        });
+        return $http.put(window.location.origin + '/api/studies/close/' + id, cancellor, $scope.header);
       },
 
       reopen: function(id) {
-        return $.ajax({
-          url: window.location.origin + '/api/studies/reopen/' + id,
-          type: 'PUT'
-        });
+        return $http.put(window.location.origin + '/api/studies/reopen/' + id, {}, $scope.header);
       }
     };
 

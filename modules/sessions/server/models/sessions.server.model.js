@@ -8,6 +8,7 @@ const sessionSchema = new Schema({
       ref: 'User'
     },
     attended: Boolean,
+    approved: Boolean,
     compensationType: {
       type: String,
       enum: ['extraCredit', 'monetary', 'none'],
@@ -29,10 +30,6 @@ const sessionSchema = new Schema({
     }
   }],
   startTime: {
-    type: Date,
-    required: true
-  },
-  endTime: {
     type: Date,
     required: true
   },

@@ -1,8 +1,23 @@
-angular.module('core').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams',
-  function($scope, $http, NgTableParams, $location, $state, $stateParams) {
+angular.module('core').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams', 'Authentication',
+  function($scope, $http, NgTableParams, $location, $state, $stateParams, Authentication) {
+    let alreadyClicked = false;
+
     const init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
+
+      $scope.user = Authentication.user;
+      console.log('tw user', $scope.user);
+
+      $scope.authToken = Authentication.authToken;
+      console.log('tw auth token', $scope.authToken);
+
+      $scope.header = {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-access-token': $scope.authToken
+        }
+      };
 
       $scope.calculating = true;
       $scope.studyId = $stateParams.studyId;
@@ -12,6 +27,8 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
       $scope.filters.completed = '';
       $scope.ages = [];
       $scope.stats = {};
+      $scope.approvalTable = {};
+      $scope.approvalTable.data = [];
       $scope.stats.display = false;
       $scope.stats.maleCount = 0;
       $scope.stats.femaleCount = 0;
@@ -31,9 +48,17 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
           $scope.studySessions.forEach((session) => {
             date = new Date(session.startTime);
             session.date = `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
-            session.time = `${date.getHours() > 12 ? date.getHours() - 12 : date.getHours()}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+            session.time = `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 
             session.participants.forEach((participant) => {
+              // Store participants in table if they are awaiting approval
+              if ($scope.study.requireApproval && !participant.approved) {
+                participant.sessionID = session._id;
+                participant.sessionDate = session.date;
+                participant.sessionTime = session.time;
+                $scope.approvalTable.data.push(participant);
+              }
+
               // Calculate age of participants
               const dob = new Date(participant.userID.birthday);
               const today = new Date();
@@ -114,6 +139,16 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
             counts: [], // hides page sizes
             dataset: $scope.studySessions // select data
           });
+
+          $scope.approvalTable = new NgTableParams({
+            count: 10,
+            sorting: {
+              'userID.lastName': 'asc'
+            }
+          }, {
+            counts: [], // hides page sizes
+            dataset: $scope.approvalTable.data // select data
+          });
         })
         .catch((err) => {
           console.log(err);
@@ -121,7 +156,7 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
     };
 
     $scope.getAllSessionsByStudyId = function() {
-      return $http.get(window.location.origin + '/api/studySessions/' + $scope.studyId);
+      return $http.get(window.location.origin + '/api/studySessions/' + $scope.studyId, $scope.header);
     };
 
     // Show modal and populate it with session data
@@ -130,7 +165,59 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
       $('#detailModal').modal('show');
     };
 
+    $scope.approvalDetails = function(user) {
+      $scope.currentUser = user;
+      $scope.error = '';
+      $('#approvalModal').modal('show');
+    };
+
+    $scope.approveUser = function() {
+      if (!alreadyClicked) {
+        $scope.error = '';
+        alreadyClicked = true;
+
+        $http.put(window.location.origin + '/api/sessions/approveUser/' + $scope.currentUser.sessionID,
+          $scope.currentUser,
+          $scope.header)
+          .then(() => {
+            // Reinitialize table
+            init();
+            $('#approvalModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            console.log(err);
+            $scope.error = 'There was a problem approving the participant. Please contact the admin.';
+            alreadyClicked = false;
+          });
+      }
+    };
+
+    $scope.denyUser = function() {
+      if (!alreadyClicked) {
+        $scope.error = '';
+        alreadyClicked = true;
+
+        $http.put(window.location.origin + '/api/sessions/denyUser/' + $scope.currentUser.sessionID,
+          $scope.currentUser,
+          $scope.header)
+          .then(() => {
+            // Reinitialize table
+            init();
+            $('#approvalModal').modal('hide');
+            alreadyClicked = false;
+          })
+          .catch((err) => {
+            console.log(err);
+            $scope.error = 'There was a problem denying the participant. Please contact the admin.';
+            alreadyClicked = false;
+          });
+      }
+    };
+
     $scope.toTitleCase = function(str) {
+      if (!str) return;
+      
       return str.replace(/\w\S*/g, (txt) => {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       });

@@ -24,7 +24,7 @@
                 <label for="birthday">Birthday</label>
                 <div class='input-group date'>
                     <input type='text' id="birthday" name="birthday" ng-model="credentials.birthday" onkeydown="return false" class="form-control" />
-                    <span class="input-group-addon">
+                    <span class="input-group-addon" ng-click="toggleBirthdayFocus()">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
                 </div>

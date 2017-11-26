@@ -49,13 +49,22 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/edit/:studyId',
       templateUrl: 'modules/core/client/views/study-create.client.view.html'
     })
+    .state('studies.availability', {
+      url: '/availability/:studyId',
+      templateUrl: 'modules/core/client/views/availability.client.view.html'
+    })
+    .state('studies.availability-edit', {
+      url: '/edit/availability/:studyId',
+      templateUrl: 'modules/core/client/views/availability.client.view.html',
+      params: {
+        studyId: null,
+        avail: null,
+        durate: null
+      }
+    })
     .state('studies.data', {
       url: '/data/:studyId',
       templateUrl: 'modules/core/client/views/study-data.client.view.html'
-    })
-    .state('sessions-create', {
-      url: '/create/:studyId',
-      templateUrl: 'modules/core/client/views/session-create.client.view.html'
     })
     .state('faculty-portal', {
       url: '/faculty',
@@ -66,16 +75,12 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       templateUrl: 'modules/core/client/views/admin-portal.client.view.html'
     })
     .state('manage-users', {
-      url: '/admin-portal.manage-users',
+      url: '/admin/manage-users',
       templateUrl: 'modules/core/client/views/manage-users.client.view.html'
     })
-    .state('manage-studies', {
-      url: '/admin-portal.manage-studies',
-      templateUrl: 'modules/core/client/views/manage-studies.client.view.html'
-    })
-    .state('manage-sessions', {
-      url: '/admin-portal.manage-sessions',
-      templateUrl: 'modules/core/client/views/manage-sessions.client.view.html'
+    .state('cancel', {
+      url: '/cancel/:token',
+      templateUrl: 'modules/core/client/views/session-cancel.client.view.html'
     })
     .state('not-found', {
       url: '/not-found',

@@ -21,10 +21,21 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-12">
+            <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="address">Location</label>
                 <input type="text" id="address" name="address" class="form-control" ng-model="currentStudy.location" placeholder="Room Number or Address" required>
+                <!--
+                <div ng-messages="userForm.address.$error" role="alert">
+                  <p class="help-block error-text" ng-message="required">Address is required.</p>
+                </div>
+              -->
+              </div>
+            </div>
+            <div class="col-sm-6">
+              <div class="form-group" show-errors>
+                <label for="requireApproval" class="full-width">Require Approval</label>
+                <input id="requireApproval" ng-model="currentStudy.requireApproval" type="checkbox">
                 <!--
                 <div ng-messages="userForm.address.$error" role="alert">
                   <p class="help-block error-text" ng-message="required">Address is required.</p>
@@ -120,7 +131,7 @@
             </div>
           </div>
           <div class="form-group no-margin">
-            <button type="submit" class="btn btn-primary full-width no-margin small-top-margin"><span ng-if="state!=='edit'">Create</span><span ng-if="state==='edit'">Update</span></button>
+            <button type="submit" class="btn btn-primary full-width no-margin small-top-margin"><span ng-if="state!=='edit'">Create and Select Availability</span><span ng-if="state==='edit'">Update and Edit Availability</span></button>
           </div>
           <div ng-show="error" class="text-center text-danger">
             <strong ng-bind="error"></strong>

@@ -23,6 +23,7 @@ module.exports = function(app) {
 
   app.route('/api/auth/verify/:id').post(users.verify);
 
+<<<<<<< HEAD
   // Setting the facebook oauth routes
   app.route('/api/auth/facebook').get(users.oauthCall('facebook', {
     scope: ['email']
@@ -62,4 +63,6 @@ module.exports = function(app) {
   //new routes
   app.route('/api/profile/').get(users.getUser).put(users.update);
   //app.route('/api/profile/').put(users.update);
+=======
+>>>>>>> develop
 };
