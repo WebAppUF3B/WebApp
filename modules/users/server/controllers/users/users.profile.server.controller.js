@@ -28,7 +28,7 @@ exports.update = function(req, res) {
     //console.log('user here');
     User.findById(user._id)
       .then((userById) => {
-        //console.log('user here', userById);
+        console.log('user here', userById);
         userById.firstName = user.firstName;
         userById.lastName = user.lastName;
         userById.gender = user.gender;
@@ -36,6 +36,8 @@ exports.update = function(req, res) {
         userById.position = user.position;
         userById.birthday = user.birthday;
         userById.updated = Date.now();
+        console.log('user updated  here', userById);
+
         return userById.save();
       })
       .then((result) => {
