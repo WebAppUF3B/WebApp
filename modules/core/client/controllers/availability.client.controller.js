@@ -16,7 +16,6 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
     };
 
     const init = function() {
-      $scope.loading = true;
       $scope.studyId = $stateParams.studyId;
       $scope.availability = [];
       $scope.startTime = [];
@@ -24,6 +23,20 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       $scope.currentStudy = {};
       $scope.error = null;
       $scope.type = 'individual';
+
+      //Initialize the calendar with fake date
+      $scope.selectedDates = [0];
+      $scope.options = {
+        startingDay: 1,
+        minDate: new Date(),
+        customClass: function(data) {
+          if ($scope.selectedDates.indexOf(data.date.setHours(0, 0, 0, 0)) > -1) {
+            return 'selected';
+          }
+          console.log("Running");
+          return '';
+        }
+      };
 
       if ($state.current.name === 'studies.availability-edit') {
         $scope.state = 'edit';
@@ -47,27 +60,15 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         $scope.prepStartTime();
 
         // Prepare data for calendar
-        $scope.activeDate = null;
         if ($scope.state === 'edit') {
           $scope.putInDate = [];
           $scope.interpretCurrentAvailability();
-          //$scope.loaded = true;
           $scope.selectedDates = $scope.putInDate; //able to manipulated via external array first.
         } else {
-          //$scope.loaded = true;
           $scope.selectedDates = [new Date().setHours(0,0,0,0)];
         }
-        $scope.options = {
-          startingDay: 1,
-          minDate: new Date(),
-          customClass: function(data) {
-            if ($scope.selectedDates.indexOf(data.date.setHours(0, 0, 0, 0)) > -1) {
-              return 'selected';
-            }
-            return '';
-          }
-        };
-        $scope.loading = false;
+        $scope.activeDate = $scope.selectedDates[0];
+        $scope.activeDate = null;
       })
       .catch((err) => {
         console.log(err);
