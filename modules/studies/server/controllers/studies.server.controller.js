@@ -25,6 +25,7 @@ exports.getAll = function(req, res) {
 exports.getAllAvailable = function(req, res) {
   const possibleStudies = [];
   Study.find({ closed: false })
+    .populate('availability.existingStudySessions')
     .then((studies) => {
       studies.forEach((study) => {
         if (study.availability && study.availability.length === 0) return;
@@ -39,10 +40,23 @@ exports.getAllAvailable = function(req, res) {
           const totalTimePeriod = dateUtils.differenceInMins(startTime, endTime);
           const studyDuration = study.duration;
           const numOfStudySessions = totalTimePeriod / studyDuration;
-          if (slot.existingStudySessions && numOfStudySessions <= slot.existingStudySessions.length) return;
+
+          if (study.participantsPerSession === 1 &&
+              slot.existingStudySessions &&
+              numOfStudySessions <= slot.existingStudySessions.length) return;
+
+          if (study.participantsPerSession > 1 && numOfStudySessions <= slot.existingStudySessions.length) {
+            const hasPartialOpening = slot.existingStudySessions.some((existingSession) => {
+              if (existingSession.participants &&
+                existingSession.participants.length < study.participantsPerSession) return true;
+            });
+
+            if (!hasPartialOpening) return;
+          }
+
           return true;
         });
-        console.log('tw get all hasOpening', hasOpening);
+        console.log('tw get all hasOpening', study.title, hasOpening);
         if (hasOpening) possibleStudies.push(study);
       });
       res.status(200).send(possibleStudies);
