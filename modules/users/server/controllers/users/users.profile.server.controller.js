@@ -25,29 +25,31 @@ exports.update = function(req, res) {
   delete req.body.role;
 
   if (user) {
+    //console.log('user here');
     User.findById(user._id)
       .then((userById) => {
+        //console.log('user here', userById);
         userById.firstName = user.firstName;
         userById.lastName = user.lastName;
         userById.gender = user.gender;
         userById.address = user.address;
-        userByID.position = user.position;
-        userByID.birthday = user.birthday;
+        userById.position = user.position;
+        userById.birthday = user.birthday;
         userById.updated = Date.now();
         return userById.save();
       })
       .then((result) => {
-        //console.log('result here after saving', result);
+        console.log('result here after saving', result);
         const minimalUser = {
-          firstName: user.firstName,
-          lastName: user.lastName,
-          gender: user.gender,
-          birthday: user.birthday,
-          email: user.email,
-          role: user.role,
-          position: user.position,
-          address: user.address,
-          _id: user._id
+          firstName: result.firstName,
+          lastName: result.lastName,
+          gender: result.gender,
+          birthday: result.birthday,
+          email: result.email,
+          role: result.role,
+          position: result.position,
+          address: result.address,
+          _id: result._id
         };
         //Authentication.user = user;
         res.status(200).send({

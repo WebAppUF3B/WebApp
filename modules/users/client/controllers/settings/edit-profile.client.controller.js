@@ -8,6 +8,7 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
     $scope.updateUserProfile = function(isValid) {
       $scope.success = $scope.error = null;
       $scope.user.birthday = $('#birthday').val();
+      console.log('user birthday? ', $scope.user.birthday);
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
 
@@ -32,8 +33,8 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
       //$http.get(window.location.origin + '/api/profile/' + id);
       $http.put(window.location.origin + '/api/profile/', $scope.user)
         .then((result) => {
-          //console.log('result in client controller:\n', $scope.user);
-          Authentication.user = $scope.user;
+          console.log('result in client controller:\n', result.data.user);
+          Authentication.user = result.data.user;
         });
     };
   }
