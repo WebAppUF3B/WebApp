@@ -31,6 +31,8 @@ exports.update = function(req, res) {
         userById.lastName = user.lastName;
         userById.gender = user.gender;
         userById.address = user.address;
+        userByID.position = user.position;
+        userByID.birthday = user.birthday;
         userById.updated = Date.now();
         return userById.save();
       })
@@ -43,6 +45,7 @@ exports.update = function(req, res) {
           birthday: user.birthday,
           email: user.email,
           role: user.role,
+          position: user.position,
           address: user.address,
           _id: user._id
         };

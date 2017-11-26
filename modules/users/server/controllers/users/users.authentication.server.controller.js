@@ -197,6 +197,7 @@ exports.signin = function(req, res, next) {
           email: user.email,
           role: user.role,
           address: user.address,
+          position: user.position,
           _id: user._id
         };
 
