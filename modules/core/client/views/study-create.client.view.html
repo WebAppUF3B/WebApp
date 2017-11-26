@@ -75,7 +75,7 @@
           </div>
           <div class="row">
             <div class="col-sm-12">
-              <div class="form-group" ng-show='currentStudy.compensationType==="monetary"'>
+              <div class="form-group" ng-show='compensatemodel[0].id === 2 || compensatemodel[1].id === 2'>
                 <label>Monetary Compensation Amount (USD)</label>
                 <div id="compensationAmount" class="compensationAmount">
                   <input type="number" id="compensationAmount" name="compensationAmount" class="form-control" ng-model="currentStudy.compensationAmount" placeholder="0.00">
