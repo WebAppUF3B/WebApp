@@ -16,6 +16,37 @@
             <p class="help-block error-text" ng-message="required">Last name is required.</p>
           </div>
         </div>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="form-group" show-errors>
+              <label for="birthday">Birthday</label>
+              <div class='input-group date'>
+                  <input type='text' id="birthday" name="birthday" ng-model="user.birthday" onkeydown="return false" class="form-control" />
+                  <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                  </span>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="form-group" show-errors>
+              <div id="gender" class="form-group">
+                <label>Gender</label>
+                <select name="gender" class="form-control" ng-model="user.gender" required>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="none">Prefer Not to Disclose</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <!--
         <div id="gender" class="form-group" show-errors>
           <label>Gender</label>
           <select name="gender" class="form-control" ng-model="user.gender" required>
@@ -25,6 +56,7 @@
             <option value="none">Prefer Not to Disclose</option>
           </select>
         </div>
+      -->
         <div class="form-group" ng-show="user.role == 'participant'" show-errors>
           <label for="address">Address</label>
           <input type="text" id="address" name="address" class="form-control" ng-model="user.address" required>
@@ -63,4 +95,14 @@
       </fieldset>
     </form>
   </div>
+  <script type="text/javascript">
+      var today = Date.now();
+      $(function () {
+          $('#birthday').datetimepicker({
+            format: 'MM/DD/YYYY',
+            viewMode: 'years',
+            maxDate: today,
+          })
+      });
+  </script>
 </section>

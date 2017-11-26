@@ -7,14 +7,14 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
     console.log('View here', $scope.user);
     $scope.updateUserProfile = function(isValid) {
       $scope.success = $scope.error = null;
-
+      $scope.user.birthday = $('#birthday').val();
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
 
         return false;
       }
       //var user = new Users($scope.user);
-      let id = $scope.user._id;
+      const id = $scope.user._id;
       console.log(id);
 
       // let user = {
