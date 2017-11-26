@@ -32,6 +32,9 @@
   .phone-hidden{
     display: none !important;
   }
+  .hidden.phone-show{
+    display: inline-block !important;
+  }
   .hide-col-1-phone th:nth-child(1), .hide-col-1-phone td:nth-child(1){
     display: none !important;
   }
@@ -46,6 +49,9 @@
   }
   .phone-top-margin{
     margin-top: 10px;
+  }
+  .phone-bottom-margin{
+    margin-bottom: 10px;
   }
   .pane{
   	padding: 0px 15px 15px !important;
@@ -64,6 +70,26 @@
   .border-right {
     border-bottom: 2px solid #c3c3c3;
   }
+  .special-margin {
+    margin-top: 15px !important;
+  }
+  .uib-daypicker table{
+    margin: auto;
+  }
+  .phone-full-width {
+    width: 100%;
+  }
+  .phone-half-width {
+    width: 50%;
+  }
+  .small-button-margin {
+    margin-top: 10px !important;
+  }
+  .fit-table {
+    width: 258px;
+    margin: auto;
+    padding: 0px !important;
+  }
 }
 
 /* For Tablet/Phone */
@@ -76,6 +102,12 @@
   }
   .title-pad{
     padding-top: 40px !important;
+  }
+  .uib-day button, .uib-year button, .uib-right.btn, .uib-title.btn, .uib-left.btn{
+    padding: 5px;
+  }
+  .uib-month button{
+    padding: 5px 2px;
   }
 }
 
@@ -102,6 +134,13 @@
   }
   .expand {
     flex: 1;
+  }
+  .btn.btn-small {
+    padding: 3px 5px !important;
+  }
+  .x-btn {
+    height: 34px;
+    padding-top: 5px !important;
   }
   .top-divider{
     display: none;
@@ -180,6 +219,25 @@ h2, h3, h4, h5, h6 {
   font-size: 16px;
 }
 
+.loading-background {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  background:rgba(0,0,0,0.5);
+  display: flex;
+}
+
+.loading-image {
+  margin: auto;
+  max-height: 150px;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+}
+
 .top-logo {
   width: 50%;
   padding: 10px 0px 10px 0px;
@@ -196,6 +254,10 @@ h2, h3, h4, h5, h6 {
 
 .float-right {
   float: right;
+}
+
+.pad {
+  padding: 10px 7px;
 }
 
 .top-pad {
@@ -226,12 +288,29 @@ h2, h3, h4, h5, h6 {
   margin-top: 10px;
 }
 
+.force-small-top-margin {
+  margin-top: 10px !important;
+}
+
+.medium-top-margin {
+  margin-top: 18px !important;
+}
+
+.medium-bottom-margin {
+  margin-bottom: 18px !important;
+}
+
 .bottom-margin {
   margin-bottom: 30px !important;
 }
 
 .small-bottom-margin {
   margin-bottom: 10px !important;
+}
+
+.special-margin {
+  margin-top: 0px;
+  margin-bottom: 5px;
 }
 
 .gator-dark-blue {
@@ -320,6 +399,10 @@ footer .uf-monogram {
   margin-bottom: 0px !important;
 }
 
+.no-margin-top {
+  margin-top: 0px !important;
+}
+
 .btn{
   border-radius: 2px !important;
   font-size: 1.3em !important;
@@ -339,6 +422,10 @@ footer .uf-monogram {
 
 .btn-primary:hover{
   background: #2e66af !important;
+}
+
+.btn-primary.active{
+  background: #295a99 !important;
 }
 
 .btn-orange{
@@ -408,6 +495,7 @@ md-datepicker {
   background-color: white;
   box-shadow: -2px 2px 5px #888888;
   border: 1px solid #c3c3c3;
+  min-height: 40px;
 }
 
 .form-panel form{
@@ -420,25 +508,6 @@ md-datepicker {
 
 .no-margin{
   margin: 0px !important;
-}
-
-.loading-background {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 2000;
-  background:rgba(0,0,0,0.5);
-  display: flex;
-}
-
-.loading-image {
-  margin: auto;
-  max-height: 150px;
-  user-select: none;
-  -moz-user-select: none;
-  -webkit-user-select: none;
 }
 
 table.ng-table th{
@@ -705,6 +774,10 @@ hr {
 
 .clear-filters-btn:hover{
   cursor: pointer;
+}
+
+.x-btn{
+  margin-top: 25px;
 }
 
 .filter-area{
