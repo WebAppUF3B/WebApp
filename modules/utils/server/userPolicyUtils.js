@@ -25,6 +25,7 @@ const participantPermissions = {
     /^\/api\/studySessions\/signup\/\w*\/\w*$/,
     /^\/api\/courses\/$/,
     /^\/api\/studies\/$/,
+    /^\/api\/studies\/discover$/
   ],
   PUT: [
 
@@ -43,6 +44,7 @@ const researcherPermissions = {
     /^\/api\/studies\/\w*$/,
     /^\/api\/sessions\/user\/\w*$/,
     /^\/api\/studies\/user\/\w*$/,
+    /^\/api\/studies\/research\/\w*$/,
     /^\/api\/studySessions\/\w*$/,
   ],
   PUT: [

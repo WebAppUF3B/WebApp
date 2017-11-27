@@ -5,8 +5,6 @@ const policies = require('./userPolicyUtils');
 exports.authUser = function(req, res, next) {
 
   const reqPath = req.path;
-  console.log('tw req', reqPath);
-
   const isHostRoute = policies.hostRoutes.some((pathRegex) => {
     console.log('Host check', pathRegex, reqPath, pathRegex.test(reqPath));
     if (pathRegex.test(reqPath)) return true;
