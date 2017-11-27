@@ -115,7 +115,7 @@ exports.createUser = function(req, res) {
       const mailOptions = {
         from: 'no.replyhccresearch@gmail.com',
         to: user.email,
-        subject: 'HCC Research Pool Account Verification',
+        subject: 'HCC Research Pool Account Creation',
         text: verificationText
       };
       return transporter.sendMail(mailOptions);

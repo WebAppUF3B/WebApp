@@ -75,18 +75,17 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
       //$scope.credentials.confirmNewPassword
       return $http.post(window.location.origin + '/api/password/reset', $scope.credentials)
       .then((results) => {
-        $state.go(authentication.signin);
+        $state.go('authentication.signin');
       })
       .catch((err) => {
-        console.log(err);
+        console.log('forgot ', err);
         return err;
       });
     };
 
 
     $scope.forgotPassword = function() {
-      //console.log($stateParams.userId);
-      return $http.get(window.location.origin + '/api/password/forgotPassword/' + $stateParams.email, $scope.header)
+      return $http.post(window.location.origin + '/api/password/forgot/' + $scope.credentials.email)//, $scope.header)
       .then((results) => {
         return results;
       })

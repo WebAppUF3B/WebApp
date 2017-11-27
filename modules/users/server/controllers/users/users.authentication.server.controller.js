@@ -274,14 +274,38 @@ exports.oauthCall = function(strategy, scope) {
 };
 
 exports.forgotPassword = function(req, res) {
-  console.log('ok u forgot');
-  console.log(req.body)
-  //User.find({ email: req.body.email }, '-salt -password')
+  console.log('ok u forgot: ');
+  const theemail = req.params.email;
+  const token = authUtils.generateResetPasswordToken(theemail);
+  console.log(theemail);
+  User.find({ email: theemail }, '-salt -password')
+    .exec()
     .then((results) => {
-      res.json(results);
+      const theuser = results[0];
+      const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/reset-password/${token}`; //this will be a password reset link
+      const verificationText = `Hello ${theuser.firstName} ${theuser.lastName},
+                                \nYou have requested a password reset. If this was not you, please ignore this email.
+                                \nPlease reset a password by clicking this link: ${verificationUri}`; //pass a json web token through the url as part of auth
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: theuser.email,
+        subject: 'HCC Research Pool Password Reset',
+        text: verificationText
+      };
+      return transporter.sendMail(mailOptions);
+    })
+    .then(() => {
+      return res.status(200).send();
     })
     .catch((err) => {
-      res.status(400).send();
+      console.log(err);
+      res.status(200).send();
     });
 };
 exports.resetPassword = function(req, res) {
