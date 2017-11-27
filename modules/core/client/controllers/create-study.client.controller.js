@@ -59,6 +59,7 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
           $scope.currentStudy.duration = results.data.duration;
           $scope.currentStudy.participantsPerSession = results.data.participantsPerSession;
           $scope.currentStudy.description = results.data.description;
+          $scope.currentStudy.availability = results.data.availability;
           $scope.currentStudy.researchers = results.data.researchers;
           $scope.currentStudy.compensationAmount = results.data.compensationAmount;
 
@@ -71,7 +72,7 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
             $scope.researchers.sort(sortResearchers);
 
             for (let i = 0; i < $scope.researchers.length; i++) {
-              if ($scope.researchers[i]._id == $scope.user._id) {
+              if ($scope.researchers[i]._id === $scope.user._id) {
                 $scope.researchers.splice(i,1);
                 break;
               }
@@ -89,7 +90,7 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
             }
 
             for (let x = 0; x<$scope.currentStudy.researchers.length; x++) {
-              if ($scope.currentStudy.researchers[x].userID != $scope.user._id) {
+              if ($scope.currentStudy.researchers[x].userID !== $scope.user._id) {
                 const indexOfExistingResearcherInData = $scope.findIndex($scope.currentStudy.researchers[x].userID);
                 $scope.researchermodel.push($scope.researcherdata[indexOfExistingResearcherInData]);
               }
@@ -283,7 +284,9 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
       }
 
       $http.put('/api/studies/'+$scope.pass, $scope.currentStudy, $scope.header).success((response) => {
-        $state.go('researcher-portal');
+        console.log('Did the put, here is the return');
+        console.log(response);
+        $state.go('studies.availability-edit', { 'studyId': response._id, 'avail': $scope.currentStudy.availability, 'durate': $scope.currentStudy.duration });
       }).error((response) => {
         $scope.error = 'There was a problem updating your study, please contact the admin.';
       });

@@ -4,9 +4,7 @@
 const ApplicationConfiguration = (function () {
   // Init module configuration options
   const applicationModuleName = 'mean';
-  const applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload', 'ngMaterial', 'ngTable', 'gm.datepickerMultiSelect', 'angularjs-dropdown-multiselect'];
-  //const applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload', 'ngMaterial', 'ngTable', 'gm.datepickerMultiSelect'];
-  //const applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload', 'ngMaterial', 'ngTable'];
+  const applicationModuleVendorDependencies = ['ngResource', 'ngAnimate', 'ngMessages', 'ui.router', 'ui.bootstrap', 'ui.utils', 'angularFileUpload', 'ngTable', 'gm.datepickerMultiSelect', 'angularjs-dropdown-multiselect'];
 
   // Add a new vertical module
   const registerModule = function (moduleName, dependencies) {
