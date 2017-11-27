@@ -58,9 +58,7 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/edit/availability/:studyId',
       templateUrl: 'modules/core/client/views/availability.client.view.html',
       params: {
-        studyId: null,
-        avail: null,
-        durate: null
+        studyId: null
       }
     })
     .state('studies.data', {
