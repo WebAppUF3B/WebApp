@@ -174,7 +174,7 @@ exports.delete = function(req, res) {
   const now = new Date();
   const sessionDate = new Date(session.startTime);
   if (now >= sessionDate) {
-    console.log("Cannot cancel a session that already took place");
+    console.log('Cannot cancel a session that already took place');
     return res.status(400).send();
   }
 
