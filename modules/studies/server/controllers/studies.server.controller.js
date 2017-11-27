@@ -26,16 +26,25 @@ exports.getAll = function(req, res) {
 exports.getAllAvailable = function(req, res) {
   const possibleStudies = [];
   Study.find({ closed: false })
+    .populate('researchers.userID')
     .populate('availability.existingStudySessions')
     .then((studies) => {
       studies.forEach((study) => {
         if (study.availability && study.availability.length === 0) return;
         if (study.currentNumber >= study.maxParticipants) return;
         const today = Date.now();
-
+        let totalParticipants = 0;
         const hasOpening = study.availability.some((slot) => {
           const startTime = new Date(slot.startTime);
           const endTime = new Date(slot.endTime);
+
+
+          slot.existingStudySessions.forEach((existingSession) => {
+            if (existingSession.participants) totalParticipants = totalParticipants + existingSession.participants.length;
+          });
+
+          if (totalParticipants >= study.maxParticipants) return;
+
           if (endTime.getTime() < today) return;
 
           const totalTimePeriod = dateUtils.differenceInMins(startTime, endTime);

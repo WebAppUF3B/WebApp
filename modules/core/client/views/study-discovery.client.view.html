@@ -57,6 +57,7 @@
             <td title="'Title'" filter="{ 'title': 'text'}" sortable="'title'" ng-attr-title="{{null}}">{{study.title}}</td>
             <td title="'Location'" filter="{ 'location': 'text'}" sortable="'location'" width='30%' ng-attr-title="{{null}}">{{study.location}}</td>
             <td title="'Compensation Types'" sortable="'satisfied'" width=200px ng-attr-title="{{null}}">
+              <span ng-if="study.compensationType.length == 0">None</span>
               <span ng-if="study.compensationType.length == 1 && study.compensationType[0] == 'extraCredit'">Extra Credit</span>
               <span ng-if="study.compensationType.length == 1 && study.compensationType[0] == 'monetary'">Monetary</span>
               <span ng-if="study.compensationType.length == 2">Extra Credit, Monetary</span>
@@ -128,6 +129,9 @@
             <div class="row">
               <div class="col-sm-12">
                 <p class="mini-title">Compensation Types Offered:</p>
+                <p ng-if="currentStudy.compensationType.length == 0">
+                  None
+                </p>
                 <p ng-if="currentStudy.compensationType.length == 1 && currentStudy.compensationType[0] == 'extraCredit'">
                   Extra Credit
                 </p>

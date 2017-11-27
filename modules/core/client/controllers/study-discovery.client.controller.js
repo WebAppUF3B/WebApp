@@ -33,6 +33,7 @@ angular.module('core').controller('StudyDiscoveryController', ['$scope','$http',
             if (!study.removed) {
               // Store in array
               $scope.allStudies.push(study);
+              console.log(study);
             }
           });
 

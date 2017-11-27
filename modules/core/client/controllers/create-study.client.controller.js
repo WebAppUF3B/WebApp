@@ -215,7 +215,6 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'studyForm');
         $scope.error = 'Please fill in all required fields.';
-        if ($scope.compensatemodel.length === 0) $('.needs-validation').addClass('highlight-error');
         return false;
       }
 
@@ -226,25 +225,23 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
       }
 
       $scope.currentStudy.compensationType = [];
-      if ($scope.compensatemodel.length === 0) {
-        $scope.error = 'Please fill in all required fields.';
-        $('.needs-validation').addClass('highlight-error');
-        return false;
-      } else if ($scope.compensatemodel.length === 2) {
-        $scope.currentStudy.compensationType.push('extraCredit');
-        $scope.currentStudy.compensationType.push('monetary');
-      } else {
-        if ($scope.compensatemodel[0].id === 1) {
+      if ($scope.compensatemodel.length !== 0) {
+        if ($scope.compensatemodel.length === 2) {
           $scope.currentStudy.compensationType.push('extraCredit');
-        } else {
           $scope.currentStudy.compensationType.push('monetary');
+        } else {
+          if ($scope.compensatemodel[0].id === 1) {
+            $scope.currentStudy.compensationType.push('extraCredit');
+          } else {
+            $scope.currentStudy.compensationType.push('monetary');
+          }
         }
       }
 
       $http.post('/api/studies/', $scope.currentStudy, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
-        $state.go('researcher-portal');
+        $state.go('studies.availability', { 'studyId': response._id });
       }).error((response) => {
         $scope.error = 'There was a problem creating your study, please contact the admin.';
       });
@@ -268,18 +265,16 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
       }
 
       $scope.currentStudy.compensationType = [];
-      if ($scope.compensatemodel.length === 0) {
-        $scope.error = 'Please fill in all required fields.';
-        $('.needs-validation').addClass('highlight-error');
-        return false;
-      } else if ($scope.compensatemodel.length === 2) {
-        $scope.currentStudy.compensationType.push('extraCredit');
-        $scope.currentStudy.compensationType.push('monetary');
-      } else {
-        if ($scope.compensatemodel[0].id === 1) {
+      if ($scope.compensatemodel.length !== 0) {
+        if ($scope.compensatemodel.length === 2) {
           $scope.currentStudy.compensationType.push('extraCredit');
-        } else {
           $scope.currentStudy.compensationType.push('monetary');
+        } else {
+          if ($scope.compensatemodel[0].id === 1) {
+            $scope.currentStudy.compensationType.push('extraCredit');
+          } else {
+            $scope.currentStudy.compensationType.push('monetary');
+          }
         }
       }
 
