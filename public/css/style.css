@@ -222,6 +222,10 @@ h2, h3, h4, h5, h6 {
   margin-top: 10px !important;
 }
 
+.no-margin .top-margin {
+  margin-top: 20px !important;
+}
+
 .small-top-margin {
   margin-top: 10px;
 }
@@ -803,6 +807,44 @@ li.divider{
   padding: 0px !important;
 }
 
+.form-control.dropdown-toggle{
+  padding: 6px 12px !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-group.open .form-control.dropdown-toggle, .btn-group.open .form-control.dropdown-toggle {
+  -webkit-box-shadow: none;
+  box-shadow: none;
+  border-color: #66afe9;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+}
+
+.form-control.dropdown-toggle .dropdown-menu {
+  margin-left: -15px !important;
+}
+
+.multiselect-parent{
+  width: 100%;
+}
+
+#selectAll, #deselectAll, .dropdown-menu>li>a.option{
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 1.03em;
+}
+
+#selectAll:hover, #deselectAll:hover, .dropdown-menu>li>a.option:hover{
+  cursor: pointer;
+}
+
+.highlight-error {
+  border-color: #a94442 !important;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075) !important;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075) !important;
+}
+
 .main-dropdown-toggle{
   height: 100%;
   width: 100%;
@@ -814,4 +856,8 @@ li.divider{
 .main-dropdown-toggle:hover{
   cursor: pointer !important;
   color: #23527c;
+}
+
+.dropdown-toggle.ng-binding.btn{
+  color: #333 !important
 }

@@ -1,9 +1,10 @@
 'use strict';
 
 /* Dependencies */
-const mongoose = require('mongoose');
-const Study = mongoose.model('Study');
-const dateUtils = require('../../../utils/server/dateUtilities');
+const mongoose = require('mongoose'),
+  Study = mongoose.model('Study'),
+  User = mongoose.model('User'),
+  dateUtils = require('../../../utils/server/dateUtilities');
 
 /**
  * Backend functions for CRUD operations on course collection
@@ -104,6 +105,7 @@ exports.update = function(req, res) {
   study.researchers = req.body.researchers;
   study.availability = req.body.availability;
   study.requireApproval = req.body.requireApproval;
+  study.compensationAmount = req.body.compensationAmount;
 
   study.save((err) => {
     if (err) {
@@ -185,6 +187,19 @@ exports.modifyCount = function(id, attended) {
         return err;
       });
   });
+};
+
+exports.listResearchers = function(req, res) {
+  console.log('HELLO RESEARCHERS');
+  User.find({ role: { $ne: 'participant' } }, '-salt -password')
+    .then((arrayOfAllResearchers) => {
+      console.log('Meow Researchers');
+      console.log(arrayOfAllResearchers);
+      res.json(arrayOfAllResearchers);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 /*

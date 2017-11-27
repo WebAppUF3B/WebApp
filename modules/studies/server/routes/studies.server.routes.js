@@ -7,6 +7,8 @@ const authUtils = require('../../../utils/server/authUtils');
 module.exports = function (app) {
   // Setting up the users profile api
   app.use(authUtils.authUser);
+  app.route('/api/studies/research/')
+  .get(studies.listResearchers);
   app.route('/api/studies/discover')
     .get(studies.getAllAvailable);
   app.route('/api/studies/')
