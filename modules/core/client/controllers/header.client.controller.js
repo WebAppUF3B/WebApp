@@ -22,8 +22,9 @@ angular.module('core').controller('HeaderController', ['$scope', '$state', 'Auth
     });
 
     $scope.signout = function() {
-      localStorage.removeItem('user');
+      $scope.authentication.authToken = undefined;
       $scope.authentication.user = undefined;
+      $scope.authentication.logout();
       $state.go('home');
     };
   }

@@ -5,8 +5,6 @@ const policies = require('./userPolicyUtils');
 exports.authUser = function(req, res, next) {
 
   const reqPath = req.path;
-  console.log('tw req', reqPath);
-
   const isHostRoute = policies.hostRoutes.some((pathRegex) => {
     console.log('Host check', pathRegex, reqPath, pathRegex.test(reqPath));
     if (pathRegex.test(reqPath)) return true;
@@ -56,7 +54,19 @@ exports.generateCancellationToken = function(object) {
 
 exports.parseCancellationToken = function(token) {
   const object = jwt.verify(token, process.env.JWT);
-  console.log("\n\nCancellation token");
+  console.log('\n\nCancellation token');
+  console.log(object);
+  return object;
+};
+
+exports.generateResetPasswordToken = function(object) {
+  const token = jwt.sign(object, process.env.JWT);
+  return token;
+};
+
+exports.parseResetPasswordToken = function(token) {
+  const object = jwt.verify(token, process.env.JWT);
+  console.log('\n\password reset token');
   console.log(object);
   return object;
 };

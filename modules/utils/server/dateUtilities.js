@@ -2,7 +2,7 @@ exports.formatMMDDYYYY = (date) => {
   return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
 };
 
-exports.differenceInSeconds = (dateStart, dateEnd) => {
+exports.differenceInMins = (dateStart, dateEnd) => {
   return (((dateEnd.getTime() - dateStart.getTime()) / 1000) / 60);
 };
 
@@ -28,5 +28,7 @@ exports.DOWMap = (dowInt) => {
 };
 
 exports.getTimeOfDay = (date) => {
-  return `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ${date.getHours() >= 12 ? 'PM' : 'AM'}`;
+  return `${date.getHours() === 0 ? 12 : (date.getHours() > 12 ? date.getHours() - 12 : date.getHours())}:` +
+  `${date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()} ` +
+  `${date.getHours() >= 12 ? 'PM' : 'AM'}`;
 };

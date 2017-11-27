@@ -2,7 +2,9 @@
 
 /* Dependencies */
 const mongoose = require('mongoose'),
-  Study = mongoose.model('Study');
+  Study = mongoose.model('Study'),
+  User = mongoose.model('User'),
+  dateUtils = require('../../../utils/server/dateUtilities');
 
 /**
  * Backend functions for CRUD operations on course collection
@@ -18,6 +20,51 @@ exports.getAll = function(req, res) {
       } else {
         res.json(studies);
       }
+    });
+};
+
+exports.getAllAvailable = function(req, res) {
+  const possibleStudies = [];
+  Study.find({ closed: false })
+    .populate('availability.existingStudySessions')
+    .then((studies) => {
+      studies.forEach((study) => {
+        if (study.availability && study.availability.length === 0) return;
+        if (study.currentNumber >= study.maxParticipants) return;
+        const today = Date.now();
+
+        const hasOpening = study.availability.some((slot) => {
+          const startTime = new Date(slot.startTime);
+          const endTime = new Date(slot.endTime);
+          if (endTime.getTime() < today) return;
+
+          const totalTimePeriod = dateUtils.differenceInMins(startTime, endTime);
+          const studyDuration = study.duration;
+          const numOfStudySessions = totalTimePeriod / studyDuration;
+
+          if (study.participantsPerSession === 1 &&
+              slot.existingStudySessions &&
+              numOfStudySessions <= slot.existingStudySessions.length) return;
+
+          if (study.participantsPerSession > 1 && numOfStudySessions <= slot.existingStudySessions.length) {
+            const hasPartialOpening = slot.existingStudySessions.some((existingSession) => {
+              if (existingSession.participants &&
+                existingSession.participants.length < study.participantsPerSession) return true;
+            });
+
+            if (!hasPartialOpening) return;
+          }
+
+          return true;
+        });
+        console.log('tw get all hasOpening', study.title, hasOpening);
+        if (hasOpening) possibleStudies.push(study);
+      });
+      res.status(200).send(possibleStudies);
+    })
+    .catch((err) => {
+      console.log('Get all error\n', err);
+      res.status(400).send({ message: 'Please contact and admin' });
     });
 };
 
@@ -58,35 +105,8 @@ exports.update = function(req, res) {
   study.researchers = req.body.researchers;
   study.availability = req.body.availability;
   study.requireApproval = req.body.requireApproval;
+  study.compensationAmount = req.body.compensationAmount;
 
-  // console.log('hello world');
-  // console.log(req.body.title+'\n\n\n');
-  //
-  // const id = req.params.studyID;
-  //
-  // Study.findById(id).exec((err, study) => {
-  //   if (err) {
-  //     console.log(err);
-  //     res.status(400).send(err);
-  //   } else {
-  //     console.log('MEOW', study);
-  //     console.log('MEOW', req.body.title);
-  //     console.log('MEOW', req.body.location);
-  //     console.log('MEOW', req.body.irb);
-  //     console.log('MEOW', req.body.compensationType);
-  //     console.log('MEOW', req.body.maxParticipants);
-  //     console.log('MEOW', req.body.maxParticipantsPerSession);
-  //     console.log('MEOW', req.body.description);
-  //
-  //     study.title = req.body.title;
-  //     study.location = req.body.location;
-  //     study.irb = req.body.irb;
-  //     study.compensationType = req.body.compensationType;
-  //     study.maxParticipants = req.body.maxParticipants;
-  //     study.maxParticipantsPerSession = req.body.maxParticipantsPerSession;
-  //     study.description = req.body.description;
-  //
-  //   }
   study.save((err) => {
     if (err) {
       console.log(err);
@@ -167,6 +187,19 @@ exports.modifyCount = function(id, attended) {
         return err;
       });
   });
+};
+
+exports.listResearchers = function(req, res) {
+  console.log('HELLO RESEARCHERS');
+  User.find({ role: { $ne: 'participant' } }, '-salt -password')
+    .then((arrayOfAllResearchers) => {
+      console.log('Meow Researchers');
+      console.log(arrayOfAllResearchers);
+      res.json(arrayOfAllResearchers);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 /*

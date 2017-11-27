@@ -42,43 +42,46 @@
                     <option value="none">Prefer Not to Disclose</option>
                   </select>
                 </div>
+              </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="form-group" show-errors>
-                <label for="address">Address</label>
-                <input type="text" id="address" name="address" class="form-control" ng-model="copiedUser.address" required>
-                <div ng-messages="userForm.address.$error" role="alert">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group" show-errors>
+                  <label for="address">Address</label>
+                  <input type="text" id="address" name="address" class="form-control" ng-model="copiedUser.address" required>
+                  <div ng-messages="userForm.address.$error" role="alert">
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-              <div class="form-group" ng-show="copiedUser.role != 'participant'" show-errors>
-                <div id="postion" class="form-group">
-                  <label for="position">Position</label>
-                  <select name="position" class="form-control" ng-model="copiedUser.position" required>
-                    <option value="Undergraduate Student">Undergraduate Student</option>
-                    <option value="Research Assistant">Research Assistant</option>
-                    <option value="Graduate Student">Graduate Student</option>
-                    <option value="Post Doctorate">Post Doctorate</option>
-                    <option value="Faculty">Faculty</option>
-                  </select>
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group" ng-if="copiedUser.role !== 'participant'" show-errors>
+                  <div id="postion" class="form-group">
+                    <label for="position">Position</label>
+                    <select name="position" class="form-control" ng-model="copiedUser.position" required>
+                      <option value="Undergraduate Student">Undergraduate Student</option>
+                      <option value="Research Assistant">Research Assistant</option>
+                      <option value="Graduate Student">Graduate Student</option>
+                      <option value="Post Doctorate">Post Doctorate</option>
+                      <option value="Faculty">Faculty</option>
+                    </select>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          <div class="form-group no-margin">
-            <button type="submit" class="btn btn-primary full-width no-margin small-top-margin">Update Profile</button>
-          </div>
-          <div ng-show="success" class="text-center text-success small-top-pad">
-            <strong>Profile Saved Successfully</strong>
-          </div>
-          <div ng-show="error" class="text-center text-danger small-top-pad">
-            <strong ng-bind="error"></strong>
-          </div>
+            <div class="form-group no-margin">
+              <button type="submit" class="btn btn-primary full-width no-margin small-top-margin">Update Profile</button>
+            </div>
+            <div ng-show="success" class="text-center text-success small-top-pad">
+              <strong>Profile Saved Successfully</strong>
+            </div>
+            <div ng-show="error" class="text-center text-danger small-top-pad">
+              <strong ng-bind="error"></strong>
+            </div>
+            <div class="text-center forgot-password" style='margin-top: 15px'>
+              <a ui-sref="reset-password-known">Reset Password</a>
+            </div>
           </fieldset>
         </form>
       </div>

@@ -23,7 +23,8 @@ exports.getProfile = function(req, res) {
         birthday: user.birthday,
         address: user.address,
         position: user.position,
-        _id: user._id
+        _id: user._id,
+        role: user.role
       };
 
       res.json(minimalUser);

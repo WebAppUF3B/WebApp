@@ -21,4 +21,8 @@ module.exports = function(app) {
   app.route('/api/profile/')
   .get(users.getProfile)
   .put(users.update);
+  
+  app.route('/api/password/forgot/:email').post(users.forgotPassword);
+  app.route('/api/password/reset').post(users.resetPassword);
+  app.route('/api/password/change').post(users.resetPasswordKnown);
 };

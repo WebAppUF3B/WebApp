@@ -1,13 +1,24 @@
 'use strict';
 
-angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams',
-  function($scope, $http, NgTableParams) {
+angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams', 'Authentication',
+  function($scope, $http, NgTableParams, Authentication) {
 
     let alreadyClicked = false;
 
+    $scope.user = Authentication.user;
+    console.log('tw user', $scope.user);
+
+    $scope.authToken = Authentication.authToken;
+    console.log('tw auth token', $scope.authToken);
+
+    $scope.header = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': $scope.authToken
+      }
+    };
     const init = () => {
-      $('section.ng-scope').css('margin-top', '0px');
-      $('section.ng-scope').css('margin-bottom', '0px');
+
 
       $scope.admin.getWaitingUsers()
         .then((results) => {
@@ -47,8 +58,8 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
       if (!alreadyClicked) {
         $scope.error = '';
         alreadyClicked = true;
-        console.log('Approved!');
-        $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id)
+//        console.log('Approved!');
+        $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, $scope.header)
           .then(() => {
             // Reinitialize table
             init();
@@ -67,8 +78,8 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
       if (!alreadyClicked) {
         $scope.error = '';
         alreadyClicked = true;
-        console.log('DENIED!');
-        $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id)
+//        console.log('DENIED!');
+        $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, $scope.header)
           .then(() => {
             // Reinitialize table
             init();
@@ -86,7 +97,7 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     // Declare methods that can be used to access administrative data
     $scope.admin = {
       getWaitingUsers: function() {
-        return $http.get(window.location.origin + '/api/admin/approval')
+        return $http.get(window.location.origin + '/api/admin/approval', $scope.header)
           .then((results) => {
             return results;
           })
