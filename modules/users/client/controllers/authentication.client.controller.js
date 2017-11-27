@@ -52,6 +52,7 @@ angular.module('users').controller('AuthenticationController', ['$scope', '$stat
     $scope.facultySignup = function(isValid) {
       $scope.error = null;
       $scope.credentials.birthday = $('#birthday').val();
+      $scope.credentials.position = 'Faculty';
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
