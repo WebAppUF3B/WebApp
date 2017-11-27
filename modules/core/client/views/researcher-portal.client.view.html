@@ -156,6 +156,9 @@
           <div class="row">
             <div class="col-sm-12">
               <p class="mini-title">Compensation Types Offered:</p>
+              <p ng-if="currentStudy.compensationType.length == 0">
+                None
+              </p>
               <p ng-if="currentStudy.compensationType.length == 1 && currentStudy.compensationType[0] == 'extraCredit'">
                 Extra Credit
               </p>

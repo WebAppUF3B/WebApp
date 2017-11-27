@@ -81,11 +81,13 @@ const adminPermissions = {
 
   ],
   PUT: [
-
+    /^\/api\/admin\/approval\/\w*$/,
+    /^\/api\/admin\/editUser\/\w*$/
   ],
   POST: [
   ],
   DELETE: [
+    /^\/api\/admin\/approval\/\w*$/
   ]
 };
 

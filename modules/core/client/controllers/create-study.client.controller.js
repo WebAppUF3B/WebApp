@@ -72,19 +72,34 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
 
     $scope.create = function(isValid) {
       $scope.error = null;
+      $('.needs-validation').removeClass('highlight-error');
+
+      if (!isValid) {
+        $scope.$broadcast('show-errors-check-validity', 'studyForm');
+        $scope.error = 'Please fill in all required fields.';
+        return false;
+      }
+
       $scope.currentStudy.researchers = [];
       $scope.currentStudy.researchers.push({ 'userID': $scope.user._id });
 
-      if (!isValid) {
-        $scope.$broadcast('show-errors-check-validity', 'userForm');
-        alert('Invalid JSON');
-        return false;
+      $scope.currentStudy.compensationType = [];
+      if ($scope.compensatemodel.length !== 0) {
+        if ($scope.compensatemodel.length === 2) {
+          $scope.currentStudy.compensationType.push('extraCredit');
+          $scope.currentStudy.compensationType.push('monetary');
+        } else {
+          if ($scope.compensatemodel[0].id === 1) {
+            $scope.currentStudy.compensationType.push('extraCredit');
+          } else {
+            $scope.currentStudy.compensationType.push('monetary');
+          }
+        }
       }
 
       $http.post('/api/studies/', $scope.currentStudy, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
-        console.log(response._id);
         $state.go('studies.availability', { 'studyId': response._id });
       }).error((response) => {
         $scope.error = response.message;
@@ -99,7 +114,25 @@ angular.module('core').controller('StudyController', ['$scope', '$rootScope', '$
         return false;
       }
 
-      console.log($scope.currentStudy);
+      $scope.currentStudy.researchers = [];
+      $scope.currentStudy.researchers.push({ 'userID': $scope.user._id });
+      for (let x = 0; x<$scope.researchermodel.length; x++) {
+        $scope.currentStudy.researchers.push({ 'userID': $scope.researchermodel[x].id });
+      }
+
+      $scope.currentStudy.compensationType = [];
+      if ($scope.compensatemodel.length !== 0) {
+        if ($scope.compensatemodel.length === 2) {
+          $scope.currentStudy.compensationType.push('extraCredit');
+          $scope.currentStudy.compensationType.push('monetary');
+        } else {
+          if ($scope.compensatemodel[0].id === 1) {
+            $scope.currentStudy.compensationType.push('extraCredit');
+          } else {
+            $scope.currentStudy.compensationType.push('monetary');
+          }
+        }
+      }
 
       $http.put('/api/studies/'+$scope.pass, $scope.currentStudy, $scope.header).success((response) => {
         console.log('Did the put, here is the return');
