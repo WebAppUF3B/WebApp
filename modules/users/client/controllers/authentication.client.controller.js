@@ -1,12 +1,6 @@
 'use strict';
-angular.module('users.signup', ['ui.bootstrap']).config(['$uibTooltipProvider',
-function($uibTooltipProvider) {
-  $uibTooltipProvider.options({
-    trigger: 'focus'
-  });
-}]);
 
-angular.module('users.signup').controller('AuthenticationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator',
+angular.module('users').controller('AuthenticationController', ['$scope', '$state', '$http', '$location', '$window', 'Authentication', 'PasswordValidator',
   function($scope, $state, $http, $location, $window, Authentication, PasswordValidator) {
     $scope.authentication = Authentication;
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
@@ -58,7 +52,6 @@ angular.module('users.signup').controller('AuthenticationController', ['$scope',
     $scope.facultySignup = function(isValid) {
       $scope.error = null;
       $scope.credentials.birthday = $('#birthday').val();
-      $scope.credentials.position = 'Faculty';
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');

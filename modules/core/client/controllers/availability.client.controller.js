@@ -19,25 +19,33 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       $scope.error = null;
       $scope.type = 'individual';
 
-      //Initialize the calendar with fake date
-      $scope.selectedDates = [0];
-      $scope.options = {
-        startingDay: 1,
-        minDate: new Date(),
-        customClass: function(data) {
-          if ($scope.selectedDates.indexOf(data.date.setHours(0, 0, 0, 0)) > -1) {
-            return 'selected';
-          }
-          console.log('Running');
-          return '';
-        }
-      };
-
       if ($state.current.name === 'studies.availability-edit') {
         $scope.state = 'edit';
+        if ($stateParams.avail !== null) {
+          localStorage.setItem('avail', JSON.stringify($stateParams.avail));
+          $scope.tempAvailability = $stateParams.avail;
+        } else {
+          console.log('Getting avail from Persistance');
+          console.log(JSON.parse(localStorage.getItem('avail')));
+          $scope.tempAvailability = JSON.parse(localStorage.getItem('avail'));
+        }
+        if ($stateParams.durate !== null) {
+          localStorage.setItem('durate', $stateParams.durate);
+          $scope.currentStudy.duration = $stateParams.durate;
+        } else {
+          console.log('Getting durate from Persistance');
+          console.log(localStorage.getItem('durate'));
+          $scope.currentStudy.duration = localStorage.getItem('durate');
+        }
+        alert('Edit Detected');
+        console.log('tempAvailability got');
+        console.log($scope.tempAvailability);
+        console.log('Durate got');
+        console.log($scope.currentStudy.duration);
       }
       $scope.getStudy($scope.studyId)
       .then((results) => {
+        console.log(results);
         $scope.currentStudy.title = results.data.title;
         $scope.currentStudy.location = results.data.location;
         $scope.currentStudy.irb = results.data.irb;
@@ -50,29 +58,41 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         $scope.currentStudy.researchers = results.data.researchers;
         $scope.currentStudy.requireApproval = results.data.requireApproval;
         $scope.currentStudy.availability = [];
-        $scope.tempAvailability = results.data.availability;
-        $scope.currentStudy.compensationAmount = results.data.compensationAmount;
+        console.log('From http.get request - availability was left blank on purpose');
         console.log($scope.currentStudy);
         $scope.prepStartTime();
 
-        // Prepare data for calendar
-        if ($scope.state === 'edit') {
-          $scope.putInDate = [];
-          $scope.interpretCurrentAvailability();
-          $scope.selectedDates = $scope.putInDate; //able to manipulated via external array first.
-        } else {
-          $scope.selectedDates = [new Date().setHours(0,0,0,0)];
-        }
-        $scope.activeDate = $scope.selectedDates[0];
-        $scope.activeDate = null;
       })
       .catch((err) => {
         console.log(err);
       });
+
+      $scope.activeDate = null;
+      if ($scope.state === 'edit') {
+        $scope.putInDate = [];
+        $scope.interpretCurrentAvailability();
+        console.log('Finished Interpret of Passed Param');
+        console.log($scope.putInDate);
+        console.log($scope.availability);
+        $scope.selectedDates = $scope.putInDate; //able to manipulated via external array first.
+        console.log('edit date');
+      } else {
+        $scope.selectedDates = [new Date().setHours(0,0,0,0)];
+        console.log('non-edit date');
+      }
+      $scope.options = {
+        startingDay: 1,
+        minDate: new Date(),
+        customClass: function(data) {
+          if ($scope.selectedDates.indexOf(data.date.setHours(0, 0, 0, 0)) > -1) {
+            return 'selected';
+          }
+          return '';
+        }
+      };
     };
 
     $scope.removeFromSelected = function(dt) {
-      console.log('Removing: ' + dt);
       $scope.selectedDates.splice($scope.selectedDates.indexOf(dt), 1);
       /// Need to change activeDate for datepicker to call customClass again
       $scope.activeDate = dt;
@@ -85,75 +105,51 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
     };
 
     $scope.sendAvailability = function() {
-
-      for (let x = 0; x<$scope.availability.length; x++) {
-        for (let y = 0; y<$scope.availability.length; y++) {
-          if (x === y) {
-            continue;
-          } else {
-            if ($scope.availability[x].unixDate === $scope.availability[y].unixDate) {
-              const startTimexsplit = $scope.availability[x].startTime;
-              const endTimexsplit = $scope.availability[x].endTime;
-              const startTimeysplit = $scope.availability[y].startTime;
-              const endTimeysplit = $scope.availability[y].endTime;
-              const startTimex = parseFloat(startTimexsplit.substring(0,startTimexsplit.indexOf(':'))+'.'+startTimexsplit.substring(startTimexsplit.indexOf(':')));
-              const endTimex = parseFloat(endTimexsplit.substring(0,endTimexsplit.indexOf(':'))+'.'+endTimexsplit.substring(endTimexsplit.indexOf(':')));
-              const startTimey = parseFloat(startTimeysplit.substring(0,startTimeysplit.indexOf(':'))+'.'+startTimeysplit.substring(startTimeysplit.indexOf(':')));
-              const endTimey = parseFloat(endTimeysplit.substring(0,endTimeysplit.indexOf(':'))+'.'+endTimeysplit.substring(endTimeysplit.indexOf(':')));
-              if ((startTimex>startTimey && startTimex<endTimey) || (endTimex>startTimey && endTimex<endTimey)) {
-                alert('Overlapping Times Detected, Please Check Times');
-                return;
-              }
-            }
-          }
-        }
+      console.log('PV', 'Time Duration: '+$scope.currentStudy.duration);
+      console.log($scope.availability);
+      for (let x = 0; x<$scope.currentStudy.availability.length; x++) {
+        console.log('Timeslot: '+x+' '+$scope.currentStudy.availability[x]);
       }
 
       for (let x = 0; x < $scope.availability.length; x++) {
-        if ($scope.availability[x].startTime === null || $scope.availability[x].endTime === null) {
-          continue;
-        } else {
-          const convertedUnix = new Date($scope.availability[x].unixDate);
-          const startTimeArray = $scope.availability[x].startTime.split(':');
-          const endTimeArray = $scope.availability[x].endTime.split(':');
+        const convertedUnix = new Date($scope.availability[x].unixDate);
 
-          $scope.currentStudy.availability.push({
-            startTime: new Date(
-              convertedUnix.getFullYear(),
-              convertedUnix.getMonth(),
-              convertedUnix.getDate(),
-              startTimeArray[0],
-              startTimeArray[1]
-            ),
-            endTime: new Date(
-              convertedUnix.getFullYear(),
-              convertedUnix.getMonth(),
-              convertedUnix.getDate(),
-              endTimeArray[0],
-              endTimeArray[1]
-            )
-          });
-        }
+        $scope.currentStudy.availability.push({
+          startTime: new Date(
+            convertedUnix.getFullYear(),
+            convertedUnix.getMonth(),
+            convertedUnix.getDate(),
+            $scope.availability[x].startTime.getHours(),
+            $scope.availability[x].startTime.getMinutes()
+          ),
+          endTime: new Date(
+            convertedUnix.getFullYear(),
+            convertedUnix.getMonth(),
+            convertedUnix.getDate(),
+            $scope.availability[x].endTime.getHours(),
+            $scope.availability[x].endTime.getMinutes()
+          )
+        });
       }
 
-      console.log('Submitting here we go:');
+      console.log('Print out Current Study in sendAvailability');
       console.log($scope.currentStudy);
+
 
       $scope.error = null;
       $http.put('/api/studies/'+$scope.studyId, $scope.currentStudy, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
+        console.log(response);
         $state.go('researcher-portal');
       }).error((response) => {
         $scope.error = response.message;
+        alert(response.message);
       });
 
     };
 
     $scope.addEntry = function(date) {
-      //multipicker saves dates in unix milliseconds
-      const convertDateToDate = new Date (date);
-
       $scope.availability.push({
         startTime: null,
         endTime: null,
@@ -173,12 +169,14 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
     };
 
     $scope.prepStartTime = function() {
+      console.log('PrepTime $scope.availability');
+      console.log($scope.availability);
       if ($scope.currentStudy.duration === 15) {
         for (let hour = 0; hour <= 23; hour++) {
           for (let minute = 0; minute <= 3; minute++) {
             const unix = new Date().setHours(hour,minute*15,0,0);
             const date = new Date(unix);
-            const obj = { val: date.getHours() + ':' + date.getMinutes(), show: moment(unix).format('hh:mm A') };
+            const obj = { val: date, show: moment(unix).format('hh:mm A') };
             $scope.startTime.push(obj);
           }
         }
@@ -188,7 +186,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
           for (let minute = 0; minute <= 1; minute++) {
             const unix = new Date().setHours(hour,minute*30,0,0);
             const date = new Date(unix);
-            const obj = { val: date.getHours() + ':' + date.getMinutes(), show: moment(unix).format('hh:mm A') };
+            const obj = { val: date, show: moment(unix).format('hh:mm A') };
             $scope.startTime.push(obj);
           }
         }
@@ -197,28 +195,23 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         for (let hour = 0; hour <= 23; hour++) {
           const unix = new Date().setHours(hour,0,0,0);
           const date = new Date(unix);
-          const obj = { val: date.getHours() + ':' + date.getMinutes(), show: moment(unix).format('hh:mm A') };
+          const obj = { val: date, show: moment(unix).format('hh:mm A') };
           $scope.startTime.push(obj);
         }
       }
+      console.log('PrepTime $scope.startTime');
+      console.log($scope.startTime);
     };
 
     $scope.prepEndTime = function(possibility) {
-      let startDate = new Date(possibility.unixDate);
-      const startTimeArray = possibility.startTime.split(':');
-      startDate = new Date(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDate(),
-        startTimeArray[0],
-        startTimeArray[1]
-      );
-
+      const startDate = possibility.startTime;
       //resets ALL EndTime fields...
       possibility.endTimeList = [];
+      console.log('Here is startDate: '+startDate);
       let nextTime = startDate;
       const endOfDayUnix = new Date(startDate).setHours(23,59);
       const endOfDay = new Date(endOfDayUnix);
+      console.log('End of Day: ' +endOfDay);
       let addMinutes = 30;
       if ($scope.currentStudy.duration === 15 || $scope.currentStudy.duration === '15') {
         addMinutes = 15;
@@ -229,62 +222,22 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
       if ($scope.currentStudy.duration === 60 || $scope.currentStudy.duration === '30') {
         addMinutes = 60;
       }
+      console.log('Duration: '+addMinutes);
+      console.log('nextTime?: '+moment(nextTime).add(addMinutes,'m').toDate());
 
       while (moment(nextTime).add(addMinutes,'m').toDate() <= endOfDay) {
         nextTime = moment(nextTime).add(addMinutes,'m').toDate();
         const nextTimeUnix = nextTime.getTime();
-        const obj = { val: nextTime.getHours() + ':' + nextTime.getMinutes(), show: moment(nextTimeUnix).format('hh:mm A') };
+        const obj = { val: nextTime, show: moment(nextTimeUnix).format('hh:mm A') };
         possibility.endTimeList.push(obj);
       }
-      nextTime = moment(nextTime).add(addMinutes-1,'m').toDate();
-      const lastTimeUnix = nextTime.getTime();
-      const lastObj = { val: nextTime.getHours() + ':' + nextTime.getMinutes(), show: moment(lastTimeUnix).format('hh:mm A') };
-      possibility.endTimeList.push(lastObj);
-    };
-
-    $scope.copyToTemp = function(date) {
-      $scope.copyTemp = [];
-      console.log('copyExist to date:');
-      console.log(date);
-
-      for (let x = 0; x<$scope.availability.length; x++) {
-        if (date === $scope.availability[x].unixDate) {
-          $scope.copyTemp.push({
-            copyStart: $scope.availability[x].startTime,
-            copyEnd: $scope.availability[x].endTime
-          });
-        }
-      }
-
-      console.log('finished populating copyExist');
-      console.log($scope.copyTemp);
-    };
-
-    $scope.pasteToDay = function(date) {
-
-      for (let x = 0; x<$scope.availability.length; x++) {
-        if ($scope.availability[x].unixDate === date) {
-          $scope.availability.splice(x,1);
-        }
-      }
-
-      console.log('copyExist to date:');
-      console.log(date);
-
-      for (let x = 0; x<$scope.copyTemp.length; x++) {
-        $scope.availability.push({
-          startTime: $scope.copyTemp[x].copyStart,
-          endTime: $scope.copyTemp[x].copyEnd,
-          unixDate: date
-        });
-        $scope.prepEndTime($scope.availability[$scope.availability.length-1]);
-      }
+      console.log('Here is finished endTime');
+      console.log(possibility.endTimeList);
     };
 
     $scope.removeEntry = function(date) {
       let index = -1;
-      //alert('Removing Entry from date: '+convertedDate);
-
+      console.log(date.$$hashKey);
       for (let x = 0; x < $scope.availability.length; x++) {
         if ($scope.availability[x].$$hashKey === date.$$hashKey) {
           index = x;
@@ -292,23 +245,25 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         }
       }
 
+      console.log('Index of entry with '+date.$$hashKey+' is '+index);
+
       $scope.availability.splice(index,1);
     };
 
     //populate what's needed to get existing data to show in edit
     $scope.interpretCurrentAvailability = function() {
       for (let x = 0; x < $scope.tempAvailability.length; x++) {
+        console.log((moment($scope.tempAvailability[x].startTime)._d));
+        console.log((moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0));
         const existingEntry = (moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0);
         //push to initialize existing dates in calendarconsole.log((moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0));
         if ($scope.putInDate.indexOf(existingEntry) === -1) {
           $scope.putInDate.push(existingEntry);
         }
-        const startDate = new Date($scope.tempAvailability[x].startTime);
-        const endDate = new Date($scope.tempAvailability[x].endTime);
         //push to initialize existing timeslots in $scope.availability
         $scope.availability.push({
-          startTime: startDate.getHours() + ':' + startDate.getMinutes(),
-          endTime: endDate.getHours() + ':' + endDate.getMinutes(),
+          startTime: new Date($scope.tempAvailability[x].startTime),
+          endTime: new Date($scope.tempAvailability[x].endTime),
           unixDate: existingEntry
         });
         $scope.prepEndTime($scope.availability[x]);

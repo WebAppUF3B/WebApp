@@ -1,7 +1,7 @@
 <div class="container inner-container" ng-controller="AuthenticationController">
   <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 mobile-no-pad pad-top">
     <div class="form-panel">
-      <form name="userForm" ng-submit="signin(userForm.$valid)" class="signin" novalidate autocomplete="on">
+      <form name="userForm" ng-submit="signin(userForm.$valid)" class="signin" novalidate autocomplete="off">
         <fieldset>
           <div class="row">
             <div class="col-sm-12">
@@ -32,7 +32,7 @@
             <strong ng-bind="error"></strong>
           </div>
           <div class="text-center forgot-password">
-            <a ui-sref="forgot-password">Forget your password?</a>
+            <a ui-sref="password.forgot">Forget your password?</a>
           </div>
         </fieldset>
       </form>

@@ -1,8 +1,10 @@
+<!-- TODO modify the role of the user to "researcher" in the controller and then set "adminApproved" field to false -->
 <div class="container inner-container" ng-controller="AuthenticationController">
   <h1 class="text-center pad-top"><strong>Create a Researcher Account</strong></h1>
-  <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 mobile-no-pad">
+  <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 moile-no-pad">
+    <!-- TODO replace the form fields below with what we have in balsamiq -->
     <div class="form-panel">
-      <form name="userForm" ng-submit="researcherSignup(userForm.$valid)" class="signin" novalidate autocomplete="on">
+      <form name="userForm" ng-submit="researcherSignup(userForm.$valid)" class="signin" novalidate autocomplete="off">
         <fieldset>
           <div class="row">
             <div class="col-sm-6">
@@ -80,7 +82,7 @@
             <div class="col-sm-12">
               <div class="form-group" show-errors>
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" ng-model="credentials.password" placeholder="Password" uib-popover="{{popoverMsg}}" password-validator required>
+                <input type="password" id="password" name="password" class="form-control" ng-model="credentials.password" placeholder="Password" popover="{{popoverMsg}}" popover-trigger="focus" password-validator required>
               </div>
             </div>
           </div>

@@ -3,11 +3,16 @@
 /**
  * Module dependencies.
  */
-const passport = require('passport');
-const users = require('../controllers/users.server.controller');
+var passport = require('passport');
 
-// User Routes
-module.exports = function(app) {
+module.exports = function (app) {
+  // User Routes
+  var users = require('../controllers/users.server.controller');
+
+  // Setting up the users password api
+  app.route('/api/auth/forgot').post(users.forgot);
+  app.route('/api/auth/reset/:token').get(users.validateResetToken);
+  app.route('/api/auth/reset/:token').post(users.reset);
 
   // Setting up the users authentication api
   app.route('/api/auth/signup').post(users.signup);
@@ -18,11 +23,4 @@ module.exports = function(app) {
 
   app.route('/api/auth/verify/:id').post(users.verify);
 
-  app.route('/api/profile/')
-  .get(users.getProfile)
-  .put(users.update);
-  
-  app.route('/api/password/forgot/:email').post(users.forgotPassword);
-  app.route('/api/password/reset').post(users.resetPassword);
-  app.route('/api/password/change').post(users.resetPasswordKnown);
 };

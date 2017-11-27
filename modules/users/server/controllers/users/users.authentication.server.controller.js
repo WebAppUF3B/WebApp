@@ -10,8 +10,7 @@ const path = require('path'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
   jwt = require('jsonwebtoken'),
-  utils = require('../../../../utils/server/stringUtils'),
-  authUtils = require('../../../../utils/server/authUtils');
+  utils = require('../../../../utils/server/stringUtils');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
@@ -158,8 +157,6 @@ exports.signin = function(req, res, next) {
         lastName: user.lastName,
         gender: user.gender,
         birthday: user.birthday,
-        address: user.address,
-        position: user.position,
         email: user.email,
         role: user.role,
         _id: user._id,
@@ -221,6 +218,7 @@ exports.verify = function(req, res) {
       thisUser = user;
       if (thisUser === null) throw noUserErr;
       if (thisUser.emailValidated) throw alreadyVerifiedErr;
+      console.log("NOOOO");
       thisUser.emailValidated = true;
       return user.save();
     })
@@ -258,101 +256,159 @@ exports.verify = function(req, res) {
     });
 };
 
-exports.forgotPassword = function(req, res) {
-  const theemail = req.params.email;
-  const token = authUtils.generateResetPasswordToken(theemail);
-  console.log(theemail);
-  User.findOne({ email: theemail }, '-salt -password')
-    .exec()
-    .then((results) => {
-      const theuser = results;
-      const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/reset-password/${token}`; //this will be a password reset link
-      const verificationText = `Hello ${theuser.firstName} ${theuser.lastName},
-                                \nYou have requested a password reset. If this was not you, please ignore this email.
-                                \nPlease reset a password by clicking this link: ${verificationUri}`; //pass a json web token through the url as part of auth
-
-      //established modemailer email transporter object to send email with mailOptions populating mail with link
-      const transporter = nodemailer.createTransport({
-        service: 'Gmail',
-        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
-      });
-      const mailOptions = {
-        from: 'no.replyhccresearch@gmail.com',
-        to: theuser.email,
-        subject: 'HCC Research Pool Password Reset',
-        text: verificationText
-      };
-      return transporter.sendMail(mailOptions);
-    })
-    .then(() => {
-      return res.status(200).send();
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(200).send();
-    });
+/**
+ * OAuth provider call
+ */
+exports.oauthCall = function(strategy, scope) {
+  return function(req, res, next) {
+    // Set redirection path on session.
+    // Do not redirect to a signin or signup page
+    if (noReturnUrls.indexOf(req.query.redirectTo) === -1) {
+      req.session.redirectTo = req.query.redirectTo;
+    }
+    // Authenticate
+    passport.authenticate(strategy, scope)(req, res, next);
+  };
 };
 
-exports.resetPassword = function(req, res) {
-  const newPassword = req.body.confirmNewPassword;
-  const token = req.body.token;
-  const fromToken = authUtils.parseResetPasswordToken(token);
-  console.log('TOKEN: ' + fromToken);
-  User.find({ email: fromToken }, '-salt -password')
-    .then((results) => {
-      const thisUser = results[0];
-      thisUser.password = newPassword;
-      return thisUser.save();
-    })
-    .then(() => {
-      res.status(200).send();
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(400).send();
-    });
-};
+/**
+ * OAuth callback
+ */
+exports.oauthCallback = function(strategy) {
+  return function(req, res, next) {
+    // Pop redirect URL from session
+    const sessionRedirectURL = req.session.redirectTo;
+    delete req.session.redirectTo;
 
-exports.resetPasswordKnown = function(req, res) {
-  const oldPassword = req.body.password;
-  const newPassword = req.body.confirmNewPassword;
-  const userID = req.body.userId;
-  User.findById(userID)
-    .then((results) => {
-      const thisUser = results;
-      const doesItMatch = thisUser.authenticate(oldPassword);
-      if (doesItMatch) {
-        thisUser.password = newPassword;
-        return thisUser.save();
+    passport.authenticate(strategy, (err, user, redirectURL) => {
+      if (err) {
+        return res.redirect('/authentication/signin?err=' + encodeURIComponent(errorHandler.getErrorMessage(err)));
       }
-      res.status(400).send('Your Current Password is incorrect');
-    })
-    .then(() => {
-      res.status(200).send();
-    })
-    .catch((err) => {
-      console.log(err);
-      res.status(400).send();
-    });
+      if (!user) {
+        return res.redirect('/authentication/signin');
+      }
+      req.login(user, (err) => {
+        if (err) {
+          return res.redirect('/authentication/signin');
+        }
+
+        return res.redirect(redirectURL || sessionRedirectURL || '/');
+      });
+    })(req, res, next);
+  };
 };
 
-exports.parseToken = function(req, res, next, id) {
-  const token = id;
-  const object = authUtils.pareseResetPasswordToken(token);
+/**
+ * Helper function to save or update a OAuth user profile
+ */
+exports.saveOAuthUserProfile = function(req, providerUserProfile, done) {
+  if (!req.user) {
+    // Define a search query fields
+    const searchMainProviderIdentifierField = 'providerData.' + providerUserProfile.providerIdentifierField;
+    const searchAdditionalProviderIdentifierField = 'additionalProvidersData.' + providerUserProfile.provider + '.' + providerUserProfile.providerIdentifierField;
 
-  // Parse user ID from token
-  const userID = object.userID;
+    // Define main provider search query
+    const mainProviderSearchQuery = {};
+    mainProviderSearchQuery.provider = providerUserProfile.provider;
+    mainProviderSearchQuery[searchMainProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
 
-  // Retrieve that session
-  User.findById(userID)
-    .exec()
-    .then((results) => {
-      console.log(userID);
+    // Define additional provider search query
+    const additionalProviderSearchQuery = {};
+    additionalProviderSearchQuery[searchAdditionalProviderIdentifierField] = providerUserProfile.providerData[providerUserProfile.providerIdentifierField];
 
-      // Proceed to delete function
-      next();
-    })
-    .catch((err) => {
-      res.status(400).send(err);
+    // Define a search query to find existing user with current provider profile
+    const searchQuery = {
+      $or: [mainProviderSearchQuery, additionalProviderSearchQuery]
+    };
+
+    User.findOne(searchQuery, (err, user) => {
+      if (err) {
+        return done(err);
+      }
+      if (!user) {
+        const possibleUsername = providerUserProfile.username || ((providerUserProfile.email) ? providerUserProfile.email.split('@')[0] : '');
+
+        User.findUniqueUsername(possibleUsername, null, (availableUsername) => {
+          user = new User({
+            firstName: providerUserProfile.firstName,
+            lastName: providerUserProfile.lastName,
+            username: availableUsername,
+            displayName: providerUserProfile.displayName,
+            email: providerUserProfile.email,
+            profileImageURL: providerUserProfile.profileImageURL,
+            provider: providerUserProfile.provider,
+            providerData: providerUserProfile.providerData
+          });
+
+          // And save the user
+          user.save((err) => {
+            return done(err, user);
+          });
+        });
+      } else {
+        return done(err, user);
+      }
     });
+  } else {
+    // User is already logged in, join the provider data to the existing user
+    const user = req.user;
+
+    // Check if user exists, is not signed in using this provider, and doesn't have that provider data already configured
+    if (user.provider !== providerUserProfile.provider && (!user.additionalProvidersData || !user.additionalProvidersData[providerUserProfile.provider])) {
+      // Add the provider data to the additional provider data field
+      if (!user.additionalProvidersData) {
+        user.additionalProvidersData = {};
+      }
+
+      user.additionalProvidersData[providerUserProfile.provider] = providerUserProfile.providerData;
+
+      // Then tell mongoose that we've updated the additionalProvidersData field
+      user.markModified('additionalProvidersData');
+
+      // And save the user
+      user.save((err) => {
+        return done(err, user, '/settings/accounts');
+      });
+    } else {
+      return done(new Error('User is already connected using this provider'), user);
+    }
+  }
+};
+
+/**
+ * Remove OAuth provider
+ */
+exports.removeOAuthProvider = function(req, res, next) {
+  const user = req.user;
+  const provider = req.query.provider;
+
+  if (!user) {
+    return res.status(401).json({
+      message: 'User is not authenticated'
+    });
+  } else if (!provider) {
+    return res.status(400).send();
+  }
+
+  // Delete the additional provider
+  if (user.additionalProvidersData[provider]) {
+    delete user.additionalProvidersData[provider];
+
+    // Then tell mongoose that we've updated the additionalProvidersData field
+    user.markModified('additionalProvidersData');
+  }
+
+  user.save((err) => {
+    if (err) {
+      return res.status(400).send({
+        message: errorHandler.getErrorMessage(err)
+      });
+    }
+    req.login(user, (err) => {
+      if (err) {
+        return res.status(400).send(err);
+      }
+      return res.json(user);
+    });
+  });
 };

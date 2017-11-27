@@ -1,4 +1,3 @@
-/*~*/
 'use strict';
 
 // Setting up route
@@ -58,7 +57,9 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/edit/availability/:studyId',
       templateUrl: 'modules/core/client/views/availability.client.view.html',
       params: {
-        studyId: null
+        studyId: null,
+        avail: null,
+        durate: null
       }
     })
     .state('studies.data', {
@@ -76,26 +77,6 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
     .state('manage-users', {
       url: '/admin/manage-users',
       templateUrl: 'modules/core/client/views/manage-users.client.view.html'
-    })
-    .state('edit-user', {
-      url: '/admin/manage-users/edit/:userId',
-      templateUrl: 'modules/core/client/views/edit-user.client.view.html'
-    })
-    .state('create-user', {
-      url: '/admin/manage-users/create',
-      templateUrl: 'modules/core/client/views/edit-user.client.view.html'
-    })
-    .state('reset-password', {
-      url: '/reset-password/:token',
-      templateUrl: 'modules/core/client/views/reset-password.client.view.html'
-    })
-    .state('forgot-password', {
-      url: '/forgot-password',
-      templateUrl: 'modules/core/client/views/forgot-password.client.view.html'
-    })
-    .state('reset-password-known', { //reset password if you know your current one
-      url: '/reset-password',
-      templateUrl: 'modules/core/client/views/reset-password-known.client.view.html'
     })
     .state('cancel', {
       url: '/cancel/:token',

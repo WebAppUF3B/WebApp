@@ -2,17 +2,17 @@
 const hostRoutes = [
   /^\/api\/sessions\/emailReminders$/,
   /^\/api\/sessions\/cancel\/.*$/
-  // /^\api\/password\/forgot\/.*$/,
-  // /^\api\/password\/reset$/
 ];
 
 const secureCommonRoutes = [
-  '/api/profile',
+  '/settings',
+  '/profile',
+  '/accounts',
+  '/picture',
   '/api/studies',
   '/api/studySessions',
   '/api/courses',
-  '/api/sessions',
-  '/api/admin'
+  '/api/sessions'
 ];
 
 // https://regex101.com/
@@ -22,11 +22,10 @@ const participantPermissions = {
     /^\/api\/studySessions\/signup\/\w*\/\w*$/,
     /^\/api\/courses\/$/,
     /^\/api\/studies\/$/,
-    /^\/api\/profile\/$/,
     /^\/api\/studies\/discover$/
   ],
   PUT: [
-    /^\/api\/profile\/$/
+
   ],
   POST: [
     /^\/api\/studySession\/signup$/
@@ -42,7 +41,6 @@ const researcherPermissions = {
     /^\/api\/studies\/\w*$/,
     /^\/api\/sessions\/user\/\w*$/,
     /^\/api\/studies\/user\/\w*$/,
-    /^\/api\/studies\/research\/\w*$/,
     /^\/api\/studySessions\/\w*$/,
   ],
   PUT: [
@@ -80,22 +78,18 @@ const facultyPermissions = {
 };
 const adminPermissions = {
   GET: [
-    /^\/api\/admin\/approval$/,
-    /^\/api\/admin\/getAllUsers$/,
-    /^\/api\/admin\/editUser\/\w*$/
+
   ],
   PUT: [
     /^\/api\/admin\/approval\/\w*$/,
     /^\/api\/admin\/editUser\/\w*$/
   ],
   POST: [
-    /^\/api\/admin\/createUser$/
   ],
   DELETE: [
     /^\/api\/admin\/approval\/\w*$/
   ]
 };
-
 
 const participant = {
   permissions: [participantPermissions]
