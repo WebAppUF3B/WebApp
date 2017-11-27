@@ -159,6 +159,8 @@ exports.signin = function(req, res, next) {
         lastName: user.lastName,
         gender: user.gender,
         birthday: user.birthday,
+        address: user.address,
+        position: user.position,
         email: user.email,
         role: user.role,
         _id: user._id,

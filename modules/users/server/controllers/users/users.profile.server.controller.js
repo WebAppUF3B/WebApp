@@ -12,6 +12,27 @@ var _ = require('lodash'),
   config = require(path.resolve('./config/config')),
   User = mongoose.model('User');
 
+// Get profile info
+exports.getProfile = function(req, res) {
+  User.findById(req.decodedUser._id, '-salt -password')
+    .then((user) => {
+      const minimalUser = {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        gender: user.gender,
+        birthday: user.birthday,
+        address: user.address,
+        position: user.position,
+        _id: user._id
+      };
+
+      res.json(minimalUser);
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
+};
+
 /**
  * Update user details
  */
@@ -60,6 +81,7 @@ exports.update = function(req, res) {
         });
       })
       .catch((err) => {
+        console.log('Err updating profile:', err);
         return res.status(400).send({
           message: 'Update failed. Please contact an admin'
         });

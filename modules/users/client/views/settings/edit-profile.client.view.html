@@ -73,7 +73,7 @@
           <div class="form-group no-margin">
             <button type="submit" class="btn btn-primary full-width no-margin small-top-margin">Update Profile</button>
           </div>
-          <div ng-show="success" class="text-center text-success">
+          <div ng-show="success" class="text-center text-success small-top-pad">
             <strong>Profile Saved Successfully</strong>
           </div>
           <div ng-show="error" class="text-center text-danger small-top-pad">
@@ -87,7 +87,7 @@
 </div>
 
 <script type="text/javascript">
-    var today = copiedUser.birthday;
+    var today = Date.now();
     $(function () {
         $('#birthday').datetimepicker({
           format: 'MM/DD/YYYY',
