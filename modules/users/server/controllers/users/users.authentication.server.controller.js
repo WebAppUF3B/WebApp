@@ -10,7 +10,8 @@ const path = require('path'),
   User = mongoose.model('User'),
   nodemailer = require('nodemailer'),
   jwt = require('jsonwebtoken'),
-  utils = require('../../../../utils/server/stringUtils');
+  utils = require('../../../../utils/server/stringUtils'),
+  authUtils = require('../../../../utils/server/authUtils');
 
 // URLs for which user can't be redirected on signin
 const noReturnUrls = [
@@ -74,7 +75,6 @@ exports.facultySignup = function(req, res) {
   faculty.adminApproved = false;
   faculty.save()
          .then((faculty) => {
-           console.log('tw', faculty);
            const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${faculty._id}`;
            const verificationText = `Hello ${faculty.firstName} ${faculty.lastName},
                                      \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
@@ -113,7 +113,6 @@ exports.researcherSignup = function(req, res) {
   researcher.adminApproved = false;
   researcher.save()
     .then((researcher) => {
-      console.log('tw', researcher);
       const verificationUri = `${process.env.PROTOCOL}${req.headers.host}/authentication/verify/${researcher._id}`;
       const verificationText = `Hello ${researcher.firstName} ${researcher.lastName},
                                      \n\nPlease verify your account by clicking the link:\n\n${verificationUri}\n`;
@@ -220,7 +219,6 @@ exports.verify = function(req, res) {
       thisUser = user;
       if (thisUser === null) throw noUserErr;
       if (thisUser.emailValidated) throw alreadyVerifiedErr;
-      console.log("NOOOO");
       thisUser.emailValidated = true;
       return user.save();
     })
@@ -271,6 +269,83 @@ exports.oauthCall = function(strategy, scope) {
     // Authenticate
     passport.authenticate(strategy, scope)(req, res, next);
   };
+};
+
+exports.forgotPassword = function(req, res) {
+  const theemail = req.params.email;
+  const token = authUtils.generateResetPasswordToken(theemail);
+  console.log(theemail);
+  User.find({ email: theemail }, '-salt -password')
+    .exec()
+    .then((results) => {
+      const theuser = results[0];
+      const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/reset-password/${token}`; //this will be a password reset link
+      const verificationText = `Hello ${theuser.firstName} ${theuser.lastName},
+                                \nYou have requested a password reset. If this was not you, please ignore this email.
+                                \nPlease reset a password by clicking this link: ${verificationUri}`; //pass a json web token through the url as part of auth
+
+      //established modemailer email transporter object to send email with mailOptions populating mail with link
+      const transporter = nodemailer.createTransport({
+        service: 'Gmail',
+        auth: { user: process.env.VERIFY_EMAIL_USER, pass: process.env.VERIFY_EMAIL_PASS }
+      });
+      const mailOptions = {
+        from: 'no.replyhccresearch@gmail.com',
+        to: theuser.email,
+        subject: 'HCC Research Pool Password Reset',
+        text: verificationText
+      };
+      return transporter.sendMail(mailOptions);
+    })
+    .then(() => {
+      return res.status(200).send();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(200).send();
+    });
+};
+exports.resetPassword = function(req, res) {
+  const newPassword = req.body.confirmNewPassword;
+  const token = req.body.token;
+  const fromToken = authUtils.parseResetPasswordToken(token);
+  console.log('TOKEN: ' + fromToken);
+  User.find({ email: fromToken }, '-salt -password')
+    .then((results) => {
+      const thisUser = results[0];
+      thisUser.password = newPassword;
+      return thisUser.save();
+    })
+    .then(() => {
+      res.status(200).send();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send();
+    });
+};
+
+exports.resetPasswordKnown = function(req, res) {
+  const oldPassword = req.body.password;
+  const newPassword = req.body.confirmNewPassword;
+  const userID = req.body.userId;
+  User.findById(userID)
+    .then((results) => {
+      const thisUser = results;
+      const doesItMatch = thisUser.authenticate(oldPassword);
+      if (doesItMatch) {
+        thisUser.password = newPassword;
+        return thisUser.save();
+      }
+      res.status(400).send('Your Current Password is incorrect');
+    })
+    .then(() => {
+      res.status(200).send();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send();
+    });
 };
 
 /**
@@ -413,4 +488,25 @@ exports.removeOAuthProvider = function(req, res, next) {
       return res.json(user);
     });
   });
+};
+
+exports.parseToken = function(req, res, next, id) {
+  const token = id;
+  const object = authUtils.pareseResetPasswordToken(token);
+
+  // Parse user ID from token
+  const userID = object.userID;
+
+  // Retrieve that session
+  User.findById(userID)
+    .exec()
+    .then((results) => {
+      console.log(userID);
+
+      // Proceed to delete function
+      next();
+    })
+    .catch((err) => {
+      res.status(400).send(err);
+    });
 };

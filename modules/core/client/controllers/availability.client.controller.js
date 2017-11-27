@@ -1,15 +1,8 @@
 angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController',
 ['$scope','$http', '$location', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $http, $location, $state, $stateParams, $document, Authentication) {
-
-    //$scope.copyExist = true;
-
     $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
-
     $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
-
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
@@ -303,12 +296,10 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
 
     //populate what's needed to get existing data to show in edit
     $scope.interpretCurrentAvailability = function() {
-      //alert('interpeting tempAvailability');
       for (let x = 0; x < $scope.tempAvailability.length; x++) {
         const existingEntry = (moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0);
         //push to initialize existing dates in calendarconsole.log((moment($scope.tempAvailability[x].startTime)._d).setHours(0,0,0,0));
         if ($scope.putInDate.indexOf(existingEntry) === -1) {
-          //alert('Adding'+existingEntry);
           $scope.putInDate.push(existingEntry);
         }
         const startDate = new Date($scope.tempAvailability[x].startTime);
