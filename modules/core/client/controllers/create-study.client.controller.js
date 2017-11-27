@@ -1,5 +1,12 @@
 'use strict';
-angular.module('core.study', ['angularjs-dropdown-multiselect']).controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
+angular.module('core.study', ['ui.bootstrap','angularjs-dropdown-multiselect']).config(['$uibTooltipProvider',
+function($uibTooltipProvider) {
+  $uibTooltipProvider.options({
+    trigger: 'focus'
+  });
+}]);
+
+angular.module('core.study').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
     /* Get all the listings, then bind it to the scope */
     $scope.currentStudy = {};

@@ -24,13 +24,13 @@
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="address">Location</label>
-                <input type="text" id="address" name="address" class="form-control" ng-model="currentStudy.location" uib-popover="If selected, participants must recieve your approval before participating in a study. (You can find the approval list in this study's data page)" placeholder="Room Number or Address" required>
+                <input type="text" id="address" name="address" class="form-control" ng-model="currentStudy.location" uib-popover="" placeholder="Room Number or Address" required>
               </div>
             </div>
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="requireApproval" class="full-width">Require Approval</label>
-                <input id="requireApproval" name="requireApproval" ng-model="currentStudy.requireApproval" type="checkbox">
+                <input id="requireApproval" name="requireApproval" ng-model="currentStudy.requireApproval" uib-popover="If selected, participants must recieve your approval before participating in a study. (You can find the approval list in this study's data page)" type="checkbox">
               </div>
             </div>
           </div>
@@ -80,7 +80,7 @@
             <div class="col-sm-6">
               <div class="form-group" show-errors>
                 <label for="satisfactory">Minimum Total Desired</label>
-                <input type="number" id="satisfactory" name="satisfactory" class="form-control" ng-model="currentStudy.satisfactoryNumber" placeholder="Minimum Participants Desired">
+                <input type="number" id="satisfactory" name="satisfactory" class="form-control" ng-model="currentStudy.satisfactoryNumber" uib-popover="(Optional) Indicates the minimum amount of participants to attend sessions to satisfy the study" placeholder="Minimum Participants Desired">
               </div>
             </div>
             <div class="col-sm-6">
