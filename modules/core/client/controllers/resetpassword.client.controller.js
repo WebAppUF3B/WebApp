@@ -22,7 +22,14 @@ process for forgot password
 */
 'use strict';
 
-angular.module('core').controller('ResetPasswordController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication', 'PasswordValidator',
+angular.module('users.password', ['ui.bootstrap']).config(['$uibTooltipProvider',
+function($uibTooltipProvider) {
+  $uibTooltipProvider.options({
+    trigger: 'focus'
+  });
+}]);
+
+angular.module('users.password').controller('ResetPasswordController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication', 'PasswordValidator',
   function($scope, $rootScope, NgTableParams, $http, $state, $stateParams, $document, Authentication, PasswordValidator) {
     /* Get all the listings, then bind it to the scope */
     $scope.popoverMsg = PasswordValidator.getPopoverMsg();
@@ -52,33 +59,50 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
       $scope.pass = $stateParams.email;
     };
 
-    $scope.submit = function(isValid) {
-      $scope.error = null;
-      console.log(isValid);
-      if ($scope.state === 'reset') {
-        console.log('reset');
-        console.log(isValid);
-        //$scope.update(isValid);
-      } else {
-        console.log('forgot');
-        console.log(isValid);
-        //$scope.create(isValid);
-      }
-    };
+
 
     $scope.resetPassword = function(isValid) {
       if (!isValid) {
+        alert('Make sure your passwords match');
         return;
       }
-      console.log($scope.credentials.confirmNewPassword);
       $scope.credentials.token = $stateParams.token;
       //$scope.credentials.confirmNewPassword
       return $http.post(window.location.origin + '/api/password/reset', $scope.credentials)
-      .then((results) => {
+      .then(() => {
         $state.go('authentication.signin');
       })
       .catch((err) => {
-        console.log('forgot ', err);
+        console.log(err);
+        return err;
+      });
+    };
+
+    $scope.resetPasswordKnown = function(isValid) {
+      $scope.error = null;
+
+      const password = $scope.userForm.newPassword.$viewValue;
+      const confirmNewPassword = $scope.userForm.confirmNewPassword.$viewValue;
+      if (!isValid) {
+        //alert('Make sure your passwords match');
+        $scope.error = 'Please fill in all fields';
+        return;
+      }
+      if (confirmNewPassword && password && confirmNewPassword !== password) {
+        $scope.error = 'Your new passwords don\'t match';
+        return;
+      }
+      if (!PasswordValidator.getResult(password).strong) {
+        $scope.error = 'Your new password doesn\'t meet the required constraints';
+      }
+      $scope.credentials.userId = $scope.user._id;
+      console.log($scope.credentials.userId);
+      return $http.post(window.location.origin + '/api/password/change', $scope.credentials)
+      .then(() => {
+        $state.go('authentication.signin');
+      })
+      .catch((err) => {
+        $scope.error = err.data;
         return err;
       });
     };
@@ -87,6 +111,7 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
     $scope.forgotPassword = function() {
       return $http.post(window.location.origin + '/api/password/forgot/' + $scope.credentials.email)//, $scope.header)
       .then((results) => {
+        $state.go('authentication.signin');
         return results;
       })
       .catch((err) => {

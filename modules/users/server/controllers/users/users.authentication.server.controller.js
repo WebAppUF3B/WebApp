@@ -320,7 +320,30 @@ exports.resetPassword = function(req, res) {
       return thisUser.save();
     })
     .then(() => {
-      return res.status(200);
+      res.status(200).send();
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(400).send();
+    });
+};
+
+exports.resetPasswordKnown = function(req, res) {
+  const oldPassword = req.body.password;
+  const newPassword = req.body.confirmNewPassword;
+  const userID = req.body.userId;
+  User.findById(userID)
+    .then((results) => {
+      const thisUser = results;
+      const doesItMatch = thisUser.authenticate(oldPassword);
+      if (doesItMatch) {
+        thisUser.password = newPassword;
+        return thisUser.save();
+      }
+      res.status(400).send('Your Current Password is incorrect'); 
+    })
+    .then(() => {
+      res.status(200).send();
     })
     .catch((err) => {
       console.log(err);
