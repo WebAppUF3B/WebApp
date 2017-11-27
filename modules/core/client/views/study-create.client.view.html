@@ -61,9 +61,9 @@
           <div class="row">
             <div class="col-sm-6">
               <div class="form-group" show-errors>
-                <label for="maxParticipants">Max Participants for Study</label>
+                <label for="maxParticipants">Max Participants in Study</label>
                 <div id="maxParticipants" class="maxParticipants">
-                  <input type="number" id="maxParticipants" name="maxParticipants" class="form-control" ng-model="currentStudy.maxParticipants" placeholder="Max Study Participants" required>
+                  <input type="number" id="maxParticipants" name="maxParticipants" class="form-control" ng-model="currentStudy.maxParticipants" uib-popover="The maximum total amount of participants allowed to sign up for the entire study i.e. over all study sessions" placeholder="Max Study Participants" required>
               </div>
               </div>
             </div>
@@ -71,7 +71,7 @@
               <div class="form-group" show-errors>
                 <label for="maxParticipantsPerSession">Participants per Session</label>
                 <div id="maxParticipantsPerSession" class="ParticipantsPerSession">
-                  <input type="number" id="ParticipantsPerSession" name="ParticipantsPerSession" class="form-control" ng-model="currentStudy.participantsPerSession" placeholder="Participants per Session" required>
+                  <input type="number" id="ParticipantsPerSession" name="ParticipantsPerSession" class="form-control" ng-model="currentStudy.participantsPerSession" uib-popover="How many participants are needed for per session of this study" placeholder="Participants per Session" required>
                 </div>
               </div>
             </div>
