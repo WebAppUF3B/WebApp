@@ -104,8 +104,8 @@ exports.createUser = function(req, res) {
 
       const verificationUri = `${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/reset-password/${token}`; //this will be a password reset link
       const verificationText = `Hello ${user.firstName} ${user.lastName},
-                                \n\nYour account has been created by the administrator
-                                \n\nPlease set a password by clicking this link:\n\n${verificationUri}\n`; //pass a json web token through the url as part of auth
+                                \nYour account has been created by the administrator
+                                \nPlease set a password by clicking this link: ${verificationUri}`; //pass a json web token through the url as part of auth
 
       //established modemailer email transporter object to send email with mailOptions populating mail with link
       const transporter = nodemailer.createTransport({

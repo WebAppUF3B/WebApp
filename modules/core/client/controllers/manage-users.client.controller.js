@@ -1,5 +1,3 @@
-//////////////////////////////////
-/*~*/
 'use strict';
 
 angular.module('core').controller('AdminManageUsersController', ['$scope', '$http', 'NgTableParams', '$state', '$stateParams', 'Authentication',
@@ -18,43 +16,30 @@ angular.module('core').controller('AdminManageUsersController', ['$scope', '$htt
       }
     };
 
+    $scope.toTitleCase = function(str) {
+      if (!str) return;
+
+      return str.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      });
+    };
+
+    // Show modal and populate it with session data
+    $scope.userDetails = function(user) {
+      $scope.currentUser = user;
+      $('#detailModal').modal('show');
+    };
+
     $scope.filters = {};
     $('section.ng-scope').css('margin-top', '0px');
     $('section.ng-scope').css('margin-bottom', '0px');
 
     const init = () => {
-      //console.log($stateParams.userId);
       $scope.currentUser = {};
-
-      $scope.getUser()
-      .then((results) => {
-        //console.log(results); //THIS LINE IS CURSED! IT RETURNS A 400 FROM AN ENTIRELY DIFFERENT CONTROLLER
-        $scope.currentUser.firstName = results.data.firstName;
-        $scope.currentUser.lastName = results.data.lastName;
-        $scope.currentUser.email = results.data.email;
-        $scope.currentUser.birthday = results.data.birthday;
-        $scope.currentUser.address = results.data.address;
-        $scope.currentUser.gender = results.data.gender;
-        $scope.currentUser.role = results.data.role;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-      $scope.editUser = function(fromForm) {
-        console.log($scope.currentUser);
-        $http.put('/api/admin/editUser/' + $stateParams.userId, $scope.currentUser, $scope.header).success((response) => {
-          $state.go('manage-users');
-        }).error((response) => {
-          $scope.error = response.message;
-          alert(response.message);
-        });
-      };
 
       $scope.admin.getAllUsers()
       .then((results) => {
         $scope.allUsers = results.data;
-        //console.log(results.data);
         $scope.allUsersTable = new NgTableParams({
           count: 10,
           sorting: {
@@ -71,25 +56,8 @@ angular.module('core').controller('AdminManageUsersController', ['$scope', '$htt
       });
     };
 
-    $scope.manageUser = function(user, index) {
-      //needs to be a modal with "edit" button at bottom to full edit page
-      $state.go('edit-user', { 'userId': user._id });
-
-    };
-    $scope.getUser = function() {
-      //console.log($stateParams.userId);
-      return $http.get(window.location.origin + '/api/admin/editUser/' + $stateParams.userId, $scope.header)
-      .then((results) => {
-        return results;
-      })
-      .catch((err) => {
-        return err;
-      });
-    };
-
     $scope.search = function() {
       $scope.searchQuery = $scope.searchText;
-      console.log('ok');
     };
 
     // Toggle filter area open or closed
@@ -147,7 +115,6 @@ angular.module('core').controller('AdminManageUsersController', ['$scope', '$htt
         .then((results) => {
           //return results;
           $scope.allUsers = results.data;
-          console.log(results.data);
           $scope.AllUsersTable = new NgTableParams({
             count: 10,
             sorting: {

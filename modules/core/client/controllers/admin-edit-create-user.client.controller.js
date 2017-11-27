@@ -24,6 +24,15 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
       }
     });
 
+    $scope.toggleBirthdayFocus = function() {
+      $scope.focus = !$scope.focus;
+      if ($scope.focus) $('#birthday').focus();
+      else $('#birthday').blur();
+    };
+
+    $('#birthday').focus(() => {
+      $scope.focus = true;
+    });
 
     $scope.init = function() {
       $scope.state = 'edit';
@@ -76,6 +85,8 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
         $scope.error = 'Please fill in all required fields.';
         return false;
       }
+      $scope.currentUser.birthday = $('#birthday').val();
+
       console.log($scope.currentUser);
       $http.post('/api/admin/createUser', $scope.currentUser, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
@@ -95,6 +106,7 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
         $scope.error = 'Please fill in all required fields.';
         return false;
       }
+      $scope.currentUser.birthday = $('#birthday').val();
 
       console.log($scope.currentUser);
       $http.put('/api/admin/editUser/' + $stateParams.userId, $scope.currentUser, $scope.header).success((response) => {
