@@ -624,6 +624,10 @@ table.ng-table tbody td, table.ng-table thead th {
   color: white;
 }
 
+a:hover {
+  cursor: pointer;
+}
+
 body.modal-open{
   overflow: hidden;
 }

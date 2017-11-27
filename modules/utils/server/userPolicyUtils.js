@@ -7,10 +7,7 @@ const hostRoutes = [
 ];
 
 const secureCommonRoutes = [
-  '/settings',
-  '/profile',
-  '/accounts',
-  '/picture',
+  '/api/profile',
   '/api/studies',
   '/api/studySessions',
   '/api/courses',
@@ -25,10 +22,11 @@ const participantPermissions = {
     /^\/api\/studySessions\/signup\/\w*\/\w*$/,
     /^\/api\/courses\/$/,
     /^\/api\/studies\/$/,
+    /^\/api\/profile\/$/,
     /^\/api\/studies\/discover$/
   ],
   PUT: [
-
+    /^\/api\/profile\/$/
   ],
   POST: [
     /^\/api\/studySession\/signup$/

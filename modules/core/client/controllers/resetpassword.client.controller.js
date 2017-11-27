@@ -22,9 +22,7 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
     console.log('tw auth token', $scope.authToken);
 
     let isLoggedIn = false;
-    if ($scope.user !== null) {
-      isLoggedIn = true;
-    }
+
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
@@ -33,6 +31,10 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
     };
 
     $document.ready(() => {
+      if ($scope.user) {
+        isLoggedIn = true;
+      }
+
       if ($state.current.name === 'forgot-password' && isLoggedIn) {
         $state.go('reset-password-known');
       }
@@ -45,7 +47,6 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
 
     $scope.init = function() {
       $scope.pass = $stateParams.email;
-
     };
 
 
@@ -56,7 +57,6 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
       const password = $scope.userForm.newPassword.$viewValue;
       const confirmNewPassword = $scope.userForm.confirmNewPassword.$viewValue;
       if (!isValid) {
-        //alert('Make sure your passwords match');
         $scope.error = 'Please fill in all fields';
         return;
       }
@@ -70,6 +70,7 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
       $scope.credentials.token = $stateParams.token;
       return $http.post(window.location.origin + '/api/password/reset', $scope.credentials)
       .then(() => {
+        alert('Your password was succesfully reset.');
         $state.go('authentication.signin');
       })
       .catch((err) => {
@@ -84,7 +85,6 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
       const password = $scope.userForm.newPassword.$viewValue;
       const confirmNewPassword = $scope.userForm.confirmNewPassword.$viewValue;
       if (!isValid) {
-        //alert('Make sure your passwords match');
         $scope.error = 'Please fill in all fields';
         return;
       }
@@ -99,6 +99,7 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
       console.log($scope.credentials.userId);
       return $http.post(window.location.origin + '/api/password/change', $scope.credentials)
       .then(() => {
+        alert('Your password was succesfully reset.');
         $state.go('authentication.signin');
       })
       .catch((err) => {
@@ -108,9 +109,15 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
     };
 
 
-    $scope.forgotPassword = function() {
+    $scope.forgotPassword = function(isValid) {
+      if (!isValid) {
+        $scope.error = 'Please fill in all fields';
+        return;
+      }
+
       return $http.post(window.location.origin + '/api/password/forgot/' + $scope.credentials.email)//, $scope.header)
       .then((results) => {
+        alert('We\'ve sent you an email with a link to reset your password.');
         $state.go('authentication.signin');
         return results;
       })
