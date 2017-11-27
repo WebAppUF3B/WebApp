@@ -14,6 +14,17 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
       }
     };
     $scope.copiedUser = $.extend({}, Authentication.user);
+
+    $scope.toggleBirthdayFocus = function() {
+      $scope.focus = !$scope.focus;
+      if ($scope.focus) $('#birthday').focus();
+      else $('#birthday').blur();
+    };
+
+    $('#birthday').focus(() => {
+      $scope.focus = true;
+    });
+
     // Update a user profile
     console.log('View here', $scope.copiedUser);
     $scope.updateUserProfile = function(isValid) {
