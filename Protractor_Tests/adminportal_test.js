@@ -5,7 +5,7 @@ describe('Approve Admin functionality', function() {
     browser.waitForAngular(); //wait for browser to load
   });
 
-  it('should successfully login user as a participant', function() {
+  it('should successfully login ad admin and approve user', function() {
     element.all(by.css('a[href*="/authentication/signin"]')).click();
     element(by.id('email')).sendKeys('admin@mxiia.com');
     element(by.id('password')).sendKeys('Tester123!');

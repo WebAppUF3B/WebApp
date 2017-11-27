@@ -21,7 +21,7 @@ describe('Participant Join Study functionality', function() {
     browser.sleep(1000);
     element(by.id('joinModalButton')).click();
     browser.sleep(1000);
-    element(by.xpath('.//*[.="Monday"]')).click();
+    element(by.xpath('.//*[.="Tuesday"]')).click();
     browser.sleep(1000);
     const select = element(by.model('credentials.compensation'));
     select.$('[value="monetary"]').click();
