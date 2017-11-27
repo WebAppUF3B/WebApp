@@ -22,11 +22,13 @@ process for forgot password
 */
 'use strict';
 
-angular.module('core').controller('ResetPasswordController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication',
-  function($scope, $rootScope, NgTableParams, $http, $state, $stateParams, $document, Authentication) {
+angular.module('core').controller('ResetPasswordController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication', 'PasswordValidator',
+  function($scope, $rootScope, NgTableParams, $http, $state, $stateParams, $document, Authentication, PasswordValidator) {
     /* Get all the listings, then bind it to the scope */
+    $scope.popoverMsg = PasswordValidator.getPopoverMsg();
+
     $scope.currentUser = {};
-    $scope.confirmNewPassword = null;
+    $scope.credentials = null;
 
     $scope.user = Authentication.user;
     console.log('tw user', $scope.user);
@@ -65,6 +67,10 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
     };
 
     $scope.resetPassword = function(isValid) {
+      if (!isValid) {
+        return;
+      }
+      console.log($scope.credentials.confirmNewPassword);
       $scope.credentials.token = $stateParams.token;
       //$scope.credentials.confirmNewPassword
       return $http.post(window.location.origin + '/api/password/reset', $scope.credentials)
@@ -72,6 +78,7 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
         $state.go(authentication.signin);
       })
       .catch((err) => {
+        console.log(err);
         return err;
       });
     };
@@ -87,18 +94,17 @@ angular.module('core').controller('ResetPasswordController', ['$scope', '$rootSc
         return err;
       });
     };
-/*
-    $http.post(`${window.location.origin}/api/password/reset/${token}`, $scope.header)
-      .catch((err) => {
-        $scope.error = true;
-        console.log(err);
-      });
 
-    $http.post(`${window.location.origin}/api/password/forgot/`, $scope.header)
-      .catch((err) => {
-        $scope.error = true;
-        console.log(err);
-      });
-*/
+    $scope.validateConfirmPassword = (confirmNewPassword) => {
+      const password = $scope.userForm.newPassword.$viewValue;
+      if (confirmNewPassword && password && confirmNewPassword !== password) {
+        $scope.userForm.confirmNewPassword.$setValidity('goodConfirm', false);
+        return;
+      }
+      $scope.userForm.confirmNewPassword.$setValidity('goodConfirm', true);
+      console.log('match');
+
+    };
+
   }
 ]);

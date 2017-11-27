@@ -288,8 +288,8 @@ exports.resetPassword = function(req, res) {
   const newPassword = req.body.confirmNewPassword;
   const token = req.body.token;
   const fromToken = authUtils.parseResetPasswordToken(token);
-
-  User.find({ email: fromToken.email }, '-salt -password')
+  console.log('TOKEN: ' + fromToken);
+  User.find({ email: fromToken }, '-salt -password')
     .then((results) => {
       const thisUser = results[0];
       thisUser.password = newPassword;
@@ -299,6 +299,7 @@ exports.resetPassword = function(req, res) {
       return res.status(200);
     })
     .catch((err) => {
+      console.log(err);
       res.status(400).send();
     });
 };
