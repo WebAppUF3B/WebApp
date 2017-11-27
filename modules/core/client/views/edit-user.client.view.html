@@ -18,7 +18,7 @@
                 </div>
               </div>
             </div>
-            <div class="col-sm-6" ng-if='currentUser.role !== "participant"'>
+            <div class="col-sm-6" ng-if='currentUser.role !== "participant" && currentUser.role !== "faculty"'>
               <div class="form-group" show-errors>
                 <div id="position" class="form-group">
                   <label>Position</label>
@@ -111,95 +111,3 @@
         })
     });
 </script>
-
-<!-- <div class="container inner-container" ng-controller="AdminEditCreateController">
-
-<section>
-  <div class="page-header">
-    <h1 ng-if="state!=='edit'">Create a User</h1>
-    <h1 ng-if="state==='edit'">User: {{currentUser.firstName}} {{currentUser.lastName}}</h1>
-  </div>
-  <div class="col-md-12">
-    <form name="userForm" ng-submit="submit(userForm.$valid)" novalidate>
-      <fieldset>
-        <div class="form-group" show-errors>
-          <label for="firstName">First Name</label>
-          <input type="text" id="firstName" name="firstName" class="form-control" ng-model="currentUser.firstName" placeholder="First Name" required />
-          <div ng-messages="userForm.firstName.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">First name is required.</p>
-          </div>
-        </div>
-        <div class="form-group" show-errors>
-          <label for="lastName">Last Name</label>
-          <input type="text" id="lastName" name="lastName" class="form-control" ng-model="currentUser.lastName" placeholder="Last Name" required />
-          <div ng-messages="userForm.lastName.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Last name is required.</p>
-          </div>
-        </div>
-        <div class="form-group" show-errors>
-          <label for="gender">Gender</label>
-          <select type="text" id="gender" name="gender" class="form-control" ng-model="currentUser.gender" placeholder="Unknown" required>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-            <option value="none">Prefer Not to Disclose</option>
-          </select>
-          <div ng-messages="userForm.gender.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Gender is required.</p>
-          </div>
-        </div>
-        <div class="form-group" show-errors>
-          <label for="address">Address</label>
-          <input type="text" id="address" name="address" class="form-control" ng-model="currentUser.address" placeholder="123 Example Street" required />
-          <div ng-messages="userForm.address.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Address is required.</p>
-          </div>
-        </div>
-        <div class="form-group" show-errors>
-          <label for="email">Email</label>
-          <input type="text" id="email" name="email" class="form-control" ng-model="currentUser.email" placeholder="email@example.com" required />
-          <div ng-messages="userForm.email.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Email is required.</p>
-          </div>
-        </div>
-        <div class="form-group" show-errors>
-          <label for="birthday">Birthday</label>
-          <input type="text" id="birthday" name="birthday" class="form-control" ng-model="currentUser.birthday" placeholder="01/01/1970" required />
-          <div ng-messages="userForm.birthday.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Birthday is required.</p>
-          </div>
-        </div>
-        <div class="form-group" show-errors>
-          <label for="role">Role</label>
-          <select id="role" name="role" class="form-control" ng-model="currentUser.role" placeholder="participant" required>
-            <option value="participant">participant</option>
-            <option value="researcher">researcher</option>
-            <option value="faculty">faculty</option>
-            <option value="admin">admin</option>
-          </select>
-          <div ng-messages="userForm.role.$error" role="alert">
-            <p class="help-block error-text" ng-message="required">Role is required.</p>
-          </div>
-        </div>
-        <div ng-if="currentUser.role !== 'participant' && currentUser.role !== 'faculty'" class="form-group" show-errors>
-          <label for="position">Position</label>
-          <select type="text" id="position" name="position" class="form-control" ng-model="currentUser.position" placeholder="">
-            <option value="Undergraduate Student">Undergraduate Student</option>
-            <option value="Research Assistant">Research Assistant</option>
-            <option value="Graduate Student">Graduate Student</option>
-            <option value="Post Doctorate">Post Doctorate</option>
-            <option value="Faculty">Faculty</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <input type="submit" value="Submit" class="btn btn-primary">
-        </div>
-        <div ng-show="error" class="text-danger">
-          <strong ng-bind="error"></strong>
-        </div>
-      </fieldset>
-    </form>
-  </div>
-</section>
-
-</div> -->
