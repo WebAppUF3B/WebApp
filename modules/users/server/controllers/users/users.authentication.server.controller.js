@@ -274,7 +274,6 @@ exports.oauthCall = function(strategy, scope) {
 };
 
 exports.forgotPassword = function(req, res) {
-  console.log('ok u forgot: ');
   const theemail = req.params.email;
   const token = authUtils.generateResetPasswordToken(theemail);
   console.log(theemail);
@@ -340,7 +339,7 @@ exports.resetPasswordKnown = function(req, res) {
         thisUser.password = newPassword;
         return thisUser.save();
       }
-      res.status(400).send('Your Current Password is incorrect'); 
+      res.status(400).send('Your Current Password is incorrect');
     })
     .then(() => {
       res.status(200).send();
