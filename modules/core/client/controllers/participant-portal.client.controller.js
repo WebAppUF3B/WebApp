@@ -117,8 +117,10 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
           })
           .catch((err) => {
             $scope.error = true;
-            console.log(err);
+            console.log('error deleting session', err);
             alreadyClicked = false;
+            $scope.init();
+            $('#cancelModal').modal('hide');
           });
       }
     };

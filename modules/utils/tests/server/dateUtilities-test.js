@@ -13,7 +13,7 @@ describe('GIVEN TWO DATES, RETURN DURATION IN MINTUES BETWEEN THEM', () => {
   it(`GIVEN new Date('${mockStartTime}') AND GIVEN new Date('${mockEndTime}'), 'RETURN 240'`, () => {
     const date = new Date(mockStartTime);
     const date2 = new Date(mockEndTime);
-    assert.equal(dateUtils.differenceInSeconds(date, date2), 240);
+    assert.equal(dateUtils.differenceInMins(date, date2), 240);
   });
 });
 describe('GIVEN AN INTEGER 0-6, RETURN STRING OF THE CORRESPONDING DOW', () => {

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose'),
   Schema = mongoose.Schema;
+const dateUtils = require('../../../utils/server/dateUtilities');
 
 const studySchema = new Schema({
   title: {
@@ -47,8 +48,12 @@ const studySchema = new Schema({
     type: Number
   },
   availability: [{
-    startTime: { type: Date },
-    endTime: { type: Date }
+    startTime: Date,
+    endTime: Date,
+    existingStudySessions: [{
+      type: Schema.Types.ObjectId,
+      ref: 'studySession'
+    }]
   }],
   closed: {
     type: Boolean,
