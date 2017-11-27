@@ -51,6 +51,7 @@ angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).cont
         $scope.currentStudy.requireApproval = results.data.requireApproval;
         $scope.currentStudy.availability = [];
         $scope.tempAvailability = results.data.availability;
+        $scope.currentStudy.compensationAmount = results.data.compensationAmount;
         console.log($scope.currentStudy);
         $scope.prepStartTime();
 
