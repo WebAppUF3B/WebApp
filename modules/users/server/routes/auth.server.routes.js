@@ -22,5 +22,7 @@ module.exports = function (app) {
   app.route('/api/auth/signout').get(users.signout);
 
   app.route('/api/auth/verify/:id').post(users.verify);
-
+  app.route('/api/password/forgot/:email').post(users.forgotPassword);
+  app.route('/api/password/reset').post(users.resetPassword);
+  app.route('/api/password/change').post(users.resetPasswordKnown);
 };
