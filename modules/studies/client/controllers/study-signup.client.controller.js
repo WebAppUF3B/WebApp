@@ -1,4 +1,4 @@
-angular.module('core').controller('StudySignupController', ['$scope','$http', '$location', '$state', '$stateParams', 'Authentication', 'NgTableParams',
+angular.module('studies').controller('StudySignupController', ['$scope','$http', '$location', '$state', '$stateParams', 'Authentication', 'NgTableParams',
   function($scope, $http, $location, $state, $stateParams, Authentication, NgTableParams) {
     $scope.user = Authentication.user;
 

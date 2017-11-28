@@ -1,7 +1,7 @@
 'use strict';
 
 // TODO consider replacing $http requests with factory
-angular.module('core').controller('StudyDiscoveryController', ['$scope','$http','NgTableParams', 'Authentication',
+angular.module('studies').controller('StudyDiscoveryController', ['$scope','$http','NgTableParams', 'Authentication',
   function($scope, $http, NgTableParams, Authentication) {
 
     // Called after page loads

@@ -1,4 +1,4 @@
-angular.module('core').controller('SessionCancellationController', ['$scope','$http', '$state', '$stateParams', 'Authentication',
+angular.module('sessions').controller('SessionCancellationController', ['$scope','$http', '$state', '$stateParams', 'Authentication',
   function($scope, $http, $state, $stateParams, Authentication) {
     const init = function() {
       $scope.error = null;

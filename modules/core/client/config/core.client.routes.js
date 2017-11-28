@@ -22,6 +22,7 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/participant',
       templateUrl: 'modules/core/client/views/participant-portal.client.view.html'
     })
+<<<<<<< HEAD
     .state('studies', {
       url: '/studies',
       templateUrl: 'modules/core/client/views/studies.client.view.html'
@@ -34,32 +35,11 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/sign-up/:studyId',
       templateUrl: 'modules/core/client/views/study-sign-up.client.view.html'
     })
+=======
+>>>>>>> 9bcb46851164e1af4040ff36f400198cd8eb7899
     .state('researcher-portal', {
       url: '/researcher',
       templateUrl: 'modules/core/client/views/researcher-portal.client.view.html'
-    })
-    .state('studies.create', {
-      url: '/create',
-      templateUrl: 'modules/core/client/views/study-create.client.view.html'
-    })
-    .state('studies.edit', {
-      url: '/edit/:studyId',
-      templateUrl: 'modules/core/client/views/study-create.client.view.html'
-    })
-    .state('studies.availability', {
-      url: '/availability/:studyId',
-      templateUrl: 'modules/core/client/views/availability.client.view.html'
-    })
-    .state('studies.availability-edit', {
-      url: '/edit/availability/:studyId',
-      templateUrl: 'modules/core/client/views/availability.client.view.html',
-      params: {
-        studyId: null
-      }
-    })
-    .state('studies.data', {
-      url: '/data/:studyId',
-      templateUrl: 'modules/core/client/views/study-data.client.view.html'
     })
     .state('faculty-portal', {
       url: '/faculty',
@@ -84,10 +64,6 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
     .state('reset-password-known', { //reset password if you know your current one
       url: '/reset-password',
       templateUrl: 'modules/core/client/views/reset-password-known.client.view.html'
-    })
-    .state('cancel', {
-      url: '/cancel/:token',
-      templateUrl: 'modules/core/client/views/session-cancel.client.view.html'
     })
     .state('not-found', {
       url: '/not-found',
