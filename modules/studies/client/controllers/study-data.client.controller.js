@@ -1,6 +1,6 @@
 angular.module('studies').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams', 'Authentication',
   function($scope, $http, NgTableParams, $location, $state, $stateParams, Authentication) {
-    let alreadyClicked = false;
+    Authentication.loading = true;
 
     const init = function() {
       $('section.ng-scope').css('margin-top', '0px');
@@ -145,9 +145,11 @@ angular.module('studies').controller('StudyDataController', ['$scope','$http','N
             counts: [], // hides page sizes
             dataset: $scope.approvalTable.data // select data
           });
+          Authentication.loading = false;
         })
         .catch((err) => {
           console.log(err);
+          Authentication.loading = false;
         });
     };
 
@@ -168,9 +170,9 @@ angular.module('studies').controller('StudyDataController', ['$scope','$http','N
     };
 
     $scope.approveUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
+        Authentication.loading = true;
 
         $http.put(window.location.origin + '/api/sessions/approveUser/' + $scope.currentUser.sessionID,
           $scope.currentUser,
@@ -179,20 +181,20 @@ angular.module('studies').controller('StudyDataController', ['$scope','$http','N
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = 'There was a problem approving the participant. Please contact the admin.';
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };
 
     $scope.denyUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
+        Authentication.loading = true;
 
         $http.put(window.location.origin + '/api/sessions/denyUser/' + $scope.currentUser.sessionID,
           $scope.currentUser,
@@ -201,12 +203,12 @@ angular.module('studies').controller('StudyDataController', ['$scope','$http','N
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = 'There was a problem denying the participant. Please contact the admin.';
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };

@@ -8,6 +8,9 @@ function($uibTooltipProvider) {
 
 angular.module('studies.study').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
+
+    Authentication.loading = true;
+
     /* Get all the listings, then bind it to the scope */
     $scope.currentStudy = {};
     $scope.researchers = [];
@@ -117,9 +120,10 @@ angular.module('studies.study').controller('StudyController', ['$scope', '$rootS
               $scope.compensatemodel.push({ id: 2, label: 'Monetary' });
             }
           }
-
+          Authentication.loading = false;
         })
         .catch((err) => {
+          Authentication.loading = false;
           console.log(err);
         });
       } else {
@@ -155,9 +159,10 @@ angular.module('studies.study').controller('StudyController', ['$scope', '$rootS
               label: $scope.researchers[x].firstName+' '+$scope.researchers[x].lastName+' - '+$scope.researchers[x].position
             });
           }
-
+          Authentication.loading = false;
         })
         .catch((err) => {
+          Authentication.loading = false;
           console.log(err);
         });
       }
@@ -209,6 +214,7 @@ angular.module('studies.study').controller('StudyController', ['$scope', '$rootS
     };
 
     $scope.create = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
       $('.needs-validation').removeClass('highlight-error');
 
@@ -248,6 +254,7 @@ angular.module('studies.study').controller('StudyController', ['$scope', '$rootS
     };
 
     $scope.update = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
       $('.needs-validation').removeClass('highlight-error');
 
@@ -255,6 +262,7 @@ angular.module('studies.study').controller('StudyController', ['$scope', '$rootS
         $scope.$broadcast('show-errors-check-validity', 'studyForm');
         $scope.error = 'Please fill in all required fields.';
         if ($scope.compensatemodel.length === 0) $('.needs-validation').addClass('highlight-error');
+        Authentication.loading = false;
         return false;
       }
 

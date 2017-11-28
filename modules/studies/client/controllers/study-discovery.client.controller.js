@@ -3,6 +3,7 @@
 // TODO consider replacing $http requests with factory
 angular.module('studies').controller('StudyDiscoveryController', ['$scope','$http','NgTableParams', 'Authentication',
   function($scope, $http, NgTableParams, Authentication) {
+    Authentication.loading = true;
 
     // Called after page loads
     $scope.init = function() {
@@ -46,9 +47,10 @@ angular.module('studies').controller('StudyDiscoveryController', ['$scope','$htt
             counts: [], // hides page sizes
             dataset: $scope.allStudies // select data
           });
-
+          Authentication.loading = false;
         })
         .catch((err) => {
+          Authentication.loading = false;
           console.log(err);
         });
     };

@@ -1,5 +1,6 @@
 angular.module('studies').controller('StudySignupController', ['$scope','$http', '$location', '$state', '$stateParams', 'Authentication', 'NgTableParams',
   function($scope, $http, $location, $state, $stateParams, Authentication, NgTableParams) {
+    Authentication.loading = true;
     $scope.user = Authentication.user;
 
     $scope.authToken = Authentication.authToken;
@@ -72,8 +73,10 @@ angular.module('studies').controller('StudySignupController', ['$scope','$http',
             counts: [], // hides page sizes
             dataset: $scope.emptySessions // select data
           });
+          Authentication.loading = false;
         })
         .catch((err) => {
+          Authentication.loading = false;
           console.log(err);
         });
     };
@@ -90,6 +93,7 @@ angular.module('studies').controller('StudySignupController', ['$scope','$http',
     };
 
     $scope.studySignup = function() {
+      Authentication.loading = true;
       $scope.error = null;
       if ($scope.credentials.compensation && $scope.credentials.compensation === 'extraCredit' && !$scope.credentials.classCode) {
         $scope.error = 'Please select a class code';
