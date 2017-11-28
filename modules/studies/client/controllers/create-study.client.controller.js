@@ -1,13 +1,16 @@
 'use strict';
-angular.module('core.study', ['ui.bootstrap','angularjs-dropdown-multiselect']).config(['$uibTooltipProvider',
+angular.module('studies.study', ['ui.bootstrap','angularjs-dropdown-multiselect']).config(['$uibTooltipProvider',
 function($uibTooltipProvider) {
   $uibTooltipProvider.options({
     trigger: 'focus'
   });
 }]);
 
-angular.module('core.study').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
+angular.module('studies.study').controller('StudyController', ['$scope', '$rootScope', '$http', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $rootScope, $http, $state, $stateParams, $document, Authentication) {
+
+    Authentication.loading = true;
+
     /* Get all the listings, then bind it to the scope */
     $scope.currentStudy = {};
     $scope.researchers = [];
@@ -24,11 +27,13 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
     };
 
     $document.ready(() => {
+      //detect if editing study or not
       if ($state.current.name === 'studies.edit') {
         $scope.state = 'edit';
       }
     });
 
+    //sorting researchers in multiselect
     const sortResearchers = function(a,b) {
       if (a.lastName < b.lastName)
         return -1;
@@ -42,10 +47,10 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
       }
       return 0;
     };
-
+    //runs upon loading the page
     $scope.init = function() {
       $scope.pass = $stateParams.studyId;
-
+      //if editing in a study, get study information
       if ($state.current.name === 'studies.edit') {
         $scope.getStudy($scope.pass)
         .then((results) => {
@@ -100,7 +105,7 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
           .catch((err) => {
             console.log(err);
           });
-
+          //setup compensate multiselect
           $scope.compensatemodel = [];
           $scope.compensatedata = [
             { id: 1, label: 'Extra Credit' },
@@ -117,13 +122,14 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
               $scope.compensatemodel.push({ id: 2, label: 'Monetary' });
             }
           }
-
+          Authentication.loading = false;
         })
         .catch((err) => {
+          Authentication.loading = false;
           console.log(err);
         });
       } else {
-
+        //set up compensate multi select
         $scope.compensatemodel = [];
         $scope.compensatedata = [
           { id: 1, label: 'Extra Credit' },
@@ -155,13 +161,14 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
               label: $scope.researchers[x].firstName+' '+$scope.researchers[x].lastName+' - '+$scope.researchers[x].position
             });
           }
-
+          Authentication.loading = false;
         })
         .catch((err) => {
+          Authentication.loading = false;
           console.log(err);
         });
       }
-
+      //smartbutton showing the dropdown multiselect for researchers
       $scope.researchersettings = {
         smartButtonMaxItems: 1,
         enableSearch: true,
@@ -173,13 +180,13 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
           return itemText;
         }
       };
-
+      //dropdown multi setting for compensate dropbox
       $scope.compensatesettings = {
         smartButtonMaxItems: 2,
         buttonClasses: 'form-control needs-validation'
       };
     };
-
+    //determine if editing or creating update to backend
     $scope.submit = function(isValid) {
       if ($scope.state === 'edit') {
         $scope.update(isValid);
@@ -187,7 +194,7 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
         $scope.create(isValid);
       }
     };
-
+    //query backend for study information
     $scope.getStudy = function(studyId) {
       return $http.get(window.location.origin + '/api/studies/' + studyId, $scope.header)
         .then((results) => {
@@ -197,7 +204,7 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
           return err;
         });
     };
-
+    //query backend for all non-participant users
     $scope.getResearchers = function() {
       return $http.get(window.location.origin + '/api/studies/research/', $scope.header)
       .then((results) => {
@@ -207,8 +214,9 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
         return err;
       });
     };
-
+    //create study in backend
     $scope.create = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
       $('.needs-validation').removeClass('highlight-error');
 
@@ -217,13 +225,13 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
         $scope.error = 'Please fill in all required fields.';
         return false;
       }
-
+      //populate research list from multiselect dropbox
       $scope.currentStudy.researchers = [];
       $scope.currentStudy.researchers.push({ 'userID': $scope.user._id });
       for (let x = 0; x<$scope.researchermodel.length; x++) {
         $scope.currentStudy.researchers.push({ 'userID': $scope.researchermodel[x].id });
       }
-
+      //populate compensationType list from multiselect dropbox
       $scope.currentStudy.compensationType = [];
       if ($scope.compensatemodel.length !== 0) {
         if ($scope.compensatemodel.length === 2) {
@@ -248,6 +256,7 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
     };
 
     $scope.update = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
       $('.needs-validation').removeClass('highlight-error');
 
@@ -255,15 +264,16 @@ angular.module('core.study').controller('StudyController', ['$scope', '$rootScop
         $scope.$broadcast('show-errors-check-validity', 'studyForm');
         $scope.error = 'Please fill in all required fields.';
         if ($scope.compensatemodel.length === 0) $('.needs-validation').addClass('highlight-error');
+        Authentication.loading = false;
         return false;
       }
-
+      //populate research list from multiselect dropbox
       $scope.currentStudy.researchers = [];
       $scope.currentStudy.researchers.push({ 'userID': $scope.user._id });
       for (let x = 0; x<$scope.researchermodel.length; x++) {
         $scope.currentStudy.researchers.push({ 'userID': $scope.researchermodel[x].id });
       }
-
+      //populate compensationType list from multiselect dropbox
       $scope.currentStudy.compensationType = [];
       if ($scope.compensatemodel.length !== 0) {
         if ($scope.compensatemodel.length === 2) {

@@ -1,17 +1,13 @@
 'use strict';
 
-angular.module('core').controller('AdminEditCreateController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication',
+angular.module('users.adminEdit').controller('AdminEditCreateController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $rootScope, NgTableParams, $http, $state, $stateParams, $document, Authentication) {
     /* Get all the listings, then bind it to the scope */
     Authentication.loading = true;
     $scope.currentUser = {};
 
     $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
-
     $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
-
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
@@ -19,6 +15,7 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
       }
     };
 
+    // When you click the calendar, the date panel appears
     $scope.toggleBirthdayFocus = function() {
       $scope.focus = !$scope.focus;
       if ($scope.focus) $('#birthday').focus();
@@ -29,6 +26,7 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
       $scope.focus = true;
     });
 
+    // Runs when the page loads
     $scope.init = function() {
       if ($state.current.name === 'edit-user') {
 
@@ -57,9 +55,10 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
       }
     };
 
+    // Click submit button
     $scope.submit = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
-      console.log(isValid);
       if ($scope.state === 'edit') {
         console.log('edit');
         $scope.update(isValid);
@@ -69,8 +68,8 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
       }
     };
 
+    // Get user if editing
     $scope.getUser = function() {
-      //console.log($stateParams.userId);
       return $http.get(window.location.origin + '/api/admin/editUser/' + $stateParams.userId, $scope.header)
       .then((results) => {
         Authentication.loading = false;
@@ -84,31 +83,32 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
       });
     };
 
+    // Create user
     $scope.create = function(isValid) {
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'Please fill in all required fields.';
+        Authentication.loading = false;
         return false;
       }
       $scope.currentUser.birthday = $('#birthday').val();
 
-      console.log($scope.currentUser);
       $http.post('/api/admin/createUser', $scope.currentUser, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
-        console.log(response._id);
         $state.go('manage-users', { 'edit-user': response._id });
       }).error((response) => {
         $scope.error = response.message;
-        alert(response.message);
+        Authentication.loading = false;
       });
     };
 
-
+    // Update user
     $scope.update = function(isValid) {
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'Please fill in all required fields.';
+        Authentication.loading = false;
         return false;
       }
       $scope.currentUser.birthday = $('#birthday').val();
@@ -118,6 +118,7 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
         $state.go('manage-users');
       }).error((response) => {
         $scope.error = response.message;
+        Authentication.loading = false;
       });
     };
     $scope.init();

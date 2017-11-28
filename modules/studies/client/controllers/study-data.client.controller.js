@@ -1,7 +1,7 @@
-angular.module('core').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams', 'Authentication',
+angular.module('studies').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams', 'Authentication',
   function($scope, $http, NgTableParams, $location, $state, $stateParams, Authentication) {
-    let alreadyClicked = false;
-
+    Authentication.loading = true;
+    //method occurs on load of page
     const init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
@@ -34,7 +34,7 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
       $scope.stats.ageMax = -1;
       $scope.stats.completed = 0;
       $scope.stats.enrolled = 0;
-
+      //interprets session data
       $scope.getAllSessionsByStudyId()
         .then((results) => {
           $scope.studySessions = results.data.sessions;
@@ -145,9 +145,11 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
             counts: [], // hides page sizes
             dataset: $scope.approvalTable.data // select data
           });
+          Authentication.loading = false;
         })
         .catch((err) => {
           console.log(err);
+          Authentication.loading = false;
         });
     };
 
@@ -168,9 +170,9 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
     };
 
     $scope.approveUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
+        Authentication.loading = true;
 
         $http.put(window.location.origin + '/api/sessions/approveUser/' + $scope.currentUser.sessionID,
           $scope.currentUser,
@@ -179,20 +181,20 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = 'There was a problem approving the participant. Please contact the admin.';
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };
-
+    //denying user
     $scope.denyUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
+        Authentication.loading = true;
 
         $http.put(window.location.origin + '/api/sessions/denyUser/' + $scope.currentUser.sessionID,
           $scope.currentUser,
@@ -201,19 +203,19 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = 'There was a problem denying the participant. Please contact the admin.';
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };
 
     $scope.toTitleCase = function(str) {
       if (!str) return;
-      
+
       return str.replace(/\w\S*/g, (txt) => {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       });

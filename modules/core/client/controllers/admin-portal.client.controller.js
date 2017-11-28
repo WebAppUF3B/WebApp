@@ -5,14 +5,8 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
 
     Authentication.loading = true;
 
-    let alreadyClicked = false;
-
     $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
-
     $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
-
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
@@ -21,7 +15,7 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     };
     const init = () => {
 
-
+      // All users that need to be confirmed
       $scope.admin.getWaitingUsers()
         .then((results) => {
           $scope.allUsers = results.data;
@@ -59,41 +53,40 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     };
 
     $scope.approveUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
-//        console.log('Approved!');
+        Authentication.loading = true;
         $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, {} ,$scope.header)
           .then(() => {
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = err;
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };
 
+    // Will also delete a user
     $scope.denyUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
-//        console.log('DENIED!');
+        Authentication.loading = true;
         $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, $scope.header)
           .then(() => {
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = err;
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };

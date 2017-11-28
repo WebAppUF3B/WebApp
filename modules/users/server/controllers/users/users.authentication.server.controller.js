@@ -23,9 +23,6 @@ const noReturnUrls = [
  * Signup
  */
 exports.signup = function(req, res) {
-  // For security measurement we remove the roles from the req.body object
-  delete req.body.roles;
-
   // Server side validation of user, returns an object of errors.\
 
 
@@ -193,7 +190,7 @@ exports.signout = function(req, res) {
   res.redirect('/');
 };
 
-//verify
+//verify whether or not a user is valid
 exports.verify = function(req, res) {
   let thisUser;
   const transporter = nodemailer.createTransport({
@@ -258,6 +255,9 @@ exports.verify = function(req, res) {
     });
 };
 
+
+//searches database for email passed in url
+//if email exists, token is created and email sent with link to reset password
 exports.forgotPassword = function(req, res) {
   const theemail = req.params.email;
   const token = authUtils.generateResetPasswordToken(theemail);
@@ -289,10 +289,13 @@ exports.forgotPassword = function(req, res) {
     })
     .catch((err) => {
       console.log(err);
+      //returns 200 on error to prevent phishing for emails
       res.status(200).send();
     });
 };
 
+//checks token to ensure security
+//creates new salt and saves salted user new password
 exports.resetPassword = function(req, res) {
   const newPassword = req.body.confirmNewPassword;
   const token = req.body.token;
@@ -313,6 +316,8 @@ exports.resetPassword = function(req, res) {
     });
 };
 
+//validates that old password matches
+//if match, new salt generated and password changed and salted
 exports.resetPasswordKnown = function(req, res) {
   const oldPassword = req.body.password;
   const newPassword = req.body.confirmNewPassword;
@@ -336,6 +341,7 @@ exports.resetPasswordKnown = function(req, res) {
     });
 };
 
+//used to extract information from jwt token
 exports.parseToken = function(req, res, next, id) {
   const token = id;
   const object = authUtils.pareseResetPasswordToken(token);

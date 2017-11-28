@@ -229,7 +229,7 @@ h2, h3, h4, h5, h6 {
 }
 
 .loading-background {
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
@@ -713,6 +713,10 @@ hr {
 
 .study-closed, .study-satisfied .study-closed{
   background-color: #e0a9a9 !important;
+}
+
+.approval-pending {
+  background-color: #ffe7a8 !important;
 }
 
 .not-bold{

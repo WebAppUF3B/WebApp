@@ -1,5 +1,6 @@
-angular.module('core').controller('StudySignupController', ['$scope','$http', '$location', '$state', '$stateParams', 'Authentication', 'NgTableParams',
+angular.module('studies').controller('StudySignupController', ['$scope','$http', '$location', '$state', '$stateParams', 'Authentication', 'NgTableParams',
   function($scope, $http, $location, $state, $stateParams, Authentication, NgTableParams) {
+    Authentication.loading = true;
     $scope.user = Authentication.user;
 
     $scope.authToken = Authentication.authToken;
@@ -21,16 +22,16 @@ angular.module('core').controller('StudySignupController', ['$scope','$http', '$
     $scope.credentials = {};
     $scope.multipleParticipants = null;
     $scope.allCourses = null;
-
+    //upon starting up page
     const init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
-
+      //get all course
       $scope.courses.getAll()
         .then((results) => {
           $scope.allCourses = results.data;
         });
-
+      //get all sessions in study
       $scope.getAllSessionsByStudyId()
         .then((results) => {
           $scope.partialSessions = results.data.partialSessions;
@@ -56,7 +57,7 @@ angular.module('core').controller('StudySignupController', ['$scope','$http', '$
           $scope.partialSessionsTable = new NgTableParams({
             count: 10,
             sorting: {
-              startTime: 'desc'
+              startTime: 'asc'
             }
           }, {
             counts: [], // hides page sizes
@@ -66,14 +67,16 @@ angular.module('core').controller('StudySignupController', ['$scope','$http', '$
           $scope.emptySessionsTable = new NgTableParams({
             count: 10,
             sorting: {
-              startTime: 'desc'
+              startTime: 'asc'
             }
           }, {
             counts: [], // hides page sizes
             dataset: $scope.emptySessions // select data
           });
+          Authentication.loading = false;
         })
         .catch((err) => {
+          Authentication.loading = false;
           console.log(err);
         });
     };
@@ -81,15 +84,16 @@ angular.module('core').controller('StudySignupController', ['$scope','$http', '$
     $scope.getAllSessionsByStudyId = () => {
       return $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`, $scope.header);
     };
-
+    //controller for signup modal
     $scope.studySignupModal = function(session, index) {
       $scope.currentSession = session;
       $scope.currentIndex = index;
       $scope.error = false;
       $('#studySignupModal').modal('show');
     };
-
+    //parsing information and push information to backend
     $scope.studySignup = function() {
+      Authentication.loading = true;
       $scope.error = null;
       if ($scope.credentials.compensation && $scope.credentials.compensation === 'extraCredit' && !$scope.credentials.classCode) {
         $scope.error = 'Please select a class code';

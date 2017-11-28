@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('core').controller('AdminManageUsersController', ['$scope', '$http', 'NgTableParams', '$state', '$stateParams', 'Authentication',
+angular.module('users.adminEdit').controller('AdminManageUsersController', ['$scope', '$http', 'NgTableParams', '$state', '$stateParams', 'Authentication',
   function($scope, $http, NgTableParams, $state, $stateParams, Authentication) {
 
     Authentication.loading = true;
@@ -97,7 +97,9 @@ angular.module('core').controller('AdminManageUsersController', ['$scope', '$htt
       }
     });
 
+    // Reloads ng-table
     $scope.reloadTable = function() {
+      Authentication.loading = true;
       $scope.allUsersTable = new NgTableParams({
         count: 10,
         sorting: {
@@ -108,30 +110,12 @@ angular.module('core').controller('AdminManageUsersController', ['$scope', '$htt
         counts: [], // hides page sizes
         dataset: $scope.allUsers // select data
       });
+      Authentication.loading = false;
     };
 
     // Declare methods that can be used to access administrative data
-    //////
     $scope.admin = {
-      getAllUsers: function() {
-        return $http.get(window.location.origin + '/api/admin/getAllUsers', $scope.header)
-        .then((results) => {
-          //return results;
-          $scope.allUsers = results.data;
-          $scope.AllUsersTable = new NgTableParams({
-            count: 10,
-            sorting: {
-              lastName: 'asc'
-            }
-          }, {
-            counts: [], // hides page sizes
-            dataset: $scope.allUsers // select data
-          });
-        })
-        .catch((err) => {
-          return err;
-        });
-      },
+      // Populates table with users
       getAllUsers: function() {
         return $http.get(window.location.origin + '/api/admin/getAllUsers', $scope.header)
         .then((results) => {
@@ -140,19 +124,6 @@ angular.module('core').controller('AdminManageUsersController', ['$scope', '$htt
         .catch((err) => {
           return err;
         });
-      },
-      getWaitingUsers: function() {
-        return $http.get(window.location.origin + '/api/admin/approval', $scope.header)
-          .then((results) => {
-            return results;
-          })
-          .catch((err) => {
-            return err;
-          });
-      },
-      editUser: function(fromForm) {
-        console.log('hi + ');
-        console.log(fromForm);
       }
     };
 
