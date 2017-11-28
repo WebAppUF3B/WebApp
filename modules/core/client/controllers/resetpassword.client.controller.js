@@ -79,7 +79,7 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
       });
     };
 
-    //password change for users logged in
+    // Password change for users logged in
     $scope.resetPasswordKnown = function(isValid) {
       Authentication.loading = true;
       $scope.error = null;
@@ -115,6 +115,7 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
       });
     };
 
+    // Submits forgot password form
     $scope.forgotPassword = function(isValid) {
       if (!isValid) {
         $scope.error = 'Please fill in all fields';
