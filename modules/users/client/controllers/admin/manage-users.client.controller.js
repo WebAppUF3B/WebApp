@@ -6,11 +6,7 @@ angular.module('users.adminEdit').controller('AdminManageUsersController', ['$sc
     Authentication.loading = true;
 
     $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
-
     $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
-
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',

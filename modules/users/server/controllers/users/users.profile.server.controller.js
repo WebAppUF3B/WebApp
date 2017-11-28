@@ -39,18 +39,13 @@ exports.getProfile = function(req, res) {
  */
 exports.update = function(req, res) {
   // Init Variables
-  //console.log(req.body);
   const user = req.body;
-
-  //console.log(req.user);
   // For security measurement we remove the roles from the req.body object
   delete req.body.role;
 
   if (user) {
-    //console.log('user here');
     User.findById(user._id)
       .then((userById) => {
-        //console.log('user here', userById);
         userById.firstName = user.firstName;
         userById.lastName = user.lastName;
         userById.gender = user.gender;
@@ -58,12 +53,10 @@ exports.update = function(req, res) {
         userById.position = user.position;
         userById.birthday = user.birthday;
         userById.updated = Date.now();
-        //console.log('user updated  here', userById);
 
         return userById.save();
       })
       .then((result) => {
-        //console.log('result here after saving', result);
         const minimalUser = {
           firstName: result.firstName,
           lastName: result.lastName,
@@ -82,7 +75,6 @@ exports.update = function(req, res) {
         });
       })
       .catch((err) => {
-        console.log('Err updating profile:', err);
         return res.status(400).send({
           message: 'Update failed. Please contact an admin'
         });

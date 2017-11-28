@@ -55,7 +55,6 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
         $scope.currentStudy.availability = [];
         $scope.tempAvailability = results.data.availability;
         $scope.currentStudy.compensationAmount = results.data.compensationAmount;
-        console.log($scope.currentStudy);
         $scope.prepStartTime();
 
         // Prepare data for calendar
@@ -73,12 +72,11 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
       })
       .catch((err) => {
         console.log(err);
-        Authentication.loading = true;
+        Authentication.loading = false;
       });
     };
     //remove a day from the selectedDays list
     $scope.removeFromSelected = function(dt) {
-      console.log('Removing: ' + dt);
       $scope.selectedDates.splice($scope.selectedDates.indexOf(dt), 1);
       /// Need to change activeDate for datepicker to call customClass again
       $scope.activeDate = dt;
@@ -91,7 +89,6 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
     };
     //sending information to update study
     $scope.sendAvailability = function() {
-
       Authentication.loading = true;
       //ensure no timeslots overlap
       for (let x = 0; x<$scope.availability.length; x++) {
@@ -110,6 +107,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
               const endTimey = parseFloat(endTimeysplit.substring(0,endTimeysplit.indexOf(':'))+'.'+endTimeysplit.substring(endTimeysplit.indexOf(':')));
               if ((startTimex>startTimey && startTimex<endTimey) || (endTimex>startTimey && endTimex<endTimey)) {
                 alert('Overlapping Times Detected, Please Check Times');
+                Authentication.loading = false;
                 return;
               }
             }
@@ -144,9 +142,6 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
         }
       }
 
-      console.log('Submitting here we go:');
-      console.log($scope.currentStudy);
-
       $scope.error = null;
       $http.put('/api/studies/'+$scope.studyId, $scope.currentStudy, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
@@ -154,6 +149,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
         $state.go('researcher-portal');
       }).error((response) => {
         $scope.error = response.message;
+        Authentication.loading = false;
       });
 
     };
@@ -252,8 +248,6 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
     //setting up temp array to copy over timeslots
     $scope.copyToTemp = function(date) {
       $scope.copyTemp = [];
-      console.log('copyExist to date:');
-      console.log(date);
 
       for (let x = 0; x<$scope.availability.length; x++) {
         if (date === $scope.availability[x].unixDate) {
@@ -263,9 +257,6 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
           });
         }
       }
-
-      console.log('finished populating copyExist');
-      console.log($scope.copyTemp);
     };
     //interpreting temp copy array to paste into another day's timeslots
     $scope.pasteToDay = function(date) {

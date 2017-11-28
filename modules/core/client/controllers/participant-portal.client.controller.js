@@ -31,7 +31,6 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.allSessions = results.data;
-          console.log($scope.allSessions);
 
           // Populate date and time fields for each sessions
           const today = new Date();
@@ -48,10 +47,8 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
                 session.participants.forEach((participant) => {
                   if (participant.userID._id == Authentication.user._id) {
                     if (!participant.approved) {
-                      console.log('Not approved');
                       session.needsApproval = true;
                     } else {
-                      console.log('Approved')
                       session.needsApproval = false;
                     }
                   }

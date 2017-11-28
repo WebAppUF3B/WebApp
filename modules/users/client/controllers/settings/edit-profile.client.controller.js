@@ -42,8 +42,6 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
     $scope.updateUserProfile = function(isValid) {
       Authentication.loading = true;
       $scope.success = $scope.error = null;
-
-      console.log('user birthday? ', $scope.copiedUser.birthday);
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'Please fill in all fields.';
@@ -56,7 +54,6 @@ angular.module('users').controller('EditProfileController', ['$scope', '$http', 
       $http.put(window.location.origin + '/api/profile/', $scope.copiedUser, $scope.header)
         .then((result) => {
           $scope.success = true;
-          console.log('result in client controller:\n', result.data.user);
           const resultedUser = result.data.user;
           $scope.user.birthday = resultedUser.birthday;
           $scope.user.firstName = resultedUser.firstName;
