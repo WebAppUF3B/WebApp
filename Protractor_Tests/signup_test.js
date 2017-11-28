@@ -19,6 +19,23 @@ describe('Sign up functionality', function() {
     expect(browser.getCurrentUrl()).toEqual('http://localhost:5000/authentication/signup');
     browser.sleep(2000);
   });
+
+
+    it('should successfully signup as a participant and redirect to email sent splashpage', function() {
+    browser.waitForAngular();
+    element(by.css('[ui-sref="authentication.signup"]')).click(); //Finds sign up button
+    element(by.id('firstName')).sendKeys('Test');
+    element(by.id('lastName')).sendKeys('Test');
+    const select = element(by.model('credentials.gender'));
+    select.$('[value="male"]').click();
+    element(by.id('email')).sendKeys('PTest@mxiia.com');
+    element(by.id('address')).sendKeys('Account created by Protractor e2e Testing');
+    element(by.id('password')).sendKeys('Tester123!');
+    element(by.id('confirm')).sendKeys('Tester123!');
+    browser.actions().sendKeys(protractor.Key.ENTER).perform();
+    expect(browser.getCurrentUrl()).toEqual('http://localhost:5000/authentication/email-sent');
+    browser.sleep(2000);
+  });
   
   it('should successfully signup as participant. Will not work if email already exists', function() {
     browser.waitForAngular();
@@ -27,8 +44,8 @@ describe('Sign up functionality', function() {
     element(by.id('lastName')).sendKeys('Test');
     const select = element(by.model('credentials.gender'));
     select.$('[value="male"]').click();
-    element(by.id('email')).sendKeys('participant@mxiia.com');
-    element(by.id('address')).sendKeys('Test');
+    element(by.id('email')).sendKeys('PTest@mxiia.com');
+    element(by.id('address')).sendKeys('Account created by Protractor e2e Testing');
     element(by.id('password')).sendKeys('Tester123!');
     element(by.id('confirm')).sendKeys('Tester123!');
     browser.actions().sendKeys(protractor.Key.ENTER).perform();
