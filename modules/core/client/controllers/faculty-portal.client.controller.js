@@ -125,6 +125,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
           $http.post('/api/courses/', $scope.newCourse, $scope.header).success((response) => {
             $('#addCourseModal').modal('hide');
             $scope.init();
+            alert('The course was successfully added to the system.');
             Authentication.loading = false;
           }).error((err) => {
             $scope.error = 'This course is already in the system!';
