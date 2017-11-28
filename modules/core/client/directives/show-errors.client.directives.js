@@ -4,6 +4,8 @@
  * Edits by Ryan Hutchison
  * Credit: https://github.com/paulyoder/angular-bootstrap-show-errors */
 
+// boiler plate, displays errors on fields when referenced
+
 angular.module('core')
   .directive('showErrors', ['$timeout', '$interpolate', function ($timeout, $interpolate) {
     var linkFn = function (scope, el, attrs, formCtrl) {
