@@ -45,8 +45,23 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
 
             // Place session in correct array
             if (date >= today) {
+              // Highlight sessions if approval is pending
+              if (session.studyID.requireApproval) {
+                session.participants.forEach((participant) => {
+                  if (participant.userID._id == Authentication.user._id) {
+                    if (!participant.approved) {
+                      console.log('Not approved');
+                      session.needsApproval = true;
+                    } else {
+                      console.log('Approved')
+                      session.needsApproval = false;
+                    }
+                  }
+                });
+              }
               $scope.upcomingSessions.data.push(session);
             } else {
+              // Highlight sessions based on whether you attended or not
               session.participants.forEach((participant) => {
                 if (participant.userID._id == Authentication.user._id) {
                   if (participant.attended) {

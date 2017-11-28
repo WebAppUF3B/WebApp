@@ -51,7 +51,6 @@ exports.allSessionsForSignup = function(req, res) {
     const startTime = new Date(slot._doc.startTime);
     const endTime = new Date(slot._doc.endTime);
     const totalTimePeriod = dateUtils.differenceInMins(startTime, endTime);
-    console.log('tw total time')
     const studyDuration = study.duration;
     const studyDurationMs = studyDuration * 60 * 1000;
     let baseStartTime = startTime.getTime();
@@ -76,7 +75,7 @@ exports.allSessionsForSignup = function(req, res) {
       if (newStartTime > endTime) {
         continue;
       }
-      
+
       const newSession = {
         dow: dateUtils.DOWMap(newStartTime.getDay()),
         date: dateUtils.formatMMDDYYYY(newStartTime),
@@ -111,6 +110,7 @@ exports.allSessionsForSignup = function(req, res) {
       }
     });
   });
+  console.log(partialSessions);
   res.status(200).send({ study: study, emptySessions: emptySessions, partialSessions: partialSessions });
 };
 
@@ -336,9 +336,15 @@ exports.sessionSignup = function(req, res) {
           throw err;
         }
 
-        session.participants.push(newParticipant);
+        mailOptionArray = generateMailOptionsForSignup(session.researchers,
+          session.participants,
+          study.participantsPerSession,
+          singingUser,
+          signupSession.startTime,
+          study.title,
+          study.location);
 
-        mailOptionArray = generateMailOptionsForSignup(session.researchers, singingUser, signupSession.startTime, study.title, study.location);
+        session.participants.push(newParticipant);
         session.save()
           .then(() => {
             return Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)));
@@ -615,7 +621,7 @@ const generateMailOptions = (effectedUsers, cancellor, studyTitle) => {
   return mailOptionArray;
 };
 
-const generateMailOptionsForSignup = (effectedUsers, signingUser, sessionTime, studyTitle, studyLocation) => {
+const generateMailOptionsForSignup = (researchers, participants, participantsPerSession, signingUser, sessionTime, studyTitle, studyLocation) => {
   // Email any other participants involved
   const mailOptionArray = [];
   const sessionDate = new Date(sessionTime);
@@ -634,7 +640,7 @@ const generateMailOptionsForSignup = (effectedUsers, signingUser, sessionTime, s
 
   mailOptionArray.push(signingUserOptions);
 
-  effectedUsers.forEach((populatedUser) => {
+  researchers.forEach((populatedUser) => {
     const affectedUser = populatedUser.userID;
     if (affectedUser !== null && affectedUser.email) {
       const emailBody = `Hello ${affectedUser.firstName} ${affectedUser.lastName},
@@ -649,6 +655,29 @@ const generateMailOptionsForSignup = (effectedUsers, signingUser, sessionTime, s
       mailOptionArray.push(mailOptions);
     }
   });
+
+  console.log(`\n\nChecking Full Email\nParticipants per session: ${participantsPerSession}\nParticipants.length ${participants.length}\n\n`)
+  if (participantsPerSession > 1 && participants.length + 1 === participantsPerSession) {
+    researchers.concat(participants).forEach((populatedUser) => {
+      const affectedUser = populatedUser.userID;
+      if (affectedUser !== null && affectedUser.email) {
+        const emailBody = `Hello ${affectedUser.firstName} ${affectedUser.lastName},
+                     \nThe last participant required for "${studyTitle}" on ${sessionMMDDYY} at ${sessionTimeOfDay} located at ${studyLocation} has signed up.
+                     \nThe session is now confirmed and will take place.`;
+
+        console.log('\n\n\n', emailBody);
+
+        const mailOptions = {
+          from: 'no.replyhccresearch@gmail.com',
+          to: affectedUser.email,
+          subject: `Session Confirmed for "${studyTitle}"`,
+          text: emailBody
+        };
+        mailOptionArray.push(mailOptions);
+      }
+    });
+  }
+
   return mailOptionArray;
 };
 

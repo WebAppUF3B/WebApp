@@ -715,6 +715,10 @@ hr {
   background-color: #e0a9a9 !important;
 }
 
+.approval-pending {
+  background-color: #ffe7a8 !important;
+}
+
 .not-bold{
   font-weight: normal;
 }
