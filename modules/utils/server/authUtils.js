@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
-const lodash = require('lodash');
 const policies = require('./userPolicyUtils');
 
+// Will authorize a user based on policies defined by certain roles.
+// Roles decoded from JWT's
 exports.authUser = function(req, res, next) {
 
   const reqPath = req.path;
@@ -39,7 +40,7 @@ exports.authUser = function(req, res, next) {
 
       if (!checkRolePermissions(decodedUser.role, req.method, reqPath)) {
         return res.status(unauthorizedUserErr.code).send(unauthorizedUserErr);
-      };
+      }
 
       req.decodedUser = decodedUser;
       next();
@@ -47,6 +48,7 @@ exports.authUser = function(req, res, next) {
   }
 };
 
+// 24 hour cancellation ahead of time. Added to url in email.
 exports.generateCancellationToken = function(object) {
   const token = jwt.sign(object, process.env.JWT);
   return token;
@@ -59,6 +61,7 @@ exports.parseCancellationToken = function(token) {
   return object;
 };
 
+// Token is added to url in a provided email.
 exports.generateResetPasswordToken = function(object) {
   const token = jwt.sign(object, process.env.JWT);
   return token;
@@ -71,6 +74,7 @@ exports.parseResetPasswordToken = function(token) {
   return object;
 };
 
+// General auth jwt for most backend resources
 const parseAuthToken = function(req) {
   const token = req.body.authToken || req.headers['x-access-token'];
   if (token) {
@@ -102,6 +106,7 @@ const checkRolePermissions = (role, reqMethod, reqPath) => {
   }
 };
 
+// checkout the re REGEX's in the policy utils
 const checkPermissions = (rolePermissions, reqMethod, reqPath) => {
   let isAllowed = false;
 
