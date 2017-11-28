@@ -12,7 +12,7 @@ var path = require('path'),
   crypto = require('crypto'),
   authUtils = require('../../../utils/server/authUtils');
 
-//*//
+//queries database to get users that need to be approved by admin
 exports.getWaitingUsers = function(req, res) {
   User.find({ emailValidated: true, adminApproved: false }, '-salt -password')
     .exec()
@@ -24,6 +24,9 @@ exports.getWaitingUsers = function(req, res) {
     });
 };
 
+//new user is pushed from front end admin portal
+// random password generated
+// email sent to user to change their password
 exports.createUser = function(req, res) {
   const newUser = req.body;
   newUser.password = crypto.randomBytes(12).toString('base64');
@@ -32,7 +35,6 @@ exports.createUser = function(req, res) {
   if (newUser.role === 'faculty') {
     newUser.position = 'Faculty';
   }
-   //generate me pls
   //must generate jwt then embed in url on email
   const user = new User(newUser);
   const token = authUtils.generateResetPasswordToken(user.email);
@@ -72,7 +74,8 @@ exports.createUser = function(req, res) {
     });
 };
 
-//*//
+//changes flag in database so that user is approved
+//emails user to le them know of approval
 exports.approveUser = function(req, res) {
   const thisUser = req.model;
 
@@ -105,7 +108,8 @@ exports.approveUser = function(req, res) {
 
 };
 
-//*//
+//deletes user from databse
+//emails user to le them know of denial
 exports.denyUser = function(req, res) {
   const thisUser = req.model;
 
@@ -159,7 +163,7 @@ exports.userByID = function(req, res, next, id) {
   });
 };
 
-/* Retreive all the Users */
+// gets all users from database
 exports.getAllUsers = function(req, res) {
   User.find({}, '-salt -password')
   .then((results) => {
@@ -186,12 +190,12 @@ exports.getUser = function(req, res) {
   });
 };
 
+//submits modified user to database
 exports.editUser = function(req, res) {
   const theUser = req.body; //the data from the form
   const original = req.model; //data from db
   User.findById(original.id, '-salt -password')
   .then((results) => {
-    //there's probably a better way to do this but this way does work...
     if (theUser.gender !== original.gender) {
       if (theUser.gender === '') {
         console.log('gender can\'t be empty');
