@@ -90,6 +90,9 @@
     margin: auto;
     padding: 0px !important;
   }
+  .make-tall {
+    min-height: 750px;
+  }
 }
 
 /* For Tablet/Phone */
