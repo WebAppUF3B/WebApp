@@ -5,11 +5,9 @@ angular.module('sessions').controller('SessionCancellationController', ['$scope'
 
       // Get token
       const token = $stateParams.token;
-
       $scope.user = Authentication.user;
-
       $scope.authToken = Authentication.authToken;
-
+      Authentication.loading = true;
       $scope.header = {
         headers: {
           'Content-Type': 'application/json',
@@ -19,8 +17,12 @@ angular.module('sessions').controller('SessionCancellationController', ['$scope'
 
       // Cancel the session
       $http.delete(`${window.location.origin}/api/sessions/cancel/${token}`, $scope.header)
+        .then(() => {
+          Authentication.loading = false;
+        })
         .catch((err) => {
           $scope.error = true;
+          Authentication.loading = false;
           console.log(err);
         });
     };
