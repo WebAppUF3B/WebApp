@@ -3,6 +3,8 @@
 angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams', 'Authentication',
   function($scope, $http, NgTableParams, Authentication) {
 
+    Authentication.loading = true;
+
     let alreadyClicked = false;
 
     $scope.user = Authentication.user;
@@ -32,11 +34,13 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
             counts: [], // hides page sizes
             dataset: $scope.allUsers // select data
           });
-
+          Authentication.loading = false;
         })
         .catch((err) => {
+          Authentication.loading = false;
           console.log(err);
         });
+
     };
 
     $scope.toTitleCase = function(str) {
