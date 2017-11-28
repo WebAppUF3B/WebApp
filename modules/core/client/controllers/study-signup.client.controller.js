@@ -56,7 +56,7 @@ angular.module('core').controller('StudySignupController', ['$scope','$http', '$
           $scope.partialSessionsTable = new NgTableParams({
             count: 10,
             sorting: {
-              startTime: 'desc'
+              startTime: 'asc'
             }
           }, {
             counts: [], // hides page sizes
@@ -66,7 +66,7 @@ angular.module('core').controller('StudySignupController', ['$scope','$http', '$
           $scope.emptySessionsTable = new NgTableParams({
             count: 10,
             sorting: {
-              startTime: 'desc'
+              startTime: 'asc'
             }
           }, {
             counts: [], // hides page sizes
