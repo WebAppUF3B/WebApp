@@ -1,4 +1,4 @@
-angular.module('core').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams', 'Authentication',
+angular.module('studies').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams', 'Authentication',
   function($scope, $http, NgTableParams, $location, $state, $stateParams, Authentication) {
     let alreadyClicked = false;
 
@@ -213,7 +213,7 @@ angular.module('core').controller('StudyDataController', ['$scope','$http','NgTa
 
     $scope.toTitleCase = function(str) {
       if (!str) return;
-      
+
       return str.replace(/\w\S*/g, (txt) => {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       });

@@ -1,4 +1,4 @@
-angular.module('core.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController',
+angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController',
 ['$scope','$http', '$location', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $http, $location, $state, $stateParams, $document, Authentication) {
     $scope.user = Authentication.user;

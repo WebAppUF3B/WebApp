@@ -22,48 +22,9 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/participant',
       templateUrl: 'modules/core/client/views/participant-portal.client.view.html'
     })
-    .state('studies', {
-      url: '/studies',
-      templateUrl: 'modules/core/client/views/studies.client.view.html'
-    })
-    .state('studies.discover', {
-      url: '/discover',
-      templateUrl: 'modules/core/client/views/study-discovery.client.view.html'
-    })
-    .state('studies.sign-up', {
-      url: '/sign-up/:studyId',
-      templateUrl: 'modules/core/client/views/study-sign-up.client.view.html'
-    })
-    .state('studies.thank-you', {
-      url: '/thank-you',
-      templateUrl: 'modules/core/client/views/study-thank-you.client.view.html'
-    })
     .state('researcher-portal', {
       url: '/researcher',
       templateUrl: 'modules/core/client/views/researcher-portal.client.view.html'
-    })
-    .state('studies.create', {
-      url: '/create',
-      templateUrl: 'modules/core/client/views/study-create.client.view.html'
-    })
-    .state('studies.edit', {
-      url: '/edit/:studyId',
-      templateUrl: 'modules/core/client/views/study-create.client.view.html'
-    })
-    .state('studies.availability', {
-      url: '/availability/:studyId',
-      templateUrl: 'modules/core/client/views/availability.client.view.html'
-    })
-    .state('studies.availability-edit', {
-      url: '/edit/availability/:studyId',
-      templateUrl: 'modules/core/client/views/availability.client.view.html',
-      params: {
-        studyId: null
-      }
-    })
-    .state('studies.data', {
-      url: '/data/:studyId',
-      templateUrl: 'modules/core/client/views/study-data.client.view.html'
     })
     .state('faculty-portal', {
       url: '/faculty',
