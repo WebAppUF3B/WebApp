@@ -22,21 +22,6 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/participant',
       templateUrl: 'modules/core/client/views/participant-portal.client.view.html'
     })
-<<<<<<< HEAD
-    .state('studies', {
-      url: '/studies',
-      templateUrl: 'modules/core/client/views/studies.client.view.html'
-    })
-    .state('studies.discover', {
-      url: '/discover',
-      templateUrl: 'modules/core/client/views/study-discovery.client.view.html'
-    })
-    .state('studies.sign-up', {
-      url: '/sign-up/:studyId',
-      templateUrl: 'modules/core/client/views/study-sign-up.client.view.html'
-    })
-=======
->>>>>>> 9bcb46851164e1af4040ff36f400198cd8eb7899
     .state('researcher-portal', {
       url: '/researcher',
       templateUrl: 'modules/core/client/views/researcher-portal.client.view.html'

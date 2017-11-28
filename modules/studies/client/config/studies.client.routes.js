@@ -17,10 +17,6 @@ angular.module('studies').config(['$stateProvider',
         url: '/sign-up/:studyId',
         templateUrl: 'modules/studies/client/views/study-sign-up.client.view.html'
       })
-      .state('studies.thank-you', {
-        url: '/thank-you',
-        templateUrl: 'modules/studies/client/views/study-thank-you.client.view.html'
-      })
       .state('studies.create', {
         url: '/create',
         templateUrl: 'modules/studies/client/views/study-create.client.view.html'
