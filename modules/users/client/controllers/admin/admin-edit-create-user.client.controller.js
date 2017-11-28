@@ -1,16 +1,12 @@
 'use strict';
 
-angular.module('core').controller('AdminEditCreateController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication',
+angular.module('users.adminEdit').controller('AdminEditCreateController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $rootScope, NgTableParams, $http, $state, $stateParams, $document, Authentication) {
     /* Get all the listings, then bind it to the scope */
     $scope.currentUser = {};
 
     $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
-
     $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
-
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
