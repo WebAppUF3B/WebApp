@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('core').controller('AdminManageUsersController', ['$scope', '$http', 'NgTableParams', '$state', '$stateParams', 'Authentication',
+angular.module('users.adminEdit').controller('AdminManageUsersController', ['$scope', '$http', 'NgTableParams', '$state', '$stateParams', 'Authentication',
   function($scope, $http, NgTableParams, $state, $stateParams, Authentication) {
 
     $scope.user = Authentication.user;

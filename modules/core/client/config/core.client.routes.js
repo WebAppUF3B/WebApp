@@ -73,14 +73,6 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/admin',
       templateUrl: 'modules/core/client/views/admin-portal.client.view.html'
     })
-    .state('manage-users', {
-      url: '/admin/manage-users',
-      templateUrl: 'modules/core/client/views/manage-users.client.view.html'
-    })
-    .state('edit-user', {
-      url: '/admin/manage-users/edit/:userId',
-      templateUrl: 'modules/core/client/views/edit-user.client.view.html'
-    })
     .state('create-user', {
       url: '/admin/manage-users/create',
       templateUrl: 'modules/core/client/views/edit-user.client.view.html'
