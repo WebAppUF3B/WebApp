@@ -14,9 +14,6 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     $scope.participatedStudies = {};
     $scope.extraCredit = {};
     $scope.newCourse = {};
-
-    // Prevent race condition
-    let alreadyClicked = false;
     $scope.currentStudy = {};
 
     // Search on 'enter' press
@@ -36,10 +33,10 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.allCourses = results.data;
-          Authentication.loading = false;
         });
     };
 
+    // Attempt to populate users when everything is selected
     $scope.attemptPopulate = function() {
       if ($scope.selectedCourse && $scope.selectedSemester) {
         populateCourse();
@@ -47,6 +44,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
     };
 
     const populateCourse = function() {
+      Authentication.loading = true;
       $scope.sessions.extraCreditByCourse($scope.selectedCourse.name)
         .then((results) => {
           // Assign results to upcomingSessions.data
@@ -62,6 +60,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
             counts: [], // hides page sizes
             dataset: $scope.participatedStudies.data // select data
           });
+          Authentication.loading = false;
         });
     };
 
@@ -86,6 +85,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
           temp = { startDate: new Date(temp.startDate.getFullYear(), 7, 15), endDate: new Date(temp.startDate.getFullYear() + 1, 0, 1), name: 'Fall' };
         }
       }
+      Authentication.loading = false;
     };
 
     // Open the list of students modal
@@ -115,18 +115,21 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
 
     // Add the new course code to the database
     $scope.addCourse = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
+        Authentication.loading = true;
+
         if (!$scope.newCourse.name) {
           $scope.error = 'The course name cannot be empty!';
+          Authentication.loading = false;
         } else {
           $http.post('/api/courses/', $scope.newCourse, $scope.header).success((response) => {
             $('#addCourseModal').modal('hide');
             $scope.init();
-            alreadyClicked = false;
+            Authentication.loading = false;
           }).error((err) => {
             $scope.error = 'This course is already in the system!';
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
         }
       }
@@ -134,8 +137,8 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
 
     // Export the list of students for canvas
     $scope.exportCSV = function() {
-      if (!alreadyClicked) {
-        alreadyClicked = true;
+      if (!Authentication.loading) {
+        Authentication.loading = true;
 
         const fileName = "Grades-" + $scope.currentStudy.studyTitle + '.csv';
         let mimeType = 'text/csv;encoding=utf-8';
@@ -171,7 +174,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
           location.href = 'data:application/octet-stream,' + encodeURIComponent(csvContent); //only this mime type is supported
         }
         $('#exportModal').modal('hide');
-        alreadyClicked = false;
+        Authentication.loading = false;
       }
     };
 

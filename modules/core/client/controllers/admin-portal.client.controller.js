@@ -5,8 +5,6 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
 
     Authentication.loading = true;
 
-    let alreadyClicked = false;
-
     $scope.user = Authentication.user;
     $scope.authToken = Authentication.authToken;
     $scope.header = {
@@ -55,40 +53,40 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     };
 
     $scope.approveUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
+        Authentication.loading = true;
         $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, {} ,$scope.header)
           .then(() => {
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = err;
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };
 
     // Will also delete a user
     $scope.denyUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
+        Authentication.loading = true;
         $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, $scope.header)
           .then(() => {
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = err;
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };
