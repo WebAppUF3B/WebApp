@@ -13,7 +13,9 @@ angular.module('users.signup').controller('AuthenticationController', ['$scope',
     // Get an eventual error defined in the URL query string:
     $scope.error = $location.search().err;
 
+    // Runs on page load
     function init() {
+      Authentication.loading = true;
       $scope.credentials = {};
       $scope.focus = false;
       if ($scope.authentication.user) {
@@ -27,10 +29,13 @@ angular.module('users.signup').controller('AuthenticationController', ['$scope',
           $state.go('admin-portal');
         }
       }
+      Authentication.loading = false;
     }
     init();
 
+    // Sign up function for participants
     $scope.signup = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
       $scope.credentials.birthday = $('#birthday').val();
 
@@ -39,23 +44,29 @@ angular.module('users.signup').controller('AuthenticationController', ['$scope',
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'All fields are required.';
+        Authentication.loading = false;
         return false;
       }
 
       delete $scope.credentials.confirm;
 
+      // Post to normal participant sign up in backend
       $http.post('/api/auth/signup', $scope.credentials).success((response) => {
         // If successful we assign the response to the global user model
         $scope.authentication.user = response;
 
         // And redirect to the previous or home page
+        Authentication.loading = false;
         $state.go('authentication.email-sent');
       }).error((response) => {
         $scope.error = response.message;
+        Authentication.loading = false;
       });
     };
 
+    // Sign up function for faculty
     $scope.facultySignup = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
       $scope.credentials.birthday = $('#birthday').val();
       $scope.credentials.position = 'Faculty';
@@ -63,39 +74,50 @@ angular.module('users.signup').controller('AuthenticationController', ['$scope',
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'All fields are required.';
+        Authentication.loading = false;
         return false;
       }
       delete $scope.credentials.confirm;
 
+      // Post to faculty sign up in backend
       $http.post('/api/auth/signup/faculty', $scope.credentials).success((response) => {
         $scope.authentication.user = response;
 
+        Authentication.loading = false;
         $state.go('authentication.email-sent');
       }).error((response) => {
         $scope.error = response.message;
+        Authentication.loading = false;
       });
     };
 
+    // Signup function for researcher
     $scope.researcherSignup = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
       $scope.credentials.birthday = $('#birthday').val();
 
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'All fields are required.';
+        Authentication.loading = false;
         return false;
       }
       delete $scope.credentials.confirm;
 
+      // Post to researcher sign up in backend
       $http.post('/api/auth/signup/researcher', $scope.credentials).success((response) => {
         $scope.authentication.user = response;
 
+        Authentication.loading = false;
         $state.go('authentication.email-sent');
       }).error((response) => {
         $scope.error = response.message;
+        Authentication.loading = false;
       });
     };
 
+    // Clicking calendar opens birthday menu
     $scope.toggleBirthdayFocus = function() {
       $scope.focus = !$scope.focus;
       if ($scope.focus) $('#birthday').focus();
@@ -106,16 +128,20 @@ angular.module('users.signup').controller('AuthenticationController', ['$scope',
       $scope.focus = true;
     });
 
+    // Sign in for all users
     $scope.signin = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'Please enter your username and password.';
+        Authentication.loading = false;
         return false;
       }
 
       $scope.credentials.email = $scope.credentials.email.toLowerCase();
 
+      // Post to backend to signin
       $http.post('/api/auth/signin', $scope.credentials).success((response) => {
         localStorage.setItem('authToken', JSON.stringify(response.authToken));
         $scope.authentication.authToken = response.authToken;
@@ -124,18 +150,11 @@ angular.module('users.signup').controller('AuthenticationController', ['$scope',
         redirect(response.user);
       }).error((response) => {
         $scope.error = response.message;
+        Authentication.loading = false;
       });
     };
 
-    // OAuth provider request
-    $scope.callOauthProvider = function(url) {
-      if ($state.previous && $state.previous.href) {
-        url += '?redirectTo=' + encodeURIComponent($state.previous.href);
-      }
-
-      // Effectively call OAuth authentication route:
-      $window.location.href = url;
-    };
+    // Validate passwords match
     $scope.validateConfirmPassword = (confirmation) => {
       const password = $scope.userForm.password.$viewValue;
       if (confirmation && password && confirmation !== password) {

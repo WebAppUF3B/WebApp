@@ -15,6 +15,7 @@ angular.module('users.adminEdit').controller('AdminEditCreateController', ['$sco
       }
     };
 
+    // When you click the calendar, the date panel appears
     $scope.toggleBirthdayFocus = function() {
       $scope.focus = !$scope.focus;
       if ($scope.focus) $('#birthday').focus();
@@ -25,6 +26,7 @@ angular.module('users.adminEdit').controller('AdminEditCreateController', ['$sco
       $scope.focus = true;
     });
 
+    // Runs when the page loads
     $scope.init = function() {
       if ($state.current.name === 'edit-user') {
 
@@ -53,9 +55,10 @@ angular.module('users.adminEdit').controller('AdminEditCreateController', ['$sco
       }
     };
 
+    // Click submit button
     $scope.submit = function(isValid) {
+      Authentication.loading = true;
       $scope.error = null;
-      console.log(isValid);
       if ($scope.state === 'edit') {
         console.log('edit');
         $scope.update(isValid);
@@ -65,8 +68,8 @@ angular.module('users.adminEdit').controller('AdminEditCreateController', ['$sco
       }
     };
 
+    // Get user if editing
     $scope.getUser = function() {
-      //console.log($stateParams.userId);
       return $http.get(window.location.origin + '/api/admin/editUser/' + $stateParams.userId, $scope.header)
       .then((results) => {
         Authentication.loading = false;
@@ -80,31 +83,32 @@ angular.module('users.adminEdit').controller('AdminEditCreateController', ['$sco
       });
     };
 
+    // Create user
     $scope.create = function(isValid) {
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'Please fill in all required fields.';
+        Authentication.loading = false;
         return false;
       }
       $scope.currentUser.birthday = $('#birthday').val();
 
-      console.log($scope.currentUser);
       $http.post('/api/admin/createUser', $scope.currentUser, $scope.header).success((response) => {
         // If successful we assign the response to the global user model
         // And redirect to the previous or home page
-        console.log(response._id);
         $state.go('manage-users', { 'edit-user': response._id });
       }).error((response) => {
         $scope.error = response.message;
-        alert(response.message);
+        Authentication.loading = false;
       });
     };
 
-
+    // Update user
     $scope.update = function(isValid) {
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'Please fill in all required fields.';
+        Authentication.loading = false;
         return false;
       }
       $scope.currentUser.birthday = $('#birthday').val();
@@ -114,6 +118,7 @@ angular.module('users.adminEdit').controller('AdminEditCreateController', ['$sco
         $state.go('manage-users');
       }).error((response) => {
         $scope.error = response.message;
+        Authentication.loading = false;
       });
     };
     $scope.init();

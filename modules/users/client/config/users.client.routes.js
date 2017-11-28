@@ -25,6 +25,10 @@ angular.module('users').config(['$stateProvider',
         url: '/admin/manage-users',
         templateUrl: 'modules/users/client/views/admin/manage-users.client.view.html'
       })
+      .state('create-user', {
+        url: '/admin/manage-users/create',
+        templateUrl: 'modules/users/client/views/admin/edit-user.client.view.html'
+      })
       .state('settings.password', {
         url: '/password',
         templateUrl: 'modules/users/client/views/settings/change-password.client.view.html'

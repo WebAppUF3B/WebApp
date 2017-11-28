@@ -34,10 +34,6 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/admin',
       templateUrl: 'modules/core/client/views/admin-portal.client.view.html'
     })
-    .state('create-user', {
-      url: '/admin/manage-users/create',
-      templateUrl: 'modules/core/client/views/edit-user.client.view.html'
-    })
     .state('reset-password', {
       url: '/reset-password/:token',
       templateUrl: 'modules/core/client/views/reset-password.client.view.html'

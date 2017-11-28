@@ -229,7 +229,7 @@ h2, h3, h4, h5, h6 {
 }
 
 .loading-background {
-  position: absolute;
+  position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
