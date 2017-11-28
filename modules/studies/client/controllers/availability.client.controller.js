@@ -3,7 +3,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
   function($scope, $http, $location, $state, $stateParams, $document, Authentication) {
 
     Authentication.loading = true;
-
+    //policy security
     $scope.user = Authentication.user;
     $scope.authToken = Authentication.authToken;
     $scope.header = {
@@ -12,7 +12,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
         'x-access-token': $scope.authToken
       }
     };
-
+    //on start of page...
     const init = function() {
       $scope.studyId = $stateParams.studyId;
       $scope.availability = [];
@@ -35,7 +35,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
           return '';
         }
       };
-
+      //detect state of edit or define availability
       if ($state.current.name === 'studies.availability-edit') {
         $scope.state = 'edit';
       }
@@ -60,6 +60,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
 
         // Prepare data for calendar
         if ($scope.state === 'edit') {
+          //interpret availability in existing study
           $scope.putInDate = [];
           $scope.interpretCurrentAvailability();
           $scope.selectedDates = $scope.putInDate; //able to manipulated via external array first.
@@ -75,7 +76,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
         Authentication.loading = true;
       });
     };
-
+    //remove a day from the selectedDays list
     $scope.removeFromSelected = function(dt) {
       console.log('Removing: ' + dt);
       $scope.selectedDates.splice($scope.selectedDates.indexOf(dt), 1);
@@ -88,11 +89,11 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
         }
       }
     };
-
+    //sending information to update study
     $scope.sendAvailability = function() {
 
       Authentication.loading = true;
-
+      //ensure no timeslots overlap
       for (let x = 0; x<$scope.availability.length; x++) {
         for (let y = 0; y<$scope.availability.length; y++) {
           if (x === y) {
@@ -115,7 +116,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
           }
         }
       }
-
+      //interpret availability to proper form for backend
       for (let x = 0; x < $scope.availability.length; x++) {
         if ($scope.availability[x].startTime === null || $scope.availability[x].endTime === null) {
           continue;
@@ -156,7 +157,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
       });
 
     };
-
+    //adding a timeslot for a day
     $scope.addEntry = function(date) {
       //multipicker saves dates in unix milliseconds
       const convertDateToDate = new Date (date);
@@ -178,7 +179,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
           return err;
         });
     };
-
+    //prep the dropdown options
     $scope.prepStartTime = function() {
       if ($scope.currentStudy.duration === 15) {
         for (let hour = 0; hour <= 23; hour++) {
@@ -209,7 +210,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
         }
       }
     };
-
+    //in repsonse to startTimes
     $scope.prepEndTime = function(possibility) {
       let startDate = new Date(possibility.unixDate);
       const startTimeArray = possibility.startTime.split(':');
@@ -236,7 +237,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
       if ($scope.currentStudy.duration === 60 || $scope.currentStudy.duration === '30') {
         addMinutes = 60;
       }
-
+      //interpreting values for endTimes
       while (moment(nextTime).add(addMinutes,'m').toDate() <= endOfDay) {
         nextTime = moment(nextTime).add(addMinutes,'m').toDate();
         const nextTimeUnix = nextTime.getTime();
@@ -248,7 +249,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
       const lastObj = { val: nextTime.getHours() + ':' + nextTime.getMinutes(), show: moment(lastTimeUnix).format('hh:mm A') };
       possibility.endTimeList.push(lastObj);
     };
-
+    //setting up temp array to copy over timeslots
     $scope.copyToTemp = function(date) {
       $scope.copyTemp = [];
       console.log('copyExist to date:');
@@ -266,7 +267,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
       console.log('finished populating copyExist');
       console.log($scope.copyTemp);
     };
-
+    //interpreting temp copy array to paste into another day's timeslots
     $scope.pasteToDay = function(date) {
 
       for (let x = 0; x<$scope.availability.length; x++) {
@@ -287,7 +288,7 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
         $scope.prepEndTime($scope.availability[$scope.availability.length-1]);
       }
     };
-
+    //adding avaiability
     $scope.removeEntry = function(date) {
       let index = -1;
       //alert('Removing Entry from date: '+convertedDate);

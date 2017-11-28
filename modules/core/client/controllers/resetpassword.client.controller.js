@@ -17,19 +17,14 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
     Authentication.loading = true;
 
     $scope.user = Authentication.user;
-    console.log('tw user', $scope.user);
-
     $scope.authToken = Authentication.authToken;
-    console.log('tw auth token', $scope.authToken);
-
-    let isLoggedIn = false;
-
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
         'x-access-token': $scope.authToken
       }
     };
+    let isLoggedIn = false;
 
     // Runs when page loads
     $scope.init = function() {
@@ -49,8 +44,7 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
     };
     $scope.init();
 
-
-
+    // Password change for users not logged in
     $scope.resetPassword = function(isValid) {
       Authentication.loading = true;
       $scope.error = null;
@@ -85,6 +79,7 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
       });
     };
 
+    //password change for users logged in
     $scope.resetPasswordKnown = function(isValid) {
       Authentication.loading = true;
       $scope.error = null;
@@ -120,7 +115,6 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
       });
     };
 
-
     $scope.forgotPassword = function(isValid) {
       if (!isValid) {
         $scope.error = 'Please fill in all fields';
@@ -128,7 +122,7 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
         return;
       }
 
-      return $http.post(window.location.origin + '/api/password/forgot/' + $scope.credentials.email)//, $scope.header)
+      return $http.post(window.location.origin + '/api/password/forgot/' + $scope.credentials.email)
       .then((results) => {
         alert('We\'ve sent you an email with a link to reset your password.');
         $state.go('authentication.signin');

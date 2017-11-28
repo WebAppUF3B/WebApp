@@ -2,10 +2,9 @@
 const hostRoutes = [
   /^\/api\/sessions\/emailReminders$/,
   /^\/api\/sessions\/cancel\/.*$/
-  // /^\api\/password\/forgot\/.*$/,
-  // /^\api\/password\/reset$/
 ];
 
+// routes that need to be checked for a jwt
 const secureCommonRoutes = [
   '/api/profile',
   '/api/studies',
@@ -16,6 +15,10 @@ const secureCommonRoutes = [
 ];
 
 // https://regex101.com/
+
+// resources that each role can access.
+// Included are the regular expressions representing a
+// given path and http method
 const participantPermissions = {
   GET: [
     /^\/api\/sessions\/user\/\w*$/,
@@ -78,6 +81,8 @@ const facultyPermissions = {
   DELETE: [
   ]
 };
+
+// pedantically included.
 const adminPermissions = {
   GET: [
     /^\/api\/admin\/approval$/,
@@ -96,7 +101,9 @@ const adminPermissions = {
   ]
 };
 
-
+// roles can participate in several kinds of groups. When modifying those
+// Permissions below, you give a user access to that certain group of
+// resources
 const participant = {
   permissions: [participantPermissions]
 };

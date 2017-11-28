@@ -32,6 +32,9 @@ exports.allSessionsFromStudy = function(req, res) {
   res.status(200).send({ sessions: req.allSessionsByStudyId, study: req.study });
 };
 
+
+// Generates all StudySessions ahead of time. StudySessions are
+// not persisted ahead of time
 exports.allSessionsForSignup = function(req, res) {
   const study = req.study;
   const timeSlots = study.availability;
@@ -58,6 +61,7 @@ exports.allSessionsForSignup = function(req, res) {
     const numOfStudySessions = totalTimePeriod / studyDuration;
     if (endTime < today) return;
 
+    // The possible study sessions that can be generated in a given time range
     for (let i = 0; i < numOfStudySessions; i++) {
       baseStartTime = studyDurationMs + baseStartTime;
 
@@ -86,6 +90,7 @@ exports.allSessionsForSignup = function(req, res) {
       emptySessions.push(newSession);
     }
 
+    // If the user is already signed up for a particular study, don't send it back
     existingStudySessions.forEach((existingStudySession) => {
       if (existingStudySession && existingStudySession.participants) {
         const attended = existingStudySession.participants.some((participant) => {
@@ -707,7 +712,6 @@ exports.emailReminders = function(req, res) {
 
             if (session.participants.length === session.studyID.participantsPerSession) {
               // If the session has enough participants, send reminder email
-              console.log("Reminder Email");
               // Set up emails for each participant
               session.participants.forEach((affectedUser) => {
                 const object = {};
@@ -787,7 +791,7 @@ exports.emailReminders = function(req, res) {
         res.status(400).send(err);
       });
   } else {
-    console.log("Email reminder accessed from outside the system");
+    console.log('Email reminder accessed from outside the system');
     res.status(403).send();
   }
 };

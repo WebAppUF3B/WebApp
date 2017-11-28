@@ -18,9 +18,7 @@ angular.module('core').controller('ParticipantPortalController', ['$scope','$htt
       $scope.pastSessions.data = [];
 
       $scope.user = Authentication.user;
-
       $scope.authToken = Authentication.authToken;
-
       $scope.header = {
         headers: {
           'Content-Type': 'application/json',
