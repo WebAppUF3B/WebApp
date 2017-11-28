@@ -1,14 +1,21 @@
 'use strict';
 
-angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams',
-  function($scope, $http, NgTableParams) {
+angular.module('core').controller('AdminPortalController', ['$scope', '$http', 'NgTableParams', 'Authentication',
+  function($scope, $http, NgTableParams, Authentication) {
 
-    let alreadyClicked = false;
+    Authentication.loading = true;
 
+    $scope.user = Authentication.user;
+    $scope.authToken = Authentication.authToken;
+    $scope.header = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-access-token': $scope.authToken
+      }
+    };
     const init = () => {
-      $('section.ng-scope').css('margin-top', '0px');
-      $('section.ng-scope').css('margin-bottom', '0px');
 
+      // All users that need to be confirmed
       $scope.admin.getWaitingUsers()
         .then((results) => {
           $scope.allUsers = results.data;
@@ -21,11 +28,21 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
             counts: [], // hides page sizes
             dataset: $scope.allUsers // select data
           });
-
+          Authentication.loading = false;
         })
         .catch((err) => {
+          Authentication.loading = false;
           console.log(err);
         });
+
+    };
+
+    $scope.toTitleCase = function(str) {
+      if (!str) return;
+
+      return str.replace(/\w\S*/g, (txt) => {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      });
     };
 
     $scope.approvalDetails = function(user, index) {
@@ -36,41 +53,40 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     };
 
     $scope.approveUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
-        console.log('Approved!');
-        $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id)
+        Authentication.loading = true;
+        $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, {} ,$scope.header)
           .then(() => {
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = err;
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };
 
+    // Will also delete a user
     $scope.denyUser = function() {
-      if (!alreadyClicked) {
+      if (!Authentication.loading) {
         $scope.error = '';
-        alreadyClicked = true;
-        console.log('DENIED!');
-        $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id)
+        Authentication.loading = true;
+        $http.delete(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, $scope.header)
           .then(() => {
             // Reinitialize table
             init();
             $('#approvalModal').modal('hide');
-            alreadyClicked = false;
+            Authentication.loading = false;
           })
           .catch((err) => {
             console.log(err);
             $scope.error = err;
-            alreadyClicked = false;
+            Authentication.loading = false;
           });
       }
     };
@@ -78,7 +94,7 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
     // Declare methods that can be used to access administrative data
     $scope.admin = {
       getWaitingUsers: function() {
-        return $http.get(window.location.origin + '/api/admin/approval')
+        return $http.get(window.location.origin + '/api/admin/approval', $scope.header)
           .then((results) => {
             return results;
           })

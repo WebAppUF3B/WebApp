@@ -3,16 +3,11 @@
 /**
  * Module dependencies.
  */
-var passport = require('passport');
+const passport = require('passport');
+const users = require('../controllers/users.server.controller');
 
-module.exports = function (app) {
-  // User Routes
-  var users = require('../controllers/users.server.controller');
-
-  // Setting up the users password api
-  app.route('/api/auth/forgot').post(users.forgot);
-  app.route('/api/auth/reset/:token').get(users.validateResetToken);
-  app.route('/api/auth/reset/:token').post(users.reset);
+// User Routes
+module.exports = function(app) {
 
   // Setting up the users authentication api
   app.route('/api/auth/signup').post(users.signup);
@@ -23,39 +18,11 @@ module.exports = function (app) {
 
   app.route('/api/auth/verify/:id').post(users.verify);
 
-  // Setting the facebook oauth routes
-  app.route('/api/auth/facebook').get(users.oauthCall('facebook', {
-    scope: ['email']
-  }));
-  app.route('/api/auth/facebook/callback').get(users.oauthCallback('facebook'));
-
-  // Setting the twitter oauth routes
-  app.route('/api/auth/twitter').get(users.oauthCall('twitter'));
-  app.route('/api/auth/twitter/callback').get(users.oauthCallback('twitter'));
-
-  // Setting the google oauth routes
-  app.route('/api/auth/google').get(users.oauthCall('google', {
-    scope: [
-      'https://www.googleapis.com/auth/userinfo.profile',
-      'https://www.googleapis.com/auth/userinfo.email'
-    ]
-  }));
-  app.route('/api/auth/google/callback').get(users.oauthCallback('google'));
-
-  // Setting the linkedin oauth routes
-  app.route('/api/auth/linkedin').get(users.oauthCall('linkedin', {
-    scope: [
-      'r_basicprofile',
-      'r_emailaddress'
-    ]
-  }));
-  app.route('/api/auth/linkedin/callback').get(users.oauthCallback('linkedin'));
-
-  // Setting the github oauth routes
-  app.route('/api/auth/github').get(users.oauthCall('github'));
-  app.route('/api/auth/github/callback').get(users.oauthCallback('github'));
-
-  // Setting the paypal oauth routes
-  app.route('/api/auth/paypal').get(users.oauthCall('paypal'));
-  app.route('/api/auth/paypal/callback').get(users.oauthCallback('paypal'));
+  app.route('/api/profile/')
+  .get(users.getProfile)
+  .put(users.update);
+  
+  app.route('/api/password/forgot/:email').post(users.forgotPassword);
+  app.route('/api/password/reset').post(users.resetPassword);
+  app.route('/api/password/change').post(users.resetPasswordKnown);
 };

@@ -8,18 +8,8 @@
   </div>
 
   <div class="row">
-    <div class="col-sm-4 col-sm-offset-4">
-      <a class="btn btn-primary full-width" ui-sref="admin-portal.manage-users" href="admin-portal.manage-users">Manage Users</a>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-4 col-sm-offset-4">
-      <a class="btn btn-primary full-width" ui-sref="admin-portal.manage-studies" href="admin-portal.manage-studies">Manage Studies</a>
-    </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-4 col-sm-offset-4">
-      <a class="btn btn-primary full-width" ui-sref="admin-portal.manage-sessions" href="admin-portal.manage-sessions">Manage Sessions</a>
+    <div class="col-sm-10 col-sm-offset-1">
+      <a class="btn btn-orange mobile-full-width float-right no-margin-bottom phone-top-margin" ui-sref="manage-users">Manage Users</a>
     </div>
   </div>
 
@@ -30,7 +20,7 @@
         <tr ng-click="approvalDetails(user, $index)" ng-repeat="user in approvalTable.data">
           <td title="'Name'" filter="{ 'lastName': 'text'}" sortable="'lastName'" ng-attr-title="{{null}}">{{user.firstName}} {{user.lastName}}</td>
           <td title="'Email'" filter="{ 'email': 'text'}" sortable="'email'" ng-attr-title="{{null}}">{{user.email}}</td>
-          <td title="'Role'" filter="{ 'role': 'text'}" sortable="'role'" ng-attr-title="{{null}}">{{user.role}}</td>
+          <td title="'Role'" filter="{ 'role': 'text'}" sortable="'role'" ng-attr-title="{{null}}">{{toTitleCase(user.role)}}</td>
         </tr>
       </table>
     </div>
@@ -68,19 +58,25 @@
           <div class="row">
             <div class="col-sm-12">
               <p class="mini-title">Email:</p>
-              <p>{{currentUser.email}}</p>
+              <p><a href='mailto:{{currentUser.email}}' target='_blank'>{{currentUser.email}}</a></p>
             </div>
           </div>
           <div class="row">
             <div class="col-sm-12">
               <p class="mini-title">Role:</p>
-              <p>{{currentUser.role}}</p>
+              <p>{{toTitleCase(currentUser.role)}}</p>
+            </div>
+          </div>
+          <div class="row" ng-if="currentUser.role === 'researcher'">
+            <div class="col-sm-12">
+              <p class="mini-title">Position:</p>
+              <p>{{currentUser.position}}</p>
             </div>
           </div>
 
           <div class="row pad-top">
             <div class="col-sm-6">
-              <a class="btn btn-primary full-width" ng-click="approveUser()">Approve User</a>
+              <a id="approveButton" class="btn btn-primary full-width" ng-click="approveUser()">Approve User</a>
             </div>
             <div class="col-sm-6">
               <a class="btn btn-red full-width" ng-click="denyUser()">Deny User</a>

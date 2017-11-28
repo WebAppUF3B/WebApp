@@ -1,0 +1,194 @@
+<div ng-controller="StudyDiscoveryController">
+
+  <!-- Search area -->
+  <div class="search-container">
+    <div class="container">
+      <div class="row search-pad">
+        <div class="col-sm-10">
+          <div class="search-box">
+            <input type="search" id="search" placeholder="Search for a study..." ng-model="searchText" />
+            <button class="icon btn-primary" id="search-btn" ng-click="search()"><i class="fa fa-search"></i></button>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <a class="btn filter-btn btn-orange full-width" ng-click="expandFilters()">Filter<a class="clear-filters-btn btn-red" ng-click="clearFilters()"><i class="fa fa-close"></i></a></a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Filter area -->
+  <div class="filter-area">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-3 col-sm-4">
+          <div class="row">
+            <div class="col-sm-12">
+              <h4>Compensation Type</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <select ng-change="checkFilters()" ng-model="filters.compensationType" class="select-options">
+                <option value="">None</option>
+                <option value="extraCredit">Extra Credit</option>
+                <option value="monetary">Monetary</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="container inner-container">
+
+    <div class="row">
+      <div class="col-sm-12">
+        <h1 class="phone-center"><strong>Active Studies</strong></h1>
+      </div>
+    </div>
+
+    <!-- Study Table -->
+    <div class="row small-top-pad">
+      <div class="col-sm-10 col-sm-offset-1">
+        <table ng-table="studyTable" class="table table-hover entries-selectable hide-col-3-phone shrink-col-3" show-filter="false">
+          <tr ng-click="studyDetails(study, $index)" ng-repeat="study in studyTable.data | filter: searchQuery">
+            <td title="'Title'" filter="{ 'title': 'text'}" sortable="'title'" ng-attr-title="{{null}}">{{study.title}}</td>
+            <td title="'Location'" filter="{ 'location': 'text'}" sortable="'location'" width='30%' ng-attr-title="{{null}}">{{study.location}}</td>
+            <td title="'Compensation Types'" sortable="'satisfied'" width=200px ng-attr-title="{{null}}">
+              <span ng-if="study.compensationType.length == 0">None</span>
+              <span ng-if="study.compensationType.length == 1 && study.compensationType[0] == 'extraCredit'">Extra Credit</span>
+              <span ng-if="study.compensationType.length == 1 && study.compensationType[0] == 'monetary'">Monetary</span>
+              <span ng-if="study.compensationType.length == 2">Extra Credit, Monetary</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Study Modal -->
+    <div id="studyModal" class="modal" role="dialog">
+      <div class="modal-dialog session-modal">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+          <div class="modal-header">
+            <div class="row">
+              <div class="col-xs-8 col-xs-offset-2 text-center">
+                <h3 class="no-margin"><strong>Study Details</strong></h3>
+              </div>
+              <div class="col-xs-2">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+              </div>
+            </div>
+          </div>
+          <div class="pane">
+            <!-- Study Area -->
+            <div class="row">
+              <div class="col-sm-12">
+                <h4 class="underline">Study</h4>
+              </div>
+            </div>
+            <div class="row small-top-pad">
+              <div class="col-sm-12">
+                <p class="mini-title">Title:</p>
+                <p>{{currentStudy.title}}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="mini-title">Description:</p>
+                <p>{{currentStudy.description}}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="mini-title">IRB #:</p>
+                <p>{{currentStudy.irb}}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="mini-title">Location:</p>
+                <p>{{currentStudy.location}}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="mini-title">Duration:</p>
+                <p>{{currentStudy.duration}} minutes</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="mini-title">Participants per Session:</p>
+                <p>{{currentStudy.participantsPerSession}}</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="mini-title">Compensation Types Offered:</p>
+                <p ng-if="currentStudy.compensationType.length == 0">
+                  None
+                </p>
+                <p ng-if="currentStudy.compensationType.length == 1 && currentStudy.compensationType[0] == 'extraCredit'">
+                  Extra Credit
+                </p>
+                <p ng-if="currentStudy.compensationType.length == 1 && currentStudy.compensationType[0] == 'monetary'">
+                  Monetary
+                </p>
+                <p ng-if="currentStudy.compensationType.length == 2">
+                  Extra Credit, Monetary
+                </p>
+              </div>
+            </div>
+            <div class="row" ng-if="currentStudy.compensationType[0] == 'monetary' || currentStudy.compensationType[1] == 'monetary'">
+              <div class="col-sm-12">
+                <p class="mini-title">Compensation Amount:</p>
+                <p>${{currentStudy.compensationAmount}}</p>
+              </div>
+            </div>
+            <div class="row" ng-if="currentStudy.requireApproval">
+              <div class="col-sm-12">
+                <p class="note">This study requires participants to be approved to participate. Please sign up normally and then wait for an email from the researchers with further details.</p>
+              </div>
+            </div>
+
+            <hr>
+
+            <!-- Researcher Area -->
+            <div class="row">
+              <div class="col-sm-12">
+                <h4 class="underline">Researchers</h4>
+              </div>
+            </div>
+            <div class="row" ng-repeat="researcher in currentStudy.researchers">
+              <div class="col-sm-6">
+                <p class="mini-title">Name:</p>
+                <p>{{researcher.userID.firstName}} {{researcher.userID.lastName}}</p>
+              </div>
+              <div class="col-sm-6">
+                <p class="mini-title">Email:</p>
+                <p><a href="mailto:{{researcher.userID.email}}" target="_blank">{{researcher.userID.email}}</a></p>
+              </div>
+              <div class="col-sm-12">
+                <hr class="most-width small-bottom-pad" ng-class="{'hidden':$last}">
+              </div>
+            </div>
+
+            <div class="row pad-top">
+              <div class="col-sm-6 col-sm-offset-3">
+                <a id="joinModalButton"class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.sign-up({ studyId: currentStudy._id })">Sign Up for Study</a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- End Study Modal -->
+
+  </div>
+
+</div>

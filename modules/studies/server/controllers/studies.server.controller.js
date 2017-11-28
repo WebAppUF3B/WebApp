@@ -2,7 +2,9 @@
 
 /* Dependencies */
 const mongoose = require('mongoose'),
-  Study = mongoose.model('Study');
+  Study = mongoose.model('Study'),
+  User = mongoose.model('User'),
+  dateUtils = require('../../../utils/server/dateUtilities');
 
 /**
  * Backend functions for CRUD operations on course collection
@@ -11,7 +13,7 @@ const mongoose = require('mongoose'),
 /* Retreive all the studies */
 exports.getAll = function(req, res) {
   Study.find()
-    .populate('researchers.userID')
+    .populate('researchers.userID', '-salt -password')
     .exec((err, studies) => {
       if (err) {
         res.status(400).send(err);
@@ -21,11 +23,64 @@ exports.getAll = function(req, res) {
     });
 };
 
+exports.getAllAvailable = function(req, res) {
+  const possibleStudies = [];
+  Study.find({ closed: false })
+    .populate('researchers.userID')
+    .populate('availability.existingStudySessions')
+    .then((studies) => {
+      studies.forEach((study) => {
+        if (study.availability && study.availability.length === 0) return;
+        if (study.currentNumber >= study.maxParticipants) return;
+        const today = Date.now();
+        let totalParticipants = 0;
+        const hasOpening = study.availability.some((slot) => {
+          const startTime = new Date(slot.startTime);
+          const endTime = new Date(slot.endTime);
+
+
+          slot.existingStudySessions.forEach((existingSession) => {
+            if (existingSession.participants) totalParticipants = totalParticipants + existingSession.participants.length;
+          });
+
+          if (totalParticipants >= study.maxParticipants) return;
+
+          if (endTime.getTime() < today) return;
+
+          const totalTimePeriod = dateUtils.differenceInMins(startTime, endTime);
+          const studyDuration = study.duration;
+          const numOfStudySessions = totalTimePeriod / studyDuration;
+
+          if (study.participantsPerSession === 1 &&
+              slot.existingStudySessions &&
+              numOfStudySessions <= slot.existingStudySessions.length) return;
+
+          if (study.participantsPerSession > 1 && numOfStudySessions <= slot.existingStudySessions.length) {
+            const hasPartialOpening = slot.existingStudySessions.some((existingSession) => {
+              if (existingSession.participants &&
+                existingSession.participants.length < study.participantsPerSession) return true;
+            });
+
+            if (!hasPartialOpening) return;
+          }
+
+          return true;
+        });
+        console.log('tw get all hasOpening', study.title, hasOpening);
+        if (hasOpening) possibleStudies.push(study);
+      });
+      res.status(200).send(possibleStudies);
+    })
+    .catch((err) => {
+      console.log('Get all error\n', err);
+      res.status(400).send({ message: 'Please contact and admin' });
+    });
+};
+
 /* Create a study */
 exports.create = function(req, res) {
   /* Instantiate a study */
   const study = new Study(req.body);
-  console.log('PV', study);
   /* Then save the study */
   study.save((err) => {
     if (err) {
@@ -46,42 +101,28 @@ exports.get = function(req, res) {
 
 /* Update a study */
 exports.update = function(req, res) {
-  console.log('hello world');
-  console.log(req.body.title+'\n\n\n');
+  const study = req.study;
+  study.title = req.body.title;
+  study.location = req.body.location;
+  study.irb = req.body.irb;
+  study.compensationType = req.body.compensationType;
+  study.duration = req.body.duration;
+  study.satisfactoryNumber = req.body.satisfactoryNumber;
+  study.maxParticipants = req.body.maxParticipants;
+  study.participantsPerSession = req.body.participantsPerSession;
+  study.description = req.body.description;
+  study.researchers = req.body.researchers;
+  study.availability = req.body.availability;
+  study.requireApproval = req.body.requireApproval;
+  study.compensationAmount = req.body.compensationAmount;
 
-  const id = req.params.studyID;
-
-  Study.findById(id).exec((err, study) => {
+  study.save((err) => {
     if (err) {
       console.log(err);
       res.status(400).send(err);
     } else {
-      console.log('MEOW', study);
-      console.log('MEOW', req.body.title);
-      console.log('MEOW', req.body.location);
-      console.log('MEOW', req.body.irb);
-      console.log('MEOW', req.body.compensationType);
-      console.log('MEOW', req.body.maxParticipants);
-      console.log('MEOW', req.body.maxParticipantsPerSession);
-      console.log('MEOW', req.body.description);
-
-      study.title = req.body.title;
-      study.location = req.body.location;
-      study.irb = req.body.irb;
-      study.compensationType = req.body.compensationType;
-      study.maxParticipants = req.body.maxParticipants;
-      study.maxParticipantsPerSession = req.body.maxParticipantsPerSession;
-      study.description = req.body.description;
-
+      res.json(study);
     }
-    study.save((err) => {
-      if (err) {
-        console.log(err);
-        res.status(400).send(err);
-      } else {
-        res.json(study);
-      }
-    });
   });
 };
 
@@ -96,19 +137,17 @@ exports.delete = function(req, res) {
     } else {
       res.end();
     }
-  })
+  });
 };
 
-// Close a study (no longer accept sign ups, cancel all sessions, and gray out in researcher table)
+// Reopen a study and return it to
 exports.closeStudy = function(req, res) {
   const study = req.study;
   study.closed = true;
-  const cancellor = req.body;
 
   /* Update the study */
   study.save()
     .then(() => {
-      // TODO Cancel all sessions associated with this study
       res.json(study);
     })
     .catch((err) => {
@@ -118,9 +157,9 @@ exports.closeStudy = function(req, res) {
 };
 
 // Remove study (no longer appear in researcher table)
-exports.removeStudy = function(req, res) {
+exports.reopenStudy = function(req, res) {
   const study = req.study;
-  study.removed = true;
+  study.closed = false;
 
   /* Update the study */
   study.save()
@@ -139,32 +178,43 @@ exports.modifyCount = function(id, attended) {
   Study.findById(id).exec((err, study) => {
     if (err) {
       return err;
-    } else {
-      if (attended) {
-        study.currentNumber ++;
-      } else {
-        study.currentNumber --;
-      }
-
-      // Update study
-      study.save()
-        .then(() => {
-          // Return
-          return;
-        })
-        .catch((err) => {
-          console.log(err);
-          return err;
-        });
     }
+    if (attended) {
+      study.currentNumber = study.currentNumber + 1;
+    } else {
+      study.currentNumber = study.currentNumber - 1;
+    }
+
+    // Update study
+    study.save()
+      .then(() => {
+        // Return
+        return;
+      })
+      .catch((err) => {
+        console.log(err);
+        return err;
+      });
   });
+};
+
+exports.listResearchers = function(req, res) {
+  console.log('HELLO RESEARCHERS');
+  User.find({ role: { $ne: 'participant' } }, '-salt -password')
+    .then((arrayOfAllResearchers) => {
+      console.log('Meow Researchers');
+      console.log(arrayOfAllResearchers);
+      res.json(arrayOfAllResearchers);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 };
 
 /*
   Middleware: find a study by its ID, then pass it to the next request handler.
  */
 exports.studyById = function(req, res, next, id) {
-  console.log('PV', 'StudyById fired');
   Study.findById(id).exec((err, study) => {
     if (err) {
       res.status(400).send(err);
@@ -177,7 +227,7 @@ exports.studyById = function(req, res, next, id) {
 
 exports.studyByUserId = function(req, res, next, id) {
   Study.find({ 'researchers.userID': id })
-    .populate('researchers.userID')
+    .populate('researchers.userID', '-salt -password')
     .exec()
     .then((studies) => {
       req.study = studies;

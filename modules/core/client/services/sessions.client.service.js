@@ -29,21 +29,3 @@ angular.module('core').factory('Sessions', ['$http',
     return methods;
   }
 ]);
-
-// TODO Figure out if we need to use $resource
-// angular.module('core').factory('Sessions', ['$resource',
-//   function ($resource) {
-//     return $resource('api/sessions', {}, {
-//       getAll: {
-//         method: 'GET'
-//       },
-//       create: {
-//         method: 'POST'
-//       },
-//       get
-//       update: {
-//         method: 'PUT'
-//       }
-//     });
-//   }
-// ]);

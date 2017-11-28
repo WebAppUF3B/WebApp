@@ -7,19 +7,33 @@
 
   <div class="row">
     <div class="col-sm-10 col-sm-offset-1">
-      <a class="btn btn-orange mobile-full-width float-right no-margin-bottom phone-top-margin" ui-sref="studies.create">Create a New Study</a>
+      <a id="newStudyButton" class="btn btn-orange mobile-full-width float-right no-margin-bottom phone-top-margin" ui-sref="studies.create">Create a New Study</a>
     </div>
   </div>
-
   <div class="row">
     <div class="col-sm-10 col-sm-offset-1">
       <h2 class="text-center">My Studies</h2>
+    </div>
+  </div>
+  <div class="row small-top-pad small-bottom-pad">
+    <div class="col-sm-1 col-sm-offset-4">
+        <h4>Filter:</h4>
+    </div>
+    <div class="col-sm-3">
+      <select name="filter" class="form-control" ng-model="filters.closed" ng-change="refreshTable()" required>
+        <option value="">None</option>
+        <option value="false">Open</option>
+        <option value="true">Closed</option>
+      </select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
       <table ng-table="myStudies" class="table table-hover entries-selectable hide-col-2-phone hide-col-3-phone" show-filter="false">
-        <tr ng-class="{'study-satisfied' : study.satisfied, 'study-closed' : study.closed}" ng-click="studyDetails(study, $index)" ng-repeat="study in myStudies.data">
-          <td title="'Title'" filter="{ 'title': 'text'}" sortable="'title'" ng-attr-title="{{null}}">{{study.title}}</td>
-          <td title="'IRB'" filter="{ 'irb': 'text'}" sortable="'irb'" ng-attr-title="{{null}}">{{study.irb}}</td>
+        <tr ng-class="{'study-satisfied' : study.satisfied == 1, 'study-closed' : study.closed}" ng-click="studyDetails(study, $index)" ng-repeat="study in myStudies.data">
+          <td title="'Title'" filter="{ 'title': 'text'}" sortable="'title'" class="half-width" ng-attr-title="{{null}}">{{study.title}}</td>
           <td title="'Location'" filter="{ 'location': 'text'}" sortable="'location'" ng-attr-title="{{null}}">{{study.location}}</td>
-          <td title="'Desired #'" sortable="'satisfied'" width=115px ng-attr-title="{{null}}">{{study.currentNumber}}/{{study.satisfactoryNumber}}</td>
+          <td title="'Completed/Desired'" sortable="'satisfied'" width=200px ng-attr-title="{{null}}">{{study.currentNumber}}/{{study.satisfactoryNumber}}</td>
         </tr>
       </table>
     </div>
@@ -56,10 +70,25 @@
   <div class="row">
     <div class="col-sm-10 col-sm-offset-1">
       <h2 class="text-center">Participants Awaiting Compensation</h2>
-      <table ng-table="compensation" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
-        <tr ng-click="compensationDetails(user, $index)" ng-repeat="user in compensation.data">
+      <table ng-table="awaitingCompensation" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
+        <tr ng-click="compensationDetails(user, 'awaitingCompensation')" ng-repeat="user in awaitingCompensation.data">
+          <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{user.studyID.title}}</td>
           <td title="'Name'" filter="{ 'userID.lastName': 'text'}" sortable="'userID.lastName'" ng-attr-title="{{null}}">{{user.userID.firstName}} {{user.userID.lastName}}</td>
-          <td title="'Email'" filter="{ 'userID.email': 'text'}" sortable="'userID.email'" ng-attr-title="{{null}}">{{user.userID.email}}</td>
+          <td title="'Amount'" filter="{ 'studyID.compensationAmount': 'text'}" width='100px' sortable="'studyID.compensationAmount'" ng-attr-title="{{null}}">${{user.studyID.compensationAmount}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-10 col-sm-offset-1">
+      <h2 class="text-center">Compensated Participants</h2>
+      <table ng-table="compensated" class="table table-hover entries-selectable hide-col-1-phone" show-filter="false">
+        <tr ng-click="compensationDetails(user, 'compensated')" ng-repeat="user in compensated.data">
+          <td title="'Title'" filter="{ 'studyID.title': 'text'}" sortable="'studyID.title'" ng-attr-title="{{null}}">{{user.studyID.title}}</td>
+          <td title="'Name'" filter="{ 'userID.lastName': 'text'}" sortable="'userID.lastName'" ng-attr-title="{{null}}">{{user.userID.firstName}} {{user.userID.lastName}}</td>
+          <td title="'Amount'" filter="{ 'studyID.compensationAmount': 'text'}" width='100px' sortable="'studyID.compensationAmount'" ng-attr-title="{{null}}">${{user.studyID.compensationAmount}}</td>
+          <td title="'Date'" filter="{ 'compensationDate': 'text'}" width='100px' sortable="'compensationDate'" ng-attr-title="{{null}}">{{user.date}}</td>
         </tr>
       </table>
     </div>
@@ -114,7 +143,22 @@
           </div>
           <div class="row">
             <div class="col-sm-12">
+              <p class="mini-title">Duration:</p>
+              <p>{{currentStudy.duration}} minutes</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Require Researcher Approval:</p>
+              <p><span ng-if="currentStudy.requireApproval">Yes</span><span ng-if="!currentStudy.requireApproval">No</span></p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
               <p class="mini-title">Compensation Types Offered:</p>
+              <p ng-if="currentStudy.compensationType.length == 0">
+                None
+              </p>
               <p ng-if="currentStudy.compensationType.length == 1 && currentStudy.compensationType[0] == 'extraCredit'">
                 Extra Credit
               </p>
@@ -124,6 +168,12 @@
               <p ng-if="currentStudy.compensationType.length == 2">
                 Extra Credit, Monetary
               </p>
+            </div>
+          </div>
+          <div class="row" ng-if="currentStudy.compensationType[0] == 'monetary' || currentStudy.compensationType[1] == 'monetary'">
+            <div class="col-sm-12">
+              <p class="mini-title">Compensation Amount:</p>
+              <p>${{currentStudy.compensationAmount}}</p>
             </div>
           </div>
 
@@ -144,6 +194,9 @@
               <p class="mini-title">Email:</p>
               <p><a href="mailto:{{researcher.userID.email}}" target="_blank">{{researcher.userID.email}}</a></p>
             </div>
+            <div class="col-sm-12">
+              <hr class="most-width small-bottom-pad" ng-class="{'hidden':$last}">
+            </div>
           </div>
 
           <hr>
@@ -161,6 +214,11 @@
           </div>
           <div class="row">
             <div class="col-sm-12">
+              <p class="mini-title">Participants Enrolled: <span class="not-bold"> 	&nbsp;{{currentStudy.enrolledNumber}}</span></p>
+            </div>
+          </div>
+          <div class="row" ng-if="currentStudy.satisfactoryNumber != 'NA'">
+            <div class="col-sm-12">
               <p class="mini-title">Participants Desired: <span class="not-bold"> 	&nbsp;{{currentStudy.satisfactoryNumber}}</span></p>
             </div>
           </div>
@@ -171,25 +229,27 @@
           </div>
           <div class="row">
             <div class="col-sm-12">
-              <p class="mini-title">Max Participants per Session: <span class="not-bold"> 	&nbsp;{{currentStudy.maxParticipantsPerSession}}</span></p>
+              <p class="mini-title">Participants per Session: <span class="not-bold"> 	&nbsp;{{currentStudy.participantsPerSession}}</span></p>
             </div>
           </div>
 
-
           <div class="row pad-top" ng-if="!currentStudy.closed">
-            <div class="col-sm-4">
-              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit({ studyId: currentStudy._id })">Edit</a>
+            <div class="col-sm-6">
+              <a class="btn btn-primary full-width" data-dismiss="modal" ui-sref="studies.edit({ studyId: currentStudy._id })">Edit Study</a>
             </div>
-            <div class="col-sm-4">
-              <a class="btn btn-orange full-width" data-dismiss="modal" ui-sref="sessions({ studyId: currentStudy._id })">Sessions</a>
+            <div class="col-sm-6">
+              <a class="btn btn-orange full-width" data-dismiss="modal" ui-sref="studies.data({ studyId: currentStudy._id })">View Data</a>
             </div>
-            <div class="col-sm-4">
-              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#closeStudyModal">Close</a>
+            <div class="col-sm-6 col-sm-offset-3">
+              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#closeStudyModal">Close Study</a>
             </div>
           </div>
           <div class="row pad-top" ng-if="currentStudy.closed">
-            <div class="col-sm-6 col-sm-offset-3">
-              <a class="btn btn-red full-width" data-dismiss="modal" data-toggle="modal" data-target="#removeStudyModal">Remove Study</a>
+            <div class="col-sm-6">
+              <a class="btn btn-primary full-width" data-dismiss="modal" data-toggle="modal" data-target="#reopenStudyModal">Reopen Study</a>
+            </div>
+            <div class="col-sm-6">
+              <a class="btn btn-orange full-width" data-dismiss="modal" ui-sref="studies.data({ studyId: currentStudy._id })">View Data</a>
             </div>
           </div>
 
@@ -228,22 +288,22 @@
   </div>
   <!-- End Close Study Modal -->
 
-  <!-- Remove Study Modal -->
-  <div id="removeStudyModal" class="modal" role="dialog">
+  <!-- Reopen Study Modal -->
+  <div id="reopenStudyModal" class="modal" role="dialog">
     <div class="small-modal">
         <!-- Modal content-->
         <div class="modal-content">
         <div class="row">
           <div class="col-xs-12 text-center">
-            <p>Are you sure you want to remove this study from your view?</p>
+            <p>Are you sure you want to reopen this study?</p>
           </div>
         </div>
         <div class="row">
           <div class="col-sm-4 col-sm-offset-1">
-            <button class="btn small-modal-btn full-width" ng-click="confirmRemoveStudy()">Yes</button>
+            <button class="btn small-modal-btn full-width" ng-click="confirmReopenStudy()">Yes</button>
           </div>
           <div class="col-sm-4 col-sm-offset-1">
-            <button class="btn small-modal-btn full-width" ng-click="removeStudyClose()">No</button>
+            <button class="btn small-modal-btn full-width" ng-click="reopenStudyClose()">No</button>
           </div>
         </div>
         <div class="row" ng-if="error">
@@ -255,7 +315,7 @@
     </div>
 
   </div>
-  <!-- End Remove Study Modal -->
+  <!-- End Reopen Study Modal -->
 
   <!-- Compensation Modal -->
   <div id="compensationModal" class="modal" role="dialog">
@@ -274,6 +334,27 @@
           </div>
         </div>
         <div class="pane">
+          <!-- Study Area -->
+          <div class="row">
+            <div class="col-sm-12">
+              <h4 class="underline">Study</h4>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Title:</p>
+              <p>{{currentParticipant.studyID.title}}</p>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-12">
+              <p class="mini-title">Compensation Amount:</p>
+              <p>${{currentParticipant.studyID.compensationAmount}}</p>
+            </div>
+          </div>
+
+          <hr>
+
           <!-- Participant Area -->
           <div class="row">
             <div class="col-sm-12">
@@ -296,29 +377,14 @@
               <p>{{currentParticipant.userID.address}}</p>
             </div>
           </div>
-
-          <hr>
-
-          <!-- Study Area -->
           <div class="row">
             <div class="col-sm-12">
-              <h4 class="underline">Study</h4>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-              <p class="mini-title">Title:</p>
-              <p>{{currentParticipant.studyID.title}}</p>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-sm-12">
-              <p class="mini-title">Compensation Amount:</p>
-              <p>${{currentParticipant.studyID.compensationAmount}}</p>
+              <p class="mini-title">Date Compensated:</p>
+              <p>{{currentParticipant.date}}</p>
             </div>
           </div>
 
-          <div class="row pad-top">
+          <div class="row pad-top" ng-if="currentTable=='awaitingCompensation'">
             <div class="col-sm-8 col-sm-offset-2">
               <a class="btn btn-primary full-width" ng-click="markCompensated()">Mark as Compensated</a>
             </div>
@@ -385,7 +451,10 @@
             </div>
             <div class="col-sm-3">
               <p class="mini-title">Attended:</p>
-              <input ng-model="participant.attended" type="checkbox" ng-change='changeAttendance(participant)'>
+              <input ng-model="participant.attended" type="checkbox" ng-change='changeAttendance(participant)' class="small-bottom-margin">
+            </div>
+            <div class="col-sm-12">
+              <hr class="most-width small-bottom-pad" ng-class="{'hidden':$last}">
             </div>
           </div>
 
@@ -398,9 +467,13 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-sm-12">
+            <div class="col-xs-6">
               <p class="mini-title">Location:</p>
               <p>{{currentSession.studyID.location}}</p>
+            </div>
+            <div class="col-xs-6">
+              <p class="mini-title">Duration:</p>
+              <p>{{currentSession.studyID.duration}} minutes</p>
             </div>
           </div>
           <div class="row">

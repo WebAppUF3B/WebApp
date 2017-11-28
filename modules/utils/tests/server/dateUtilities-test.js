@@ -1,6 +1,5 @@
-const dateUtils = require('../../dateUtilities');
+const dateUtils = require('../../server/dateUtilities');
 const assert = require('assert');
-
 const mockStartTime = '2017-05-15T08:30:00.000Z';
 const mockEndTime = '2017-05-15T12:30:00.000Z';
 
@@ -14,7 +13,7 @@ describe('GIVEN TWO DATES, RETURN DURATION IN MINTUES BETWEEN THEM', () => {
   it(`GIVEN new Date('${mockStartTime}') AND GIVEN new Date('${mockEndTime}'), 'RETURN 240'`, () => {
     const date = new Date(mockStartTime);
     const date2 = new Date(mockEndTime);
-    assert.equal(dateUtils.differenceInSeconds(date, date2), 240);
+    assert.equal(dateUtils.differenceInMins(date, date2), 240);
   });
 });
 describe('GIVEN AN INTEGER 0-6, RETURN STRING OF THE CORRESPONDING DOW', () => {
@@ -41,24 +40,25 @@ describe('GIVEN AN INTEGER 0-6, RETURN STRING OF THE CORRESPONDING DOW', () => {
   });
 });
 describe('GIVEN DATE, RETURN STRING IN THE FORMAT \'HOURS\':\'MINUTES\' A.M./P.M.', () => {
-  it(`GIVEN new Date('2017-05-15T08:30:00.000Z'), PRINT '4:30 A.M.'`, () => {
+  it(`GIVEN new Date('2017-05-15T08:30:00.000Z'), PRINT '4:30 AM'`, () => {
     const date = new Date('2017-05-15T08:30:00.000Z');
-    assert.equal(dateUtils.getTimeOfDay(date), '4:30 A.M.');
+    console.log(dateUtils.getTimeOfDay(date));
+    assert.equal(dateUtils.getTimeOfDay(date), '4:30 AM');
   });
-  it(`GIVEN new Date('2017-05-15T20:30:00.000Z'), PRINT '4:30 P.M.'`, () => {
+  it(`GIVEN new Date('2017-05-15T20:30:00.000Z'), PRINT '4:30 PM'`, () => {
     const date = new Date('2017-05-15T20:30:00.000Z');
-    assert.equal(dateUtils.getTimeOfDay(date), '4:30 P.M.');
+    assert.equal(dateUtils.getTimeOfDay(date), '4:30 PM');
   });
-  it(`GIVEN new Date('2017-05-15T04:30:00.000Z'), PRINT '12:30 A.M.'`, () => {
+  it(`GIVEN new Date('2017-05-15T04:30:00.000Z'), PRINT '12:30 AM'`, () => {
     const date = new Date('2017-05-15T04:30:00.000Z');
-    assert.equal(dateUtils.getTimeOfDay(date), '12:30 A.M.');
+    assert.equal(dateUtils.getTimeOfDay(date), '12:30 AM');
   });
-  it(`GIVEN new Date('2017-05-15T016:30:00.000Z'), PRINT '12:30 P.M.'`, () => {
+  it(`GIVEN new Date('2017-05-15T016:30:00.000Z'), PRINT '12:30 PM'`, () => {
     const date = new Date('2017-05-15T16:30:00.000Z');
-    assert.equal(dateUtils.getTimeOfDay(date), '12:30 P.M.');
+    assert.equal(dateUtils.getTimeOfDay(date), '12:30 PM');
   });
-  it(`GIVEN new Date('2017-05-15T08:30:00.000Z'), PRINT '4:00 A.M.'`, () => {
+  it(`GIVEN new Date('2017-05-15T08:30:00.000Z'), PRINT '4:00 AM'`, () => {
     const date = new Date('2017-05-15T08:00:00.000Z');
-    assert.equal(dateUtils.getTimeOfDay(date), '4:00 A.M.');
+    assert.equal(dateUtils.getTimeOfDay(date), '4:00 AM');
   });
 });

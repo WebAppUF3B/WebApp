@@ -1,6 +1,6 @@
 <div class="container inner-container" ng-controller="AuthenticationController">
   <h1 class="text-center pad-top"><strong>Create an Account</strong></h1>
-  <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 moile-no-pad">
+  <div class="col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 mobile-no-pad">
     <div class="form-panel">
       <form name="userForm" ng-submit="signup(userForm.$valid)" class="signin" novalidate autocomplete="on">
         <fieldset>
@@ -24,7 +24,7 @@
                 <label for="birthday">Birthday</label>
                 <div class='input-group date'>
                     <input type='text' id="birthday" name="birthday" ng-model="credentials.birthday" onkeydown="return false" class="form-control" />
-                    <span class="input-group-addon">
+                    <span class="input-group-addon" ng-click="toggleBirthdayFocus()">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
                 </div>
@@ -48,7 +48,7 @@
             <div class="col-sm-12">
               <div class="form-group" show-errors>
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" class="form-control lowercase" ng-model="credentials.email" placeholder="Email" popover="If you are participating for extra credit, you must use your UFL email." popover-trigger="focus" required>
+                <input type="email" id="email" name="email" class="form-control lowercase" ng-model="credentials.email" placeholder="Email" uib-popover="If you are participating for extra credit, you must use your UFL email." required>
               </div>
             </div>
           </div>
@@ -64,7 +64,7 @@
             <div class="col-sm-12">
               <div class="form-group" show-errors>
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="form-control" ng-model="credentials.password" placeholder="Password" popover="{{popoverMsg}}" popover-trigger="focus" password-validator required>
+                <input type="password" id="password" name="password" class="form-control" ng-model="credentials.password" placeholder="Password" uib-popover="{{popoverMsg}}" password-validator required>
               </div>
             </div>
           </div>

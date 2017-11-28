@@ -1,0 +1,75 @@
+<div class="container inner-container" ng-controller="AvailabilityController">
+  <h1 class="text-center pad-top"><strong ng-if="state!=='edit'">Create Availability for "{{currentStudy.title}}"</strong><strong ng-if="state==='edit'">Edit Availability for "{{currentStudy.title}}"</strong></h1>
+  <div class="row justify-content-between">
+    <div class='col-sm-4 col-sm-push-8'>
+      <button type="submit" ng-click='sendAvailability()' class="btn btn-orange full-width no-margin-bottom top-margin small-button-margin">Submit Availability</button>
+    </div>
+    <div class='col-sm-8 col-sm-pull-4 fit-table'>
+      <h3 class="special-margin">Selection Type:</h3>
+      <div class='btn-group' style="width:100%">
+        <button class='btn btn-primary phone-half-width' ng-model='type' uib-btn-radio='"individual"'>Individual</button>
+        <button class='btn btn-primary phone-half-width' ng-model='type' uib-btn-radio='"range"'>Range</button>
+      </div>
+    </div>
+  </div>
+  <div class='row'>
+    <div class="col-lg-4 col-md-5 col-sm-5">
+      <div uib-datepicker ng-model='activeDate' multi-select='selectedDates' select-range='{{type=="range"}}' datepicker-options='options'></div>
+    </div>
+    <div class="col-lg-8 col-md-7 col-sm-7">
+      <div>
+        <h3 class="special-margin">Selected Dates:</h3>
+        <div class='form-panel'>
+          <div class="pad">
+            <div class="row">
+              <div class="col-sm-12">
+                <p class="note" style="margin:10px" ng-if="selectedDates.length === 0">Please select a day</p>
+                <div ng-repeat='d in selectedDates | orderBy'>
+                  <div class="row phone-bottom-margin">
+                    <div class="col-md-6 small-bottom-margin">
+                      <h4 class="no-margin-top">{{d | date : 'fullDate'}}</h4>
+                    </div>
+                    <div class="col-md-2 reduce-pad small-bottom-margin">
+                      <button class='btn full-width btn-red no-margin' ng-click='removeFromSelected(d)'>Remove <span class='hidden tablet-show'>Day</span></button>
+                    </div>
+                    <div class="col-md-2 reduce-pad small-bottom-margin">
+                      <button class='btn full-width btn-orange no-margin' ng-click='copyToTemp(d)'>Copy <span class='hidden tablet-show'>Timeslots</span></button>
+                    </div>
+                    <div class="col-md-2 reduce-left-pad small-bottom-margin">
+                      <button class='btn full-width btn-green no-margin' ng-click='pasteToDay(d)' ng-if='copyTemp'>Paste <span class='hidden tablet-show'>Timeslots</span></button>
+                    </div>
+                  </div>
+                  <div ng-repeat="possibility in availability | filter:{unixDate: d}">
+                    <div class='row'>
+                      <div class="col-sm-5">
+                        <label>Start Time:</label>
+                        <select class='form-control full-width' ng-model="possibility.startTime" ng-change='prepEndTime(possibility)' ng-options="times.val as times.show for times in startTime"></select>
+                      </div>
+                      <div class="col-sm-5">
+                        <label>End Time:</label>
+                        <select class='form-control full-width' ng-model="possibility.endTime" ng-disabled='!possibility.startTime' ng-options="times.val as times.show for times in possibility.endTimeList"></select>
+                      </div>
+                      <div class='col-sm-2'>
+                        <a class="btn x-btn btn-red phone-full-width" ng-click='removeEntry(possibility)'>
+                          <i class=" phone-hidden fa fa-close"></i>
+                          <span class="phone-show hidden">Remove Time Range</span>
+                        </a>
+                      </div>
+                    </div>
+                    <hr class="most-width force-small-top-margin medium-bottom-margin">
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <button class='btn no-margin full-width btn-primary' style='margin:5px' ng-click='addEntry(d)'>Add Time Range</button>
+                    </div>
+                  </div>
+                  <hr ng-if="!$last" class="medium-top-margin medium-bottom-margin">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

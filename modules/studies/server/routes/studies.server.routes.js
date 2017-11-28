@@ -2,9 +2,15 @@
 
 // Study Routes
 const studies = require('../controllers/studies.server.controller.js');
+const authUtils = require('../../../utils/server/authUtils');
 
 module.exports = function (app) {
   // Setting up the users profile api
+  app.use(authUtils.authUser);
+  app.route('/api/studies/research/')
+  .get(studies.listResearchers);
+  app.route('/api/studies/discover')
+    .get(studies.getAllAvailable);
   app.route('/api/studies/')
     .get(studies.getAll)
     .post(studies.create);
@@ -14,9 +20,7 @@ module.exports = function (app) {
     .delete(studies.delete);
   app.route('/api/studies/user/:userID').get(studies.get);
   app.route('/api/studies/close/:studyID').put(studies.closeStudy);
-  app.route('/api/studies/remove/:studyID').put(studies.removeStudy);
-
-  app.route('/api/studies/create').post(studies.create);
+  app.route('/api/studies/reopen/:studyID').put(studies.reopenStudy);
 
   /*
     The 'router.param' method allows us to specify middleware we would like to use to handle
