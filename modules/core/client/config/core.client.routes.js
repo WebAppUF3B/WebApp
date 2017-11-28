@@ -34,10 +34,6 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/sign-up/:studyId',
       templateUrl: 'modules/core/client/views/study-sign-up.client.view.html'
     })
-    .state('studies.thank-you', {
-      url: '/thank-you',
-      templateUrl: 'modules/core/client/views/study-thank-you.client.view.html'
-    })
     .state('researcher-portal', {
       url: '/researcher',
       templateUrl: 'modules/core/client/views/researcher-portal.client.view.html'
