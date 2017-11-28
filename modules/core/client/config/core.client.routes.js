@@ -89,10 +89,6 @@ angular.module('core').config(['$stateProvider', '$urlRouterProvider',
       url: '/reset-password',
       templateUrl: 'modules/core/client/views/reset-password-known.client.view.html'
     })
-    .state('cancel', {
-      url: '/cancel/:token',
-      templateUrl: 'modules/core/client/views/session-cancel.client.view.html'
-    })
     .state('not-found', {
       url: '/not-found',
       templateUrl: 'modules/core/client/views/404.client.view.html',
