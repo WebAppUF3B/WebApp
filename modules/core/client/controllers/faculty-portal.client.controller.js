@@ -3,6 +3,7 @@
 // TODO consider replacing $http requests with controller (sessions.client.service.js)
 angular.module('core').controller('FacultyPortalController', ['$scope','$http','NgTableParams', 'Authentication',
   function($scope, $http, NgTableParams, Authentication) {
+    Authentication.loading = true;
     $scope.user = Authentication.user;
 
     $scope.authToken = Authentication.authToken;
@@ -38,6 +39,7 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.allCourses = results.data;
+          Authentication.loading = false;
         });
     };
 

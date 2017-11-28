@@ -1,6 +1,9 @@
 angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).controller('AvailabilityController',
 ['$scope','$http', '$location', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $http, $location, $state, $stateParams, $document, Authentication) {
+
+    Authentication.loading = true;
+
     $scope.user = Authentication.user;
     $scope.authToken = Authentication.authToken;
     $scope.header = {
@@ -65,9 +68,11 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
         }
         $scope.activeDate = $scope.selectedDates[0];
         $scope.activeDate = null;
+        Authentication.loading = false;
       })
       .catch((err) => {
         console.log(err);
+        Authentication.loading = true;
       });
     };
 
@@ -85,6 +90,8 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
     };
 
     $scope.sendAvailability = function() {
+
+      Authentication.loading = true;
 
       for (let x = 0; x<$scope.availability.length; x++) {
         for (let y = 0; y<$scope.availability.length; y++) {

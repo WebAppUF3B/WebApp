@@ -1,8 +1,10 @@
 'use strict';
 
 // TODO consider replacing $http requests with factory
-angular.module('core').controller('ResearcherPortalController', ['$scope','$http','NgTableParams', '$rootScope', "Authentication",
+angular.module('core').controller('ResearcherPortalController', ['$scope','$http','NgTableParams', '$rootScope', 'Authentication',
   function($scope, $http, NgTableParams, $rootScope, Authentication) {
+
+    Authentication.loading = true;
 
     // Prevent race conditions
     let alreadyClicked = false;
@@ -161,9 +163,11 @@ angular.module('core').controller('ResearcherPortalController', ['$scope','$http
               });
 
             });
+          Authentication.loading = false;
         })
         .catch((err) => {
           console.log(err);
+          Authentication.loading = false;
         });
     };
 
