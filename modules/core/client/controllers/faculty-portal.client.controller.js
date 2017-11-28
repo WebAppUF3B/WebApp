@@ -49,7 +49,6 @@ angular.module('core').controller('FacultyPortalController', ['$scope','$http','
         .then((results) => {
           // Assign results to upcomingSessions.data
           $scope.participatedStudies.data = results.data;
-          console.log($scope.participatedStudies.data);
 
           $scope.participatedStudies = new NgTableParams({
             count: 10,

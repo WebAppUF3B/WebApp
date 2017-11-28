@@ -167,7 +167,6 @@ exports.userByID = function(req, res, next, id) {
 exports.getAllUsers = function(req, res) {
   User.find({}, '-salt -password')
   .then((results) => {
-    console.log(results);
     res.json(results);
   })
   .catch((err) => {
@@ -181,7 +180,7 @@ exports.getUser = function(req, res) {
 
   User.findById(thisUser.id, '-salt -password')
   .then((results) => {
-    console.log(results);
+
     return res.status(200).json(thisUser);
   })
   .catch((err) => {

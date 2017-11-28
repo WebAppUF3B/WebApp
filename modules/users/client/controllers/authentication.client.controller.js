@@ -39,8 +39,6 @@ angular.module('users.signup').controller('AuthenticationController', ['$scope',
       $scope.error = null;
       $scope.credentials.birthday = $('#birthday').val();
 
-      console.log($scope.credentials);
-
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'userForm');
         $scope.error = 'All fields are required.';
@@ -165,7 +163,6 @@ angular.module('users.signup').controller('AuthenticationController', ['$scope',
     };
     const redirect = (response) => {
       // If successful we assign the response to the global user model
-      console.log(response);
       $scope.authentication.user = response;
 
       let destination;

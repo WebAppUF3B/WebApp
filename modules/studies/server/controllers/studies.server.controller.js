@@ -66,7 +66,6 @@ exports.getAllAvailable = function(req, res) {
 
           return true;
         });
-        console.log('tw get all hasOpening', study.title, hasOpening);
         if (hasOpening) possibleStudies.push(study);
       });
       res.status(200).send(possibleStudies);
@@ -95,7 +94,6 @@ exports.create = function(req, res) {
 /* Show the current study */
 exports.get = function(req, res) {
   /* send back the study as json from the request */
-  console.log(req.study);
   res.json(req.study);
 };
 
@@ -199,11 +197,8 @@ exports.modifyCount = function(id, attended) {
 };
 
 exports.listResearchers = function(req, res) {
-  console.log('HELLO RESEARCHERS');
   User.find({ role: { $ne: 'participant' } }, '-salt -password')
     .then((arrayOfAllResearchers) => {
-      console.log('Meow Researchers');
-      console.log(arrayOfAllResearchers);
       res.json(arrayOfAllResearchers);
     })
     .catch((err) => {

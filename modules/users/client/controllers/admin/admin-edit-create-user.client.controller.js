@@ -112,8 +112,6 @@ angular.module('users.adminEdit').controller('AdminEditCreateController', ['$sco
         return false;
       }
       $scope.currentUser.birthday = $('#birthday').val();
-
-      console.log($scope.currentUser);
       $http.put('/api/admin/editUser/' + $stateParams.userId, $scope.currentUser, $scope.header).success((response) => {
         $state.go('manage-users');
       }).error((response) => {

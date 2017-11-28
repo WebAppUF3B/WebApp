@@ -38,7 +38,6 @@ angular.module('studies').controller('StudySignupController', ['$scope','$http',
           $scope.emptySessions = results.data.emptySessions;
           $scope.study = results.data.study;
           $scope.hasPartialSessions = $scope.partialSessions.length > 0;
-          console.log($scope.emptySessions);
 
           if ($scope.study.closed) $state.go('forbidden');
 
@@ -97,6 +96,7 @@ angular.module('studies').controller('StudySignupController', ['$scope','$http',
       $scope.error = null;
       if ($scope.credentials.compensation && $scope.credentials.compensation === 'extraCredit' && !$scope.credentials.classCode) {
         $scope.error = 'Please select a class code';
+        Authentication.loading = false;
         return;
       }
 
@@ -119,7 +119,8 @@ angular.module('studies').controller('StudySignupController', ['$scope','$http',
           $state.go('participant-portal');
         })
         .catch((err) => {
-          $scope.error = err;
+          $scope.error = 'There was a problem signing up for this session. Please contact an admin.';
+          Authentication.loading = false;
         });
     };
 

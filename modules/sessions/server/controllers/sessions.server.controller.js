@@ -115,14 +115,11 @@ exports.allSessionsForSignup = function(req, res) {
       }
     });
   });
-  console.log(partialSessions);
   res.status(200).send({ study: study, emptySessions: emptySessions, partialSessions: partialSessions });
 };
 
 /* Create a session */
 exports.create = function(req, res) {
-  console.log(req.body.sessStart);
-  console.log(req.study);
   //Instantiate a session
   const session = {
     studyID: req.study._id,
@@ -131,7 +128,6 @@ exports.create = function(req, res) {
     completed: false,
     researchers: req.study.researchers
   };
-  console.log('PV', session);
   const newSession = new Session(session);
   //Then save the session
   newSession.save((err) => {
@@ -185,7 +181,6 @@ exports.delete = function(req, res) {
   const now = new Date();
   const sessionDate = new Date(session.startTime);
   if (now >= sessionDate) {
-    console.log('Cannot cancel a session that already took place');
     return res.status(400).send();
   }
 
@@ -201,7 +196,6 @@ exports.delete = function(req, res) {
       .then((study) => {
         study.availability.some((slot) => {
           const removedFromStudy = slot.existingStudySessions.some((existingSessionId) => {
-            console.log('existing id vs this id', existingSessionId, session._id, String(existingSessionId) === String(session._id));
             const index = slot.existingStudySessions.indexOf(existingSessionId);
             slot.existingStudySessions.splice(index, 1);
             if (String(existingSessionId) === String(session._id)) return true;
@@ -215,7 +209,6 @@ exports.delete = function(req, res) {
         return Promise.all(mailOptionArray.map((option) => transporter.sendMail(option)));
       })
       .then((emailsSent) => {
-        console.log('emails sent\n', emailsSent);
         return session.remove();
       })
       .then(() => {
@@ -231,7 +224,6 @@ exports.delete = function(req, res) {
       .then((study) => {
         study.availability.some((slot) => {
           const removedFromStudy = slot.existingStudySessions.some((existingSessionId) => {
-            console.log('existing id vs this id', existingSessionId, session._id, String(existingSessionId) === String(session._id));
             if (String(existingSessionId) === String(session._id)) {
               const index = slot.existingStudySessions.indexOf(existingSessionId);
               slot.existingStudySessions.splice(index, 1);
@@ -384,29 +376,19 @@ exports.sessionSignup = function(req, res) {
           const studyStartTime = new Date(slot.startTime);
           const newStartTime = new Date(newSession.startTime);
           const studyEndTime = new Date(slot.endTime);
-          console.log('tw start time vs new start time vs end time', studyStartTime, newStartTime, studyEndTime);
-          console.log('tw start time vs new start time vs end time', studyStartTime.getTime(), newStartTime.getTime(), studyEndTime.getTime());
-          console.log('in range', studyStartTime <= newStartTime &&
-            newStartTime <= studyEndTime);
           if (studyStartTime <= newStartTime &&
             newStartTime <= studyEndTime) {
-            console.log(slot.existingStudySessions);
             slot.existingStudySessions.push(newSession._id);
-            console.log(slot.existingStudySessions);
             return true;
           }
         });
 
-        console.log('study before save', queriedStudy);
-
         return queriedStudy.save();
       })
       .then((result) => {
-        console.log('study after save', result);
         res.status(200).send();
       })
       .catch((err) => {
-        console.log('new session signup error:\n', err);
         res.status(500).send();
       });
   }
@@ -528,13 +510,11 @@ exports.getExtraCredit = function(req, res) {
 
   sessions.forEach((session) => {
     let index = results.findIndex(x => x.studyID === session.studyID._id);
-    console.log("Found index: " + index);
 
     const notFound = index === -1;
     if (notFound) {
       index = results.length;
       results.push({ studyID: session.studyID._id, studyTitle: session.studyID.title, list: [] });
-      console.log("Created index: " + index);
     }
 
     session.participants.forEach((participant) => {
@@ -554,8 +534,6 @@ exports.getExtraCredit = function(req, res) {
       i++;
     }
   }
-
-  console.log(results);
 
   /* send back the list of users as json from the request */
   res.json(results);
@@ -612,8 +590,6 @@ const generateMailOptions = (effectedUsers, cancellor, studyTitle) => {
       const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
                    \nWe regret to inform you that ${cancellor.firstName} ${cancellor.lastName} cancelled your session for "${studyTitle}", which was scheduled for ${cancellor.date} at ${cancellor.time}.`;
 
-      console.log(emailBody);
-
       const mailOptions = {
         from: 'no.replyhccresearch@gmail.com',
         to: affectedUser.userID.email,
@@ -661,7 +637,6 @@ const generateMailOptionsForSignup = (researchers, participants, participantsPer
     }
   });
 
-  console.log(`\n\nChecking Full Email\nParticipants per session: ${participantsPerSession}\nParticipants.length ${participants.length}\n\n`)
   if (participantsPerSession > 1 && participants.length + 1 === participantsPerSession) {
     researchers.concat(participants).forEach((populatedUser) => {
       const affectedUser = populatedUser.userID;
@@ -669,8 +644,6 @@ const generateMailOptionsForSignup = (researchers, participants, participantsPer
         const emailBody = `Hello ${affectedUser.firstName} ${affectedUser.lastName},
                      \nThe last participant required for "${studyTitle}" on ${sessionMMDDYY} at ${sessionTimeOfDay} located at ${studyLocation} has signed up.
                      \nThe session is now confirmed and will take place.`;
-
-        console.log('\n\n\n', emailBody);
 
         const mailOptions = {
           from: 'no.replyhccresearch@gmail.com',
@@ -728,8 +701,6 @@ exports.emailReminders = function(req, res) {
                              <br><br>This is a reminder that you are scheduled to participate in "${session.studyID.title}" tomorrow (${sessionDate}) at ${sessionTime} in ${session.studyID.location}.
                              <br><br>To cancel this session, click <a href="${process.env.PROTOCOL}${process.env.WEBSITE_HOST}/cancel/${token}">here</a>.`;
 
-                console.log(emailBody);
-
                 const mailOptions = {
                   from: 'no.replyhccresearch@gmail.com',
                   to: affectedUser.userID.email,
@@ -740,15 +711,12 @@ exports.emailReminders = function(req, res) {
               });
             } else {
               // If the session does not have enough participants, cancel it
-              console.log("Cancellation Email");
               const users = session.participants.concat(session.researchers);
 
               // Established modemailer email transporter object to send email with mailOptions populating mail with link
               users.forEach((affectedUser) => {
                 const emailBody = `Hello ${affectedUser.userID.firstName} ${affectedUser.userID.lastName},
                              \nWe regret to inform you that your session for "${session.studyID.title}", which was scheduled for tomorrow (${sessionDate}) at ${sessionTime}, has been cancelled because not enough participants signed up.`;
-
-                console.log(emailBody);
 
                 const mailOptions = {
                   from: 'no.replyhccresearch@gmail.com',

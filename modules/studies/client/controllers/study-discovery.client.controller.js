@@ -14,11 +14,7 @@ angular.module('studies').controller('StudyDiscoveryController', ['$scope','$htt
       $scope.filters = {};
 
       $scope.user = Authentication.user;
-      console.log($scope.user);
-
       $scope.authToken = Authentication.authToken;
-      console.log($scope.authToken);
-
       $scope.header = {
         headers: {
           'Content-Type': 'application/json',

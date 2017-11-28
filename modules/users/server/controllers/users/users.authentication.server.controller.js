@@ -300,7 +300,6 @@ exports.resetPassword = function(req, res) {
   const newPassword = req.body.confirmNewPassword;
   const token = req.body.token;
   const fromToken = authUtils.parseResetPasswordToken(token);
-  console.log('TOKEN: ' + fromToken);
   User.find({ email: fromToken }, '-salt -password')
     .then((results) => {
       const thisUser = results[0];
@@ -353,7 +352,6 @@ exports.parseToken = function(req, res, next, id) {
   User.findById(userID)
     .exec()
     .then((results) => {
-      console.log(userID);
 
       // Proceed to delete function
       next();

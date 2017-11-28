@@ -102,7 +102,6 @@ angular.module('users.password').controller('ResetPasswordController', ['$scope'
         return;
       }
       $scope.credentials.userId = $scope.user._id;
-      console.log($scope.credentials.userId);
       return $http.post(window.location.origin + '/api/password/change', $scope.credentials)
       .then(() => {
         alert('Your password was succesfully reset.');

@@ -71,8 +71,6 @@ angular.module('studies.study').controller('StudyController', ['$scope', '$rootS
           //get researchers to pick from
           $scope.getResearchers()
           .then((results) => {
-            console.log('Got list of Researchers!');
-            console.log(results.data);
             $scope.researchers = results.data;
             $scope.researchers.sort(sortResearchers);
 
@@ -139,8 +137,6 @@ angular.module('studies.study').controller('StudyController', ['$scope', '$rootS
         //get researchers to pick from
         $scope.getResearchers()
         .then((results) => {
-          console.log('Got list of Researchers!');
-          console.log(results.data);
           $scope.researchers = results.data;
           $scope.researchers.sort(sortResearchers);
 
@@ -289,8 +285,6 @@ angular.module('studies.study').controller('StudyController', ['$scope', '$rootS
       }
 
       $http.put('/api/studies/'+$scope.pass, $scope.currentStudy, $scope.header).success((response) => {
-        console.log('Did the put, here is the return');
-        console.log(response);
         $state.go('studies.availability-edit', { 'studyId': response._id });
       }).error((response) => {
         $scope.error = 'There was a problem updating your study, please contact the admin.';
