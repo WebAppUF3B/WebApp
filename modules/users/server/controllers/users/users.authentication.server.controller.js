@@ -190,7 +190,7 @@ exports.signout = function(req, res) {
   res.redirect('/');
 };
 
-//verify
+//verify whether or not a user is valid
 exports.verify = function(req, res) {
   let thisUser;
   const transporter = nodemailer.createTransport({

@@ -8,8 +8,7 @@ const passport = require('passport'),
   User = require('mongoose').model('User');
 
 module.exports = function() {
-  // Use local strategy
-
+  // Use local strategy to validate form fields
   const signInErr = {
     message: 'Invalid email or password',
     code: 400
