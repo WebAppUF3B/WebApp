@@ -530,8 +530,6 @@ exports.getExtraCredit = function(req, res) {
   for (let i = 0; i < results.length; i++) {
     if (results[i].list.length === 0) {
       results.splice(i, 1);
-    } else {
-      i++;
     }
   }
 
