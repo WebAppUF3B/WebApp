@@ -1,13 +1,10 @@
 'use strict';
 
-// TODO consider replacing $http requests with controller (sessions.client.service.js)
 angular.module('core').controller('FacultyPortalController', ['$scope','$http','NgTableParams', 'Authentication',
   function($scope, $http, NgTableParams, Authentication) {
     Authentication.loading = true;
     $scope.user = Authentication.user;
-
     $scope.authToken = Authentication.authToken;
-
     $scope.header = {
       headers: {
         'Content-Type': 'application/json',
