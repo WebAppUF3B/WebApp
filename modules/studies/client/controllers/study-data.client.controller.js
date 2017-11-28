@@ -1,7 +1,7 @@
 angular.module('studies').controller('StudyDataController', ['$scope','$http','NgTableParams', '$location', '$state', '$stateParams', 'Authentication',
   function($scope, $http, NgTableParams, $location, $state, $stateParams, Authentication) {
     Authentication.loading = true;
-
+    //method occurs on load of page
     const init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
@@ -34,7 +34,7 @@ angular.module('studies').controller('StudyDataController', ['$scope','$http','N
       $scope.stats.ageMax = -1;
       $scope.stats.completed = 0;
       $scope.stats.enrolled = 0;
-
+      //interprets session data
       $scope.getAllSessionsByStudyId()
         .then((results) => {
           $scope.studySessions = results.data.sessions;
@@ -190,7 +190,7 @@ angular.module('studies').controller('StudyDataController', ['$scope','$http','N
           });
       }
     };
-
+    //denying user
     $scope.denyUser = function() {
       if (!Authentication.loading) {
         $scope.error = '';

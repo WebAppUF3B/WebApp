@@ -22,16 +22,16 @@ angular.module('studies').controller('StudySignupController', ['$scope','$http',
     $scope.credentials = {};
     $scope.multipleParticipants = null;
     $scope.allCourses = null;
-
+    //upon starting up page
     const init = function() {
       $('section.ng-scope').css('margin-top', '0px');
       $('section.ng-scope').css('margin-bottom', '0px');
-
+      //get all course
       $scope.courses.getAll()
         .then((results) => {
           $scope.allCourses = results.data;
         });
-
+      //get all sessions in study
       $scope.getAllSessionsByStudyId()
         .then((results) => {
           $scope.partialSessions = results.data.partialSessions;
@@ -84,14 +84,14 @@ angular.module('studies').controller('StudySignupController', ['$scope','$http',
     $scope.getAllSessionsByStudyId = () => {
       return $http.get(`${window.location.origin}/api/studySessions/signup/${$scope.user._id}/${$scope.studyId}`, $scope.header);
     };
-
+    //controller for signup modal
     $scope.studySignupModal = function(session, index) {
       $scope.currentSession = session;
       $scope.currentIndex = index;
       $scope.error = false;
       $('#studySignupModal').modal('show');
     };
-
+    //parsing information and push information to backend
     $scope.studySignup = function() {
       Authentication.loading = true;
       $scope.error = null;
