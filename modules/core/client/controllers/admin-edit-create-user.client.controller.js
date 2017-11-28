@@ -3,6 +3,7 @@
 angular.module('core').controller('AdminEditCreateController', ['$scope', '$rootScope', 'NgTableParams', '$http', '$state', '$stateParams', '$document', 'Authentication',
   function($scope, $rootScope, NgTableParams, $http, $state, $stateParams, $document, Authentication) {
     /* Get all the listings, then bind it to the scope */
+    Authentication.loading = true;
     $scope.currentUser = {};
 
     $scope.user = Authentication.user;
@@ -18,12 +19,6 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
       }
     };
 
-    $document.ready(() => {
-      if ($state.current.name === 'edit-user') {
-        $scope.init();
-      }
-    });
-
     $scope.toggleBirthdayFocus = function() {
       $scope.focus = !$scope.focus;
       if ($scope.focus) $('#birthday').focus();
@@ -35,25 +30,31 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
     });
 
     $scope.init = function() {
-      $scope.state = 'edit';
-      $scope.pass = $stateParams.UserId;
+      if ($state.current.name === 'edit-user') {
 
-      $scope.getUser()
-      .then((results) => {
-        //console.log(results); //THIS LINE IS CURSED! IT RETURNS A 400 FROM AN ENTIRELY DIFFERENT CONTROLLER
-        $scope.currentUser.firstName = results.data.firstName;
-        $scope.currentUser.lastName = results.data.lastName;
-        $scope.currentUser.email = results.data.email;
-        $scope.currentUser.birthday = results.data.birthday;
-        $scope.currentUser.address = results.data.address;
-        $scope.currentUser.gender = results.data.gender;
-        $scope.currentUser.role = results.data.role;
-        $scope.currentUser.position = results.data.position;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+        $scope.state = 'edit';
+        $scope.pass = $stateParams.UserId;
 
+        $scope.getUser()
+        .then((results) => {
+          //console.log(results); //THIS LINE IS CURSED! IT RETURNS A 400 FROM AN ENTIRELY DIFFERENT CONTROLLER
+          $scope.currentUser.firstName = results.data.firstName;
+          $scope.currentUser.lastName = results.data.lastName;
+          $scope.currentUser.email = results.data.email;
+          $scope.currentUser.birthday = results.data.birthday;
+          $scope.currentUser.address = results.data.address;
+          $scope.currentUser.gender = results.data.gender;
+          $scope.currentUser.role = results.data.role;
+          $scope.currentUser.position = results.data.position;
+          Authentication.loading = false;
+        })
+        .catch((err) => {
+          Authentication.loading = false;
+          console.log(err);
+        });
+      } else {
+        Authentication.loading = false;
+      }
     };
 
     $scope.submit = function(isValid) {
@@ -72,9 +73,13 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
       //console.log($stateParams.userId);
       return $http.get(window.location.origin + '/api/admin/editUser/' + $stateParams.userId, $scope.header)
       .then((results) => {
+        Authentication.loading = false;
+
         return results;
       })
       .catch((err) => {
+        Authentication.loading = false;
+
         return err;
       });
     };
@@ -115,6 +120,6 @@ angular.module('core').controller('AdminEditCreateController', ['$scope', '$root
         $scope.error = response.message;
       });
     };
-
+    $scope.init();
   }
 ]);

@@ -3,6 +3,8 @@
 angular.module('core').controller('AdminManageUsersController', ['$scope', '$http', 'NgTableParams', '$state', '$stateParams', 'Authentication',
   function($scope, $http, NgTableParams, $state, $stateParams, Authentication) {
 
+    Authentication.loading = true;
+
     $scope.user = Authentication.user;
     console.log('tw user', $scope.user);
 
@@ -49,9 +51,10 @@ angular.module('core').controller('AdminManageUsersController', ['$scope', '$htt
           counts: [], // hides page sizes
           dataset: $scope.allUsers // select data
         });
-
+        Authentication.loading = false;
       })
       .catch((err) => {
+        Authentication.loading = false;
         console.log(err);
       });
     };
