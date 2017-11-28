@@ -51,6 +51,7 @@ exports.allSessionsForSignup = function(req, res) {
     const startTime = new Date(slot._doc.startTime);
     const endTime = new Date(slot._doc.endTime);
     const totalTimePeriod = dateUtils.differenceInMins(startTime, endTime);
+    console.log('tw total time')
     const studyDuration = study.duration;
     const studyDurationMs = studyDuration * 60 * 1000;
     let baseStartTime = startTime.getTime();
@@ -71,6 +72,11 @@ exports.allSessionsForSignup = function(req, res) {
       if (taken) continue;
 
       const newStartTime = new Date(baseStartTime);
+
+      if (newStartTime > endTime) {
+        continue;
+      }
+      
       const newSession = {
         dow: dateUtils.DOWMap(newStartTime.getDay()),
         date: dateUtils.formatMMDDYYYY(newStartTime),
@@ -367,6 +373,8 @@ exports.sessionSignup = function(req, res) {
           const studyStartTime = new Date(slot.startTime);
           const newStartTime = new Date(newSession.startTime);
           const studyEndTime = new Date(slot.endTime);
+          console.log('tw start time vs new start time vs end time', studyStartTime, newStartTime, studyEndTime);
+          console.log('tw start time vs new start time vs end time', studyStartTime.getTime(), newStartTime.getTime(), studyEndTime.getTime());
           console.log('in range', studyStartTime <= newStartTime &&
             newStartTime <= studyEndTime);
           if (studyStartTime <= newStartTime &&

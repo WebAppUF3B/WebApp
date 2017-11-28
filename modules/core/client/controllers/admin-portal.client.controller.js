@@ -59,7 +59,7 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
         $scope.error = '';
         alreadyClicked = true;
 //        console.log('Approved!');
-        $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, $scope.header)
+        $http.put(window.location.origin + '/api/admin/approval/' + $scope.currentUser._id, {} ,$scope.header)
           .then(() => {
             // Reinitialize table
             init();
