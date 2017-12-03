@@ -90,6 +90,14 @@ There are two reset password situations.
 ![Admin Portal Create Users](Feature_Screenshots/pastedimage34.png?raw=true "Admin Portal Create Users Photo")
 
 ## Instructions On How to Run Web Application Locally
-
+The following steps must be performed to run the web application locally:
+1. Clone the repository to obtain the course code using ```git clone https://github.com/WebAppUF3B/WebApp.git```
+2. Install Node version 6.11.3 from https://nodejs.org/download/release/v6.11.3/
+3. Using the command line, move to the directory where the web application was cloned to and run ```npm install```
+4. Add the .env file to the top level of the project (the root of the folder of the web application)
+   - For confidentiality's sake, the .env file is not in the Git repository - the contents of the .env file can be found in the Client Documentation. If further assistance is required, please contact one of the team members listed in the Client Documentation.
+5. From the command line (while stil in the web application folder), run ```npm start```
+After following the instructions, the website will be hosted on http://localhost:5000/
 ## How to Update Database and Server Connections
-
+Currently, the MongoDB database is at: mongodb://ufhcc:ufwebapp3b@ds040017.mlab.com:40017/ufhcc
+To change out the database, one would need to update the MONGOLAB_URI field in the .env file to the new, valid MLab URI.
