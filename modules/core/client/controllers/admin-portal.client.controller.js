@@ -14,6 +14,8 @@ angular.module('core').controller('AdminPortalController', ['$scope', '$http', '
       }
     };
     const init = () => {
+      $('section.ng-scope').css('margin-top', '0px');
+      $('section.ng-scope').css('margin-bottom', '0px');
 
       // All users that need to be confirmed
       $scope.admin.getWaitingUsers()
