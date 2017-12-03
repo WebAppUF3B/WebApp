@@ -89,7 +89,7 @@ There are two reset password situations.
 ### Admin Create Users
 ![Admin Portal Create Users](Feature_Screenshots/pastedimage34.png?raw=true "Admin Portal Create Users Photo")
 
-## Instructions On How to Run Web Application Locally
+## Instructions On How to Run the Web Application Locally
 The following steps must be performed to run the web application locally:
 1. Clone the repository to obtain the course code using ```git clone https://github.com/WebAppUF3B/WebApp.git```
 2. Install Node version 6.11.3 from https://nodejs.org/download/release/v6.11.3/
