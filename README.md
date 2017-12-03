@@ -198,7 +198,7 @@ When creating or editing a new user, the admin is presented with a form that tak
 
 ## Instructions On How to Run the Web Application Locally
 The following steps must be performed to run the web application locally:
-1. Clone the repository to obtain the course code using ```git clone https://github.com/WebAppUF3B/WebApp.git```
+1. Clone the repository to obtain the source code using ```git clone https://github.com/WebAppUF3B/WebApp.git```
 2. Install Node version 6.11.3 from https://nodejs.org/download/release/v6.11.3/
 3. Using the command line, move to the directory where the web application was cloned to and run ```npm install```
 4. Add the .env file to the top level of the project (the root of the folder of the web application)
