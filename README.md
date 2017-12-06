@@ -2,7 +2,7 @@
 ## Deployed Site
 For demo purposes, the site is deployed in the following link (however it was taken down due to the price of keeping it online):
 
-http://ec2-54-175-5-206.compute-1.amazonaws.com:5000/
+http://ec2-34-203-28-156.compute-1.amazonaws.com:5000/
 
 The clients, the researchers of the University of Florida's Human Centered Computing, will be deploying the application on a personal server. However, since the client was out of town when the application was completed, the deployment was still pending at the time this README was completed.
 
