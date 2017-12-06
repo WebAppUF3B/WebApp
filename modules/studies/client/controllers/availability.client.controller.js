@@ -92,23 +92,27 @@ angular.module('studies.session', ['ui.bootstrap','gm.datepickerMultiSelect']).c
       Authentication.loading = true;
       //ensure no timeslots overlap
       for (let x = 0; x<$scope.availability.length; x++) {
-        for (let y = 0; y<$scope.availability.length; y++) {
-          if (x === y) {
-            continue;
-          } else {
-            if ($scope.availability[x].unixDate === $scope.availability[y].unixDate) {
-              const startTimexsplit = $scope.availability[x].startTime;
-              const endTimexsplit = $scope.availability[x].endTime;
-              const startTimeysplit = $scope.availability[y].startTime;
-              const endTimeysplit = $scope.availability[y].endTime;
-              const startTimex = parseFloat(startTimexsplit.substring(0,startTimexsplit.indexOf(':'))+'.'+startTimexsplit.substring(startTimexsplit.indexOf(':')));
-              const endTimex = parseFloat(endTimexsplit.substring(0,endTimexsplit.indexOf(':'))+'.'+endTimexsplit.substring(endTimexsplit.indexOf(':')));
-              const startTimey = parseFloat(startTimeysplit.substring(0,startTimeysplit.indexOf(':'))+'.'+startTimeysplit.substring(startTimeysplit.indexOf(':')));
-              const endTimey = parseFloat(endTimeysplit.substring(0,endTimeysplit.indexOf(':'))+'.'+endTimeysplit.substring(endTimeysplit.indexOf(':')));
-              if ((startTimex>startTimey && startTimex<endTimey) || (endTimex>startTimey && endTimex<endTimey)) {
-                alert('Overlapping Times Detected, Please Check Times');
-                Authentication.loading = false;
-                return;
+        if ($scope.availability[x].startTime === null || $scope.availability[x].endTime === null) {
+          continue;
+        } else {
+          for (let y = 0; y<$scope.availability.length; y++) {
+            if (x === y) {
+              continue;
+            } else {
+              if ($scope.availability[x].unixDate === $scope.availability[y].unixDate) {
+                const startTimexsplit = $scope.availability[x].startTime;
+                const endTimexsplit = $scope.availability[x].endTime;
+                const startTimeysplit = $scope.availability[y].startTime;
+                const endTimeysplit = $scope.availability[y].endTime;
+                const startTimex = parseFloat(startTimexsplit.substring(0,startTimexsplit.indexOf(':'))+'.'+startTimexsplit.substring(startTimexsplit.indexOf(':')));
+                const endTimex = parseFloat(endTimexsplit.substring(0,endTimexsplit.indexOf(':'))+'.'+endTimexsplit.substring(endTimexsplit.indexOf(':')));
+                const startTimey = parseFloat(startTimeysplit.substring(0,startTimeysplit.indexOf(':'))+'.'+startTimeysplit.substring(startTimeysplit.indexOf(':')));
+                const endTimey = parseFloat(endTimeysplit.substring(0,endTimeysplit.indexOf(':'))+'.'+endTimeysplit.substring(endTimeysplit.indexOf(':')));
+                if ((startTimex>startTimey && startTimex<endTimey) || (endTimex>startTimey && endTimex<endTimey)) {
+                  alert('Overlapping Times Detected, Please Check Times');
+                  Authentication.loading = false;
+                  return;
+                }
               }
             }
           }

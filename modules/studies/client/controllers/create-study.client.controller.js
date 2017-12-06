@@ -219,6 +219,8 @@ angular.module('studies.study').controller('StudyController', ['$scope', '$rootS
       if (!isValid) {
         $scope.$broadcast('show-errors-check-validity', 'studyForm');
         $scope.error = 'Please fill in all required fields.';
+        if ($scope.compensatemodel.length === 0) $('.needs-validation').addClass('highlight-error');
+        Authentication.loading = false;
         return false;
       }
       //populate research list from multiselect dropbox
