@@ -10,14 +10,9 @@
     "type": "git",
     "url": "https://github.com/meanjs/mean.git"
   },
-  "engines": {
-    "node": "6.x.x",
-    "npm": ">=1.4.28"
-  },
   "scripts": {
     "start": "grunt build && grunt --force",
-    "test": "grunt test",
-    "postinstall": "bower install --config.interactive=false"
+    "test": "grunt test"
   },
   "dependencies": {
     "acl": "~0.4.4",
