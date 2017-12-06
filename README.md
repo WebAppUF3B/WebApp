@@ -1,6 +1,6 @@
 # Human Centered Computing Research Subject Pool
 ## Deployed Site
-For demo purposes, the site is deployed in the following link (however it was taken down due to the price of keeping it online):
+For demo purposes, the site is deployed in the following link:
 
 http://ec2-34-203-28-156.compute-1.amazonaws.com:5000/
 
